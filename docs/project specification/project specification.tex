@@ -1,6 +1,5 @@
 \documentclass[10pt, a4paper]{article}
 
-
 \usepackage{appendix}
 \usepackage{graphicx}
 \usepackage{parskip}
@@ -30,8 +29,6 @@
 
 \graphicspath{{Images/}}
 
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -44,7 +41,6 @@ The aim of the project is to design and build an autonomous rover system that co
     \centering
     \includegraphics[scale=0.8]{Rover.JPG}
 \end{figure}
-
 
 The rover will have the following main functionalities:
 \begin{itemize}
@@ -82,22 +78,116 @@ The rover will have the following main functionalities:
 
 The Mars Rover project is composed of six submodules which are managed by each individual member of the team. 
 
-\subsection{EEE: Drive}
+\subsection{EEE: Drive (Alyson)}
 
-\subsection{EEE: Energy}
+Drive subsystem handles the movement of the rover, parts including the frame, motors and optical flow sensor.
 
-\subsection{EEE: Integration}
+Responsibilities:
+\begin{itemize}
+    \item Direction control
+    \item Distance measurement
+    \item Speed control 
+    \item Turning method 
+\end{itemize}
 
-\subsection{EIE: Command}
+\subsection{EEE: Energy (Ivy)}
 
-\subsection{EIE: Control}
+Energy subsystem handles the power system of the rover, provided through the solar panels.
 
-\subsection{EIE: Vision}
+Responsibilities:
+\begin{itemize}
+    \item Battery charge profile design 
+    \item Battery charge status estimation 
+    \item Battery balancing algorithms 
+    \item Charge batteries 
+    \item Prevent explosion/melt
+    \item PV MMPT algorithm
+\end{itemize}
+
+\subsection{EEE: Integration (Izzah)}
+
+Combines the subsystems of the rover together.
+
+Responsibilities:
+\begin{itemize}
+    \item Developing the central processor of the rover and ensuring correct functionality of all sub-systems.
+    \item Manage communications between the onboard rover systems and the cloud command processes.
+    \item Build, maintain and assist in debugging the other modules. 
+\end{itemize}
+
+\subsection{EIE: Command (Xin)}
+
+Allows remote control of the rover by connecting to the control subsystem and accessible via a web browser/mobile app.
+
+Responsibilities:
+\begin{itemize}
+    \item  Create a web or mobile dashboard to control the rover remotely and receive information from the different subsystems. 
+\end{itemize}
+
+\subsection{EIE: Control (Igor)}
+
+Using ESP32 microcontroller, handles communication with all the subsystems via different communication protocols. The ESP32 will have a unique IP address and will be used as an access point.
+
+Responsibilities:
+\begin{itemize}
+    \item  Communication management between:
+    \begin{itemize}
+        \item Motors 
+        \item FPGA 
+        \item Cloud command 
+        \item Charging station 
+    \end{itemize}
+\end{itemize}
+
+\subsection{EIE: Vision (Ebby)}
+
+Enables the rover to detect and avoid obstacles to achieve its target destination. 
+
+Responsibilities:
+\begin{itemize}
+    \item  Use on-board vision and software to identify obstructions and objects of interest such as:
+    \begin{itemize}
+        \item Move the robot around the terrain according to instructions from cloud command.
+        \item Avoiding obstructions.   
+        \item Closed loop monitoring of position.   
+        \item Sending commands to the motor control. 
+    \end{itemize}
+\end{itemize}
+
+\pagebreak
+
+\section{Project management}
+
+Due to the nature of the sub-systems, module development are relatively independent. Particular care should be placed on the following sub-systems:
+\begin{itemize}
+    \item Command (EIE) 
+    \item Control (EIE)
+    \item Integration (EEE)
+\end{itemize}
+as it handles the end-points and data flow of the systems.
+
+\begin{figure} [h!]
+    \centering
+    \includegraphics[scale=0.6]{project heirarchy.png}
+    \caption{Project sub-system hierarchy}
+\end{figure}
+
+Project sub-system heirarchy represents the different layers in the rover system that each handles different aspects that brings the overall system together. Any changes in the base layers needs to notify the respective upper layers to ensure compatibility is met.
+
+\begin{itemize}  
+    \item \textbf{User-interface level}: Responsible for the user experience aspect of the rover system and, ensuring a stable and seamless communication link between the rover and user interface. 
+    
+    \item \textbf{Data management level}: Serves as the bridge between the user and the functional sub-systems. 
+    
+    \textit{Integration} serves as the oversight component of the Operations level, providing neccessary support and communication between all the respective modules. This module also ensures and records all testing done in each of the sub-systems.
+
+    \item \textbf{Operations level}: Critical in ensuring correct rover operation in each of their respective domains. 
+\end{itemize}
 
 
 
 
- 
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
