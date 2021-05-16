@@ -13,3 +13,5 @@ docs/project report/Group 18 project report.bcf
 docs/project report/Group 18 project report.bbl
 docs/project report/Group 18 project report.aux
 docs/project report/Group 18 project report.toc
+src/server/__pycache__
+src/server/.vscode/settings.json
