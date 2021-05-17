@@ -20,11 +20,10 @@ PORT = int(environ.get("PORT"))
 URL = "ws://" + HOST + ":" + str(PORT)
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
-
 sio = AsyncServer(async_mode="asgi", cors_allowed_origins="*")
 socket_app = ASGIApp(sio)
 
-
+# Serve website
 @app.get("/")
 def root(request: Request):
     """ Serves the rover command page """
@@ -46,5 +45,6 @@ app.mount("/", socket_app)
 
 """
 
+# Run server
 if __name__ == "__main__":
     run('server:app', host=HOST, port=PORT)
