@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<preferences>
+ <debug showDebugMenu="0" />
+ <systemtable filter="All Interfaces">
+  <columns>
+   <connections preferredWidth="319" />
+   <irq preferredWidth="34" />
+   <name preferredWidth="201" />
+   <export preferredWidth="267" />
+  </columns>
+ </systemtable>
+ <library
+   expandedCategories="Project,Library/University Program/Communications,Library/Interface Protocols,Library/University Program,Library,Library/Interface Protocols/Serial" />
+ <window width="1971" height="1159" x="8" y="31" />
+</preferences>
