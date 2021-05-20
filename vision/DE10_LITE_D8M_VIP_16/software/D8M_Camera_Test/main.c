@@ -22,14 +22,14 @@
 
 //offsets
 #define EEE_IMGPROC_STATUS 0
-#define EEE_IMGPROC_MSG 1
-#define EEE_IMGPROC_ID 2
-#define EEE_IMGPROC_BBCOL 3
+#define EEE_IMGPROC_MSG    1
+#define EEE_IMGPROC_ID     2
+#define EEE_IMGPROC_BBCOL  3
 
-#define EXPOSURE_INIT 0x002000
-#define EXPOSURE_STEP 0x100
-#define GAIN_INIT 0x080
-#define GAIN_STEP 0x040
+#define EXPOSURE_INIT 0x0FFEFF
+#define EXPOSURE_STEP 0x1000
+#define GAIN_INIT     0x033F
+#define GAIN_STEP     0x040
 #define DEFAULT_LEVEL 3
 
 #define MIPI_REG_PHYClkCtl		0x0056
@@ -38,27 +38,27 @@
 #define MIPI_REG_PHYData2Ctl	0x005C
 #define MIPI_REG_PHYData3Ctl	0x005E
 #define MIPI_REG_PHYTimDly		0x0060
-#define MIPI_REG_PHYSta			0x0062
+#define MIPI_REG_PHYSta			  0x0062
 #define MIPI_REG_CSIStatus		0x0064
-#define MIPI_REG_CSIErrEn		0x0066
+#define MIPI_REG_CSIErrEn	  	0x0066
 #define MIPI_REG_MDLSynErr		0x0068
 #define MIPI_REG_FrmErrCnt		0x0080
 #define MIPI_REG_MDLErrCnt		0x0090
 
 void mipi_clear_error(void){
-	MipiBridgeRegWrite(MIPI_REG_CSIStatus,0x01FF); // clear error
+  MipiBridgeRegWrite(MIPI_REG_CSIStatus,0x01FF); // clear error
 	MipiBridgeRegWrite(MIPI_REG_MDLSynErr,0x0000); // clear error
 	MipiBridgeRegWrite(MIPI_REG_FrmErrCnt,0x0000); // clear error
 	MipiBridgeRegWrite(MIPI_REG_MDLErrCnt, 0x0000); // clear error
 
-  	MipiBridgeRegWrite(0x0082,0x00);
-  	MipiBridgeRegWrite(0x0084,0x00);
-  	MipiBridgeRegWrite(0x0086,0x00);
-  	MipiBridgeRegWrite(0x0088,0x00);
-  	MipiBridgeRegWrite(0x008A,0x00);
-  	MipiBridgeRegWrite(0x008C,0x00);
-  	MipiBridgeRegWrite(0x008E,0x00);
-  	MipiBridgeRegWrite(0x0090,0x00);
+  MipiBridgeRegWrite(0x0082,0x00);
+	MipiBridgeRegWrite(0x0084,0x00);
+	MipiBridgeRegWrite(0x0086,0x00);
+	MipiBridgeRegWrite(0x0088,0x00);
+	MipiBridgeRegWrite(0x008A,0x00);
+	MipiBridgeRegWrite(0x008C,0x00);
+	MipiBridgeRegWrite(0x008E,0x00);
+	MipiBridgeRegWrite(0x0090,0x00);
 }
 
 void mipi_show_error_info(void){
@@ -70,6 +70,7 @@ void mipi_show_error_info(void){
 	MDLSynErr = MipiBridgeRegRead(MIPI_REG_MDLSynErr);
 	FrmErrCnt = MipiBridgeRegRead(MIPI_REG_FrmErrCnt);
 	MDLErrCnt = MipiBridgeRegRead(MIPI_REG_MDLErrCnt);
+
 	printf("PHY_status=%xh, CSI_status=%xh, MDLSynErr=%xh, FrmErrCnt=%xh, MDLErrCnt=%xh\r\n", PHY_status, SCI_status, MDLSynErr,FrmErrCnt, MDLErrCnt);
 }
 
@@ -89,35 +90,22 @@ void mipi_show_error_info_more(void){
 }
 
 bool MIPI_Init(void){
-	bool bSuccess;
 
+		bool bSuccess;
 
-	bSuccess = oc_i2c_init_ex(I2C_OPENCORES_MIPI_BASE, 50*1000*1000,400*1000); //I2C: 400K
-	if (!bSuccess)
-		printf("failed to init MIPI- Bridge i2c\r\n");
+		bSuccess = oc_i2c_init_ex(I2C_OPENCORES_MIPI_BASE, 50*1000*1000,400*1000); //I2C: 400K
+		if (!bSuccess)
+				printf("failed to init MIPI- Bridge i2c\r\n");
 
     usleep(50*1000);
     MipiBridgeInit();
 
     usleep(500*1000);
-
-//	bSuccess = oc_i2c_init_ex(I2C_OPENCORES_CAMERA_BASE, 50*1000*1000,400*1000); //I2C: 400K
-//	if (!bSuccess)
-//		printf("failed to init MIPI- Camera i2c\r\n");
-
     MipiCameraInit();
     MIPI_BIN_LEVEL(DEFAULT_LEVEL);
-//    OV8865_FOCUS_Move_to(340);
 
-//    oc_i2c_uninit(I2C_OPENCORES_CAMERA_BASE);  // Release I2C bus , due to two I2C master shared!
-
-
- 	usleep(1000);
-
-
-//    oc_i2c_uninit(I2C_OPENCORES_MIPI_BASE);
-
-	return bSuccess;
+ 		usleep(1000);
+		return bSuccess;
 }
 
 
@@ -139,17 +127,14 @@ int main(){
 		FILE* ctrl_uart;
 	  ctrl_uart = fopen("/dev/control_uart", "r+");
 
-		fprintf(ctrl_uart, "This message is meant for control from outside the loop.\n");
+		fprintf(ctrl_uart, "Starting control uart...\n");
+		printf("Started control uart...\n");
 
 	  usleep(2000);
 
-
 		// MIPI Init
-		if (!MIPI_Init()){
-			printf("MIPI_Init Init failed!\r\n");
-		}else{
-			printf("MIPI_Init Init successfully!\r\n");
-		}
+		if (!MIPI_Init()){ printf("MIPI_Init failed!\r\n"); }
+		else{ printf("MIPI_Init successful!\r\n"); }
 
 		mipi_clear_error();
 		usleep(50*1000);
@@ -158,12 +143,11 @@ int main(){
 		mipi_show_error_info();
 
 		//////////////////////////////////////////////////////////
-		alt_u16 bin_level = DEFAULT_LEVEL;
 		alt_u8  manual_focus_step = 10;
-		alt_u16  current_focus = 300;
-		int boundingBoxColour = 0;
-		alt_u32 exposureTime = EXPOSURE_INIT;
-		alt_u16 gain = GAIN_INIT;
+		alt_u16 current_focus     = 300;
+		int     boundingBoxColour = 0;
+		alt_u32 exposureTime      = EXPOSURE_INIT;
+		alt_u16 gain              = GAIN_INIT;
 
 		OV8865SetExposure(exposureTime);
 		OV8865SetGain(gain);
@@ -171,7 +155,7 @@ int main(){
 
 		while(1){
 
-				fprintf(ctrl_uart, "This message is meant for control from inside the loop.\n");
+				fprintf(ctrl_uart, "Looping message to control.\n");
 
 				// touch KEY0 to trigger Auto focus
 				if((IORD(KEY_BASE,0)&0x03) == 0x02){ current_focus = Focus_Window(320,240); }
@@ -182,7 +166,7 @@ int main(){
 						if (word == EEE_IMGPROC_MSG_START){ 					//Newline on message identifier
 								printf("\n");
 						}
-						printf("%08x ",word);
+						printf("%08x ", (word&0x7FF)-((word>>16)&0x7FF));
 				}
 
        //Update the bounding box colour

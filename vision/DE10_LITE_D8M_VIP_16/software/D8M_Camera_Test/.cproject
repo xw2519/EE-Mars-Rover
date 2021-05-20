@@ -12,6 +12,11 @@
 							<targetPlatform id="altera.nios2.mingw.gcc4.1269419812" name="Nios II" superClass="altera.nios2.mingw.gcc4"/>
 							<builder buildPath="${workspace_loc://D8M_Camera_Test}" id="altera.tool.gnu.builder.mingw.49071199" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="altera.tool.gnu.builder.mingw"/>
 							<tool id="altera.tool.gnu.c.compiler.mingw.1481046436" name="Nios II GCC C Compiler" superClass="altera.tool.gnu.c.compiler.mingw">
+								<option id="gnu.c.compiler.option.include.paths.2083496786" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/D8M_Camera_Test_bsp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/D8M_Camera_Test_bsp/drivers/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/D8M_Camera_Test_bsp/HAL/inc}&quot;"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.586658978" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="altera.tool.gnu.cpp.compiler.mingw.1510030252" name="Nios II GCC C++ Compiler" superClass="altera.tool.gnu.cpp.compiler.mingw">
@@ -79,5 +84,10 @@
 				<runAllBuilders>false</runAllBuilders>
 			</target>
 		</buildTargets>
+	</storageModule>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Nios II">
+			<resource resourceType="PROJECT" workspacePath="/D8M_Camera_Test"/>
+		</configuration>
 	</storageModule>
 </cproject>
