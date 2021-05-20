@@ -1,0 +1,63 @@
+body {
+  margin: 0;
+  overflow: hidden;
+  height: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+}
+ 
+div {
+  outline: 2px dashed blue;
+}
+
+ /* Property definitions */
+
+/* Navigation buttons definitions */
+#Up-button{
+  position: relative;
+  border-radius: 1rem;
+  border: solid 5px #AE3244;
+  text-decoration: none;
+  color: #AE3244;
+  background-color: #FEFEFE;
+  text-align: center;
+}
+
+#Down-button{
+  position: relative;
+  border-radius: 1rem;
+  border: solid 5px #AE3244;
+  text-decoration: none;
+  color: #AE3244;
+  background-color: #FEFEFE;
+  text-align: center;
+}
+
+#Left-button{
+  position: relative;
+  border-radius: 1rem;
+  border: solid 5px #AE3244;
+  text-decoration: none;
+  color: #AE3244;
+  background-color: #FEFEFE;
+  text-align: center;
+}
+
+#Right-button{
+  position: relative;
+  border-radius: 1rem;
+  border: solid 5px #AE3244;
+  text-decoration: none;
+  color: #AE3244;
+  background-color: #FEFEFE;
+  text-align: center;
+}
+
+#Halt-button{
+  position: relative;
+  border-radius: 1rem;
+  border: solid 5px #AE3244;
+  text-decoration: none;
+  color: #AE3244;
+  background-color: #FEFEFE;
+  text-align: center;
+}
