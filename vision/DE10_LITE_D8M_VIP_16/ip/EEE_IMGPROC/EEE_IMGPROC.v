@@ -2,7 +2,6 @@ module EEE_IMGPROC(
 	// global clock & reset
 	input clk,
 	input reset_n,
-
 	// mm slave
 	input             s_chipselect,
 	input             s_read,
@@ -10,21 +9,18 @@ module EEE_IMGPROC(
 	output reg [31:0] s_readdata,
 	input	     [31:0] s_writedata,
 	input	      [2:0] s_address,
-
 	// stream sink
 	input [23:0] sink_data,
 	input        sink_valid,
 	output       sink_ready,
 	input        sink_sop,
 	input        sink_eop,
-
 	// streaming source
 	output [23:0] source_data,
 	output        source_valid,
 	input         source_ready,
 	output        source_sop,
 	output        source_eop,
-
 	// conduit
 	input mode
 );
@@ -34,7 +30,7 @@ module EEE_IMGPROC(
 parameter IMAGE_W = 11'd640;
 parameter IMAGE_H = 11'd480;
 parameter MESSAGE_BUF_MAX = 256;
-parameter MSG_INTERVAL = 6;
+parameter MSG_INTERVAL = 60;
 parameter BB_COL_DEFAULT = 24'h00ff00;
 
 wire [7:0]   red, green, blue, grey;
@@ -42,34 +38,49 @@ wire [7:0]   red_out, green_out, blue_out;
 
 wire         sop, eop, in_valid, out_ready;
 
-////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////// - Detect ball pixels, generate VGA output
 
-// Detect red areas
-wire red_detect;
-assign red_detect = (red>(green+30)) & (red>(blue+40));
-
+assign grey = green[7:1] + red[7:2] + blue[7:2];
+// Detect ball pixels
+wire   ball_detect;
+assign ball_detect = (red>=192)&(green<128)&(blue<128);
 
 // Highlight detected areas
-wire [23:0] red_high;
-assign grey = green[7:1] + red[7:2] + blue[7:2]; //Grey = green/2 + red/4 + blue/4
-
-//assign red_high  =  red_detect ? {8'hff, 8'h0, 8'h0} : {grey, grey, grey};
-assign red_high = ((red>green+16)&(red>blue+16)) ? {8'hff, 8'h0, 8'h0} :
+wire [23:0] ball_high;
+/*
+assign ball_high = ((red>green+16)&(red>blue+16)) ? {8'hff, 8'h0, 8'h0} :
  ((green>red+16)&(green>blue+16)) ? {8'h0, 8'hff, 8'h0} :
  ((blue>red+16)&(blue>green+16)) ? {8'h0, 8'h0, 8'hff} :
  {8'h0, 8'h0, 8'h0};
+*/
+/*
+assign ball_high = ((red>=56)&(green<64)&(blue<32)) ? {8'hff, 8'h0, 8'h0} :
+ ((red>=192)&(green<128)&(blue<128)) ? {8'hcc, 8'h0, 8'hcc} :
+ ((red<64)&(green>=64)&(blue>=64)) ? {8'h0, 8'hcc, 8'hcc} :
+ ((red<32)&(green<32)&(blue>=32)) ? {8'h0, 8'h0, 8'hff} :
+ ((red>=192)&(green>=192)&(blue<128)) ? {8'hcc, 8'hcc, 8'h0} :
+ {8'h0, 8'h0, 8'h0};
+*/
+/*
+assign ball_high = (red>=240) ? {8'hff, 8'h0, 8'h0} :
+(green>=240) ? {8'h0, 8'hff, 8'h0} :
+(blue>=240) ? {8'h0, 8'h0, 8'hff} :
+ {8'h0, 8'h0, 8'h0};
+*/
+assign ball_high = {grey, grey, grey};
 
 // Show bounding box
 wire [23:0] new_image;
 wire bb_active;
 assign bb_active = (x == left) | (x == right) | (y == top) | (y == bottom);
-assign new_image = bb_active ? bb_col : red_high;
+assign new_image = bb_active ? bb_col : ball_high;
 
 // Switch output pixels depending on mode switch
 // Don't modify the start-of-packet word - it's a packet discriptor
 // Don't modify data in non-video packets
 assign {red_out, green_out, blue_out} = (mode & ~sop & packet_video) ? new_image : {red,green,blue};
 
+//////////////////////////////////////////////////////////////////////// - Generate image coordinates
 
 //Count valid pixels to get the image coordinates. Reset and detect packet type on Start of Packet.
 reg [10:0] x, y;
@@ -91,11 +102,12 @@ always@(posedge clk) begin
 	end
 end
 
+////////////////////////////////////////////////////////////////////////
 
-//Find first and last red pixels
+//Find first and last pixels with balls
 reg [10:0] x_min, y_min, x_max, y_max;
 always@(posedge clk) begin
-	if (red_detect & in_valid) begin	//Update bounds when the pixel is red
+	if (ball_detect & in_valid) begin	//Update bounds when the pixel is red
 		if (x < x_min) x_min <= x;
 		if (x > x_max) x_max <= x;
 		if (y < y_min) y_min <= y;
@@ -109,34 +121,59 @@ always@(posedge clk) begin
 	end
 end
 
+reg [IMAGE_W-1:0] ball_in_col;
+always @(posedge clk) begin
+	if(sop & in_valid) begin
+		ball_in_col <= 0;
+	end
+	if(ball_detect & in_valid) begin
+		ball_in_col[x] <= 1;
+	end
+end
+
+reg in_ball, send_msg;
+reg [10:0] ball_min, ball_max;
+always@(posedge clk) begin
+	if (in_valid&(y == IMAGE_H-1)&packet_video) begin
+		in_ball <= ball_in_col[x];
+		if((in_ball==0) & (ball_in_col[x]==1)) begin
+			ball_min <= x;
+		end
+		if((in_ball==1) & (ball_in_col[x]==0)) begin
+			ball_max <= x;
+			send_msg <= 1;
+		end
+	end
+	else if(in_valid&packet_video) begin
+		in_ball <= 0;
+	end
+	if(send_msg) begin
+		send_msg <= 0;
+	end
+end
+
+////////////////////////////////////////////////////////////////////////
 
 //Process bounding box at the end of the frame.
-reg [1:0] msg_state;
 reg [10:0] left, right, top, bottom;
 reg [7:0] frame_count;
 always@(posedge clk) begin
 	if (eop & in_valid & packet_video) begin  //Ignore non-video packets
-
 		//Latch edges for display overlay on next frame
 		left <= x_min;
 		right <= x_max;
 		top <= y_min;
 		bottom <= y_max;
 
-
 		//Start message writer FSM once every MSG_INTERVAL frames, if there is room in the FIFO
 		frame_count <= frame_count - 1;
-
 		if (frame_count == 0 && msg_buf_size < MESSAGE_BUF_MAX - 3) begin
-			msg_state <= 2'b01;
 			frame_count <= MSG_INTERVAL-1;
 		end
 	end
-
-	//Cycle through message writer states once started
-	if (msg_state != 2'b00) msg_state <= msg_state + 2'b01;
-
 end
+
+////////////////////////////////////////////////////////////////////////
 
 //Generate output messages for CPU
 reg [31:0] msg_buf_in;
@@ -146,29 +183,12 @@ wire msg_buf_rd, msg_buf_flush;
 wire [7:0] msg_buf_size;
 wire msg_buf_empty;
 
-`define RED_BOX_MSG_ID "RBB"
-
-always@(*) begin	//Write words to FIFO as state machine advances
-	case(msg_state)
-		2'b00: begin
-			msg_buf_in = 32'b0;
-			msg_buf_wr = 1'b0;
-		end
-		2'b01: begin
-			msg_buf_in = `RED_BOX_MSG_ID;	//Message ID
-			msg_buf_wr = 1'b1;
-		end
-		2'b10: begin
-			msg_buf_in = {5'b0, x_min, 5'b0, x_max};	//horizontal limits
-			msg_buf_wr = 1'b1;
-		end
-		2'b11: begin
-			msg_buf_in = {5'b0, y_min, 5'b0, y_max}; //vertical limits
-			msg_buf_wr = 1'b1;
-		end
-	endcase
+always@(*) begin
+	msg_buf_in = {10'h0, ball_min, ball_max};
+	msg_buf_wr = send_msg  & (frame_count==0) & (msg_buf_size < MESSAGE_BUF_MAX);
 end
 
+////////////////////////////////////////////////////////////////////////
 
 //Output message FIFO
 MSG_FIFO	MSG_FIFO_inst (

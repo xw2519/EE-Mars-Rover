@@ -1,0 +1,14 @@
+- added uart over IO0 and IO1 to communicate with control subsystem.
+- Set camera to always use maximum zoom and maximum exposure,
+could implement variable exposure and gain later.
+- Detect balls using colours.
+- Exploit the fact that the environment is a flat plane.
+Only need to use x coordinates of beginning and end of balls.
+- Need sine to determine distance from obstacles,
+using fixed point approximation instead of sending data to command
+to reduce latency.
+
+- How to find balls:
+Yellow : Find places where "green[7:1] + red[7:2] + blue[7:2]" is large.
+Pink : ((red>=192)&(green<128)&(blue<128)) or similar has to be true.
+Blue : ((red<32)&(green<32)&(blue>=32)) finds darker areas.

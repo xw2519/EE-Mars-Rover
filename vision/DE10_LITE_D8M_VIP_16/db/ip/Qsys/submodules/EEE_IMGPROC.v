@@ -34,7 +34,7 @@ module EEE_IMGPROC(
 parameter IMAGE_W = 11'd640;
 parameter IMAGE_H = 11'd480;
 parameter MESSAGE_BUF_MAX = 256;
-parameter MSG_INTERVAL = 6;
+parameter MSG_INTERVAL = 60;
 parameter BB_COL_DEFAULT = 24'h00ff00;
 
 wire [7:0]   red, green, blue, grey;
@@ -42,34 +42,45 @@ wire [7:0]   red_out, green_out, blue_out;
 
 wire         sop, eop, in_valid, out_ready;
 
-////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////// - Detect ball pixels, generate VGA output
 
 // Detect red areas
-wire red_detect;
-assign red_detect = (red>(green+30)) & (red>(blue+40));
-
-
+wire red_detect, ball_detect;
+assign red_detect = ((red>=192)&(green<128)&(blue<128));
+assign ball_detect = ((red>=56)&(green<64)&(blue<32))|((red>=192)&(green<128)&(blue<128));
 // Highlight detected areas
-wire [23:0] red_high;
-assign grey = green[7:1] + red[7:2] + blue[7:2]; //Grey = green/2 + red/4 + blue/4
 
-//assign red_high  =  red_detect ? {8'hff, 8'h0, 8'h0} : {grey, grey, grey};
-assign red_high = ((red>green+16)&(red>blue+16)) ? {8'hff, 8'h0, 8'h0} :
- ((green>red+16)&(green>blue+16)) ? {8'h0, 8'hff, 8'h0} :
- ((blue>red+16)&(blue>green+16)) ? {8'h0, 8'h0, 8'hff} :
+assign grey = green[7:1] + red[7:2] + blue[7:2];
+
+wire [23:0] ball_high;
+/*
+assign ball_high = ((red>=56)&(green<64)&(blue<32)) ? {8'hff, 8'h0, 8'h0} :
+ ((red>=192)&(green<128)&(blue<128)) ? {8'hcc, 8'h0, 8'hcc} :
+ ((red<64)&(green>=64)&(blue>=64)) ? {8'h0, 8'hcc, 8'hcc} :
+ ((red<32)&(green<32)&(blue>=32)) ? {8'h0, 8'h0, 8'hff} :
+ ((red>=192)&(green>=192)&(blue<128)) ? {8'hcc, 8'hcc, 8'h0} :
  {8'h0, 8'h0, 8'h0};
+*/
+/*
+assign ball_high = (red>=240) ? {8'hff, 8'h0, 8'h0} :
+(green>=240) ? {8'h0, 8'hff, 8'h0} :
+(blue>=240) ? {8'h0, 8'h0, 8'hff} :
+ {8'h0, 8'h0, 8'h0};
+*/
+assign ball_high = {grey, grey, grey};
 
 // Show bounding box
 wire [23:0] new_image;
 wire bb_active;
 assign bb_active = (x == left) | (x == right) | (y == top) | (y == bottom);
-assign new_image = bb_active ? bb_col : red_high;
+assign new_image = bb_active ? bb_col : ball_high;
 
 // Switch output pixels depending on mode switch
 // Don't modify the start-of-packet word - it's a packet discriptor
 // Don't modify data in non-video packets
 assign {red_out, green_out, blue_out} = (mode & ~sop & packet_video) ? new_image : {red,green,blue};
 
+//////////////////////////////////////////////////////////////////////// - Generate image coordinates
 
 //Count valid pixels to get the image coordinates. Reset and detect packet type on Start of Packet.
 reg [10:0] x, y;
@@ -91,6 +102,7 @@ always@(posedge clk) begin
 	end
 end
 
+////////////////////////////////////////////////////////////////////////
 
 //Find first and last red pixels
 reg [10:0] x_min, y_min, x_max, y_max;
@@ -109,6 +121,36 @@ always@(posedge clk) begin
 	end
 end
 
+reg [IMAGE_W-1:0] ball_in_col;
+always @(posedge clk) begin
+	if(sop & in_valid) begin
+		ball_in_col <= 0;
+	end
+	if(ball_detect & in_valid) begin
+		ball_in_col[x] <= 1;
+	end
+end
+
+reg in_ball, send_msg;
+reg [10:0] ball_min, ball_max;
+always@(posedge clk) begin
+	if (in_valid&(y == IMAGE_H-1)&packet_video) begin
+		in_ball <= ball_in_col[x];
+		if((in_ball==0) & (ball_in_col[x]==1)) begin
+			ball_min <= x;
+		end
+		if((in_ball==1) & (ball_in_col[x]==0)) begin
+			ball_max <= x;
+			send_msg <= 1;
+		end
+	end
+	else if(in_valid&packet_video) begin
+		in_ball <= 0;
+	end
+	if(send_msg) begin
+		send_msg <= 0;
+	end
+end
 
 //Process bounding box at the end of the frame.
 reg [1:0] msg_state;
@@ -146,6 +188,12 @@ wire msg_buf_rd, msg_buf_flush;
 wire [7:0] msg_buf_size;
 wire msg_buf_empty;
 
+always@(*) begin
+	msg_buf_in = {10'h0, ball_min, ball_max};
+	msg_buf_wr = send_msg  & (frame_count==0) & (msg_buf_size < MESSAGE_BUF_MAX);
+end
+
+/*
 `define RED_BOX_MSG_ID "RBB"
 
 always@(*) begin	//Write words to FIFO as state machine advances
@@ -168,7 +216,7 @@ always@(*) begin	//Write words to FIFO as state machine advances
 		end
 	endcase
 end
-
+*/
 
 //Output message FIFO
 MSG_FIFO	MSG_FIFO_inst (
