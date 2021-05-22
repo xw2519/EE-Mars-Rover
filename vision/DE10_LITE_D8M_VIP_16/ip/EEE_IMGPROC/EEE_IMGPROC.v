@@ -40,34 +40,14 @@ wire         sop, eop, in_valid, out_ready;
 
 //////////////////////////////////////////////////////////////////////// - Detect ball pixels, generate VGA output
 
-assign grey = green[7:1] + red[7:2] + blue[7:2];
+assign grey = red[7:1] + green[7:2] + blue[7:2];
 // Detect ball pixels
 wire   ball_detect;
-assign ball_detect = (red>=192)&(green<128)&(blue<128);
+assign ball_detect = ((red>=160)|(green>=192)|(blue>=128));
 
 // Highlight detected areas
 wire [23:0] ball_high;
-/*
-assign ball_high = ((red>green+16)&(red>blue+16)) ? {8'hff, 8'h0, 8'h0} :
- ((green>red+16)&(green>blue+16)) ? {8'h0, 8'hff, 8'h0} :
- ((blue>red+16)&(blue>green+16)) ? {8'h0, 8'h0, 8'hff} :
- {8'h0, 8'h0, 8'h0};
-*/
-/*
-assign ball_high = ((red>=56)&(green<64)&(blue<32)) ? {8'hff, 8'h0, 8'h0} :
- ((red>=192)&(green<128)&(blue<128)) ? {8'hcc, 8'h0, 8'hcc} :
- ((red<64)&(green>=64)&(blue>=64)) ? {8'h0, 8'hcc, 8'hcc} :
- ((red<32)&(green<32)&(blue>=32)) ? {8'h0, 8'h0, 8'hff} :
- ((red>=192)&(green>=192)&(blue<128)) ? {8'hcc, 8'hcc, 8'h0} :
- {8'h0, 8'h0, 8'h0};
-*/
-/*
-assign ball_high = (red>=240) ? {8'hff, 8'h0, 8'h0} :
-(green>=240) ? {8'h0, 8'hff, 8'h0} :
-(blue>=240) ? {8'h0, 8'h0, 8'hff} :
- {8'h0, 8'h0, 8'h0};
-*/
-assign ball_high = {grey, grey, grey};
+assign ball_high = ((red>=160)|(green>=192)|(blue>=128)) ? {8'hdd, 8'hdd, 8'hdd} : {8'h0, 8'h0, 8'h0};
 
 // Show bounding box
 wire [23:0] new_image;

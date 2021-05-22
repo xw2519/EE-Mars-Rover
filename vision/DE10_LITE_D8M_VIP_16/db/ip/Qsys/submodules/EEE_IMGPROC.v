@@ -2,7 +2,6 @@ module EEE_IMGPROC(
 	// global clock & reset
 	input clk,
 	input reset_n,
-
 	// mm slave
 	input             s_chipselect,
 	input             s_read,
@@ -10,21 +9,18 @@ module EEE_IMGPROC(
 	output reg [31:0] s_readdata,
 	input	     [31:0] s_writedata,
 	input	      [2:0] s_address,
-
 	// stream sink
 	input [23:0] sink_data,
 	input        sink_valid,
 	output       sink_ready,
 	input        sink_sop,
 	input        sink_eop,
-
 	// streaming source
 	output [23:0] source_data,
 	output        source_valid,
 	input         source_ready,
 	output        source_sop,
 	output        source_eop,
-
 	// conduit
 	input mode
 );
@@ -44,15 +40,19 @@ wire         sop, eop, in_valid, out_ready;
 
 //////////////////////////////////////////////////////////////////////// - Detect ball pixels, generate VGA output
 
-// Detect red areas
-wire red_detect, ball_detect;
-assign red_detect = ((red>=192)&(green<128)&(blue<128));
-assign ball_detect = ((red>=56)&(green<64)&(blue<32))|((red>=192)&(green<128)&(blue<128));
+assign grey = red[7:1] + green[7:2] + blue[7:2];
+// Detect ball pixels
+wire   ball_detect;
+assign ball_detect = ((red>=160)|(green>=192)|(blue>=128));
+
 // Highlight detected areas
-
-assign grey = green[7:1] + red[7:2] + blue[7:2];
-
 wire [23:0] ball_high;
+/*
+assign ball_high = ((red>green+16)&(red>blue+16)) ? {8'hff, 8'h0, 8'h0} :
+ ((green>red+16)&(green>blue+16)) ? {8'h0, 8'hff, 8'h0} :
+ ((blue>red+16)&(blue>green+16)) ? {8'h0, 8'h0, 8'hff} :
+ {8'h0, 8'h0, 8'h0};
+*/
 /*
 assign ball_high = ((red>=56)&(green<64)&(blue<32)) ? {8'hff, 8'h0, 8'h0} :
  ((red>=192)&(green<128)&(blue<128)) ? {8'hcc, 8'h0, 8'hcc} :
@@ -67,7 +67,7 @@ assign ball_high = (red>=240) ? {8'hff, 8'h0, 8'h0} :
 (blue>=240) ? {8'h0, 8'h0, 8'hff} :
  {8'h0, 8'h0, 8'h0};
 */
-assign ball_high = {grey, grey, grey};
+assign ball_high = ((red>=160)|(green>=192)|(blue>=128)) ? {8'hdd, 8'hdd, 8'hdd} : {8'h0, 8'h0, 8'h0};
 
 // Show bounding box
 wire [23:0] new_image;
@@ -104,10 +104,10 @@ end
 
 ////////////////////////////////////////////////////////////////////////
 
-//Find first and last red pixels
+//Find first and last pixels with balls
 reg [10:0] x_min, y_min, x_max, y_max;
 always@(posedge clk) begin
-	if (red_detect & in_valid) begin	//Update bounds when the pixel is red
+	if (ball_detect & in_valid) begin	//Update bounds when the pixel is red
 		if (x < x_min) x_min <= x;
 		if (x > x_max) x_max <= x;
 		if (y < y_min) y_min <= y;
@@ -152,33 +152,28 @@ always@(posedge clk) begin
 	end
 end
 
+////////////////////////////////////////////////////////////////////////
+
 //Process bounding box at the end of the frame.
-reg [1:0] msg_state;
 reg [10:0] left, right, top, bottom;
 reg [7:0] frame_count;
 always@(posedge clk) begin
 	if (eop & in_valid & packet_video) begin  //Ignore non-video packets
-
 		//Latch edges for display overlay on next frame
 		left <= x_min;
 		right <= x_max;
 		top <= y_min;
 		bottom <= y_max;
 
-
 		//Start message writer FSM once every MSG_INTERVAL frames, if there is room in the FIFO
 		frame_count <= frame_count - 1;
-
 		if (frame_count == 0 && msg_buf_size < MESSAGE_BUF_MAX - 3) begin
-			msg_state <= 2'b01;
 			frame_count <= MSG_INTERVAL-1;
 		end
 	end
-
-	//Cycle through message writer states once started
-	if (msg_state != 2'b00) msg_state <= msg_state + 2'b01;
-
 end
+
+////////////////////////////////////////////////////////////////////////
 
 //Generate output messages for CPU
 reg [31:0] msg_buf_in;
@@ -193,30 +188,7 @@ always@(*) begin
 	msg_buf_wr = send_msg  & (frame_count==0) & (msg_buf_size < MESSAGE_BUF_MAX);
 end
 
-/*
-`define RED_BOX_MSG_ID "RBB"
-
-always@(*) begin	//Write words to FIFO as state machine advances
-	case(msg_state)
-		2'b00: begin
-			msg_buf_in = 32'b0;
-			msg_buf_wr = 1'b0;
-		end
-		2'b01: begin
-			msg_buf_in = `RED_BOX_MSG_ID;	//Message ID
-			msg_buf_wr = 1'b1;
-		end
-		2'b10: begin
-			msg_buf_in = {5'b0, x_min, 5'b0, x_max};	//horizontal limits
-			msg_buf_wr = 1'b1;
-		end
-		2'b11: begin
-			msg_buf_in = {5'b0, y_min, 5'b0, y_max}; //vertical limits
-			msg_buf_wr = 1'b1;
-		end
-	endcase
-end
-*/
+////////////////////////////////////////////////////////////////////////
 
 //Output message FIFO
 MSG_FIFO	MSG_FIFO_inst (
