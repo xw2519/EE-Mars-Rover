@@ -1,0 +1,43 @@
+/* Navigation Interface */
+
+.NavButtons {
+    text-align: center;
+    position: relative;
+    top: 30%
+}
+
+.Halt {
+    text-align: center;
+    border-radius: 4px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+}
+
+.Right {
+    border-radius: 4px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+}
+
+.Left {
+    border-radius: 4px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+}
+
+.Up {
+    border-radius: 4px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+}
+
+.Down {
+    border-radius: 4px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+}

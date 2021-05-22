@@ -1,0 +1,99 @@
+html, body {
+    text-align: center;
+    background-color: #8f95b2;
+    font-family: Lato;
+    font-size: 10px;
+  }
+  
+  /* Header */
+  .logo {
+    float: left;
+  }
+  
+  .container {
+    display: grid;
+    grid-template-columns: 0.3fr 0.4fr 0.3fr;
+    grid-template-rows: auto;
+    column-gap: 10px;
+    row-gap: 10px;
+    height: calc(100vh - 10px);
+  }
+  
+  /* Grid design */
+  .grid {
+    background-color: #444;
+    color: #fff;
+    padding: 10px;
+    font-size: 3rem;
+  }
+
+  .HeaderTitle {
+    vertical-align: middle;
+    text-align: center;
+    font-size: small;
+    grid-column: 1 / 4;
+    grid-row: 1 / 2;
+    background-color: #d8dae5;
+  }
+
+  .SensorReading {
+    grid-column: 1 / 2;
+    grid-row: 2 / 10;
+    background-color: #d8dae5;
+  }
+
+  .RoverSettings {
+    grid-column: 1 / 2;
+    grid-row: 10 / 18;
+    background-color: #d8dae5;
+  }
+
+  .Map {
+    grid-column: 2 / 3;
+    grid-row: 2 / 12;
+    background-color: #d8dae5;
+  }
+
+  .NavigationUI {
+    grid-column: 2 / 3;
+    grid-row: 12 / 18;
+    background-color: #d8dae5;
+}
+
+  .Terminal {
+    grid-column: 3 / 4;
+    grid-row: 2 / 10;
+    background-color: #d8dae5;
+  }
+  
+  .CommandSettings {
+    grid-column: 3 / 4;
+    grid-row: 10 / 18;
+    background-color: #d8dae5;
+  }
+  
+  /* Sensor display design */
+  
+  .BatteryReading {
+    outline-color: aqua;
+    font-size: 16px;
+    text-align: left;  
+  }
+  
+  .DistanceRemaining {
+    outline-color: aqua;
+    font-size: 16px;
+    text-align: left;  
+  }
+  
+  .Time {
+    outline-color: aqua;
+    font-size: 16px;
+    text-align: left;  
+  }
+  
+  .DistanceTravelled {
+    outline-color: aqua;
+    font-size: 16px;
+    text-align: left;  
+  }
