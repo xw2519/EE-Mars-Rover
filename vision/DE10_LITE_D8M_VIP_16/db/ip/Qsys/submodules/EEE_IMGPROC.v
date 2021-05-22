@@ -43,31 +43,11 @@ wire         sop, eop, in_valid, out_ready;
 assign grey = red[7:1] + green[7:2] + blue[7:2];
 // Detect ball pixels
 wire   ball_detect;
-assign ball_detect = ((red>=160)|(green>=192)|(blue>=128));
+assign ball_detect = ((red>=160)|(green>=192)|(blue>=128)|((red<32)&(green<32)&(blue>=32)));
 
 // Highlight detected areas
 wire [23:0] ball_high;
-/*
-assign ball_high = ((red>green+16)&(red>blue+16)) ? {8'hff, 8'h0, 8'h0} :
- ((green>red+16)&(green>blue+16)) ? {8'h0, 8'hff, 8'h0} :
- ((blue>red+16)&(blue>green+16)) ? {8'h0, 8'h0, 8'hff} :
- {8'h0, 8'h0, 8'h0};
-*/
-/*
-assign ball_high = ((red>=56)&(green<64)&(blue<32)) ? {8'hff, 8'h0, 8'h0} :
- ((red>=192)&(green<128)&(blue<128)) ? {8'hcc, 8'h0, 8'hcc} :
- ((red<64)&(green>=64)&(blue>=64)) ? {8'h0, 8'hcc, 8'hcc} :
- ((red<32)&(green<32)&(blue>=32)) ? {8'h0, 8'h0, 8'hff} :
- ((red>=192)&(green>=192)&(blue<128)) ? {8'hcc, 8'hcc, 8'h0} :
- {8'h0, 8'h0, 8'h0};
-*/
-/*
-assign ball_high = (red>=240) ? {8'hff, 8'h0, 8'h0} :
-(green>=240) ? {8'h0, 8'hff, 8'h0} :
-(blue>=240) ? {8'h0, 8'h0, 8'hff} :
- {8'h0, 8'h0, 8'h0};
-*/
-assign ball_high = ((red>=160)|(green>=192)|(blue>=128)) ? {8'hdd, 8'hdd, 8'hdd} : {8'h0, 8'h0, 8'h0};
+assign ball_high = ((red>=160)|(green>=192)|(blue>=128)|((red<32)&(green<32)&(blue>=32)))&(y>=288) ? {8'hdd, 8'hdd, 8'hdd} : {8'h0, 8'h0, 8'h0};
 
 // Show bounding box
 wire [23:0] new_image;
@@ -126,7 +106,7 @@ always @(posedge clk) begin
 	if(sop & in_valid) begin
 		ball_in_col <= 0;
 	end
-	if(ball_detect & in_valid) begin
+	if(ball_detect & in_valid & (y>=288)) begin
 		ball_in_col[x] <= 1;
 	end
 end

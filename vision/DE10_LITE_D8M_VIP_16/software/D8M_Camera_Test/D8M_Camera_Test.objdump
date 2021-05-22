@@ -3307,8 +3307,9 @@ int main(){
    2187c:	10bfbfc4 	addi	r2,r2,-257
    21880:	e0bffa15 	stw	r2,-24(fp)
 		alt_u16 gain              = GAIN_INIT;
-   21884:	0080cfc4 	movi	r2,831
+   21884:	00806fc4 	movi	r2,447
    21888:	e0bffb0d 	sth	r2,-20(fp)
+
 
 		OV8865SetExposure(exposureTime);
    2188c:	e13ffa17 	ldw	r4,-24(fp)
@@ -3351,14 +3352,14 @@ int main(){
    218ec:	10880104 	addi	r2,r2,8196
    218f0:	10800037 	ldwio	r2,0(r2)
    218f4:	e0bfff15 	stw	r2,-4(fp)
-						if (((word&0x7FF)-((word>>11)&0x7FF))>10){ 					//Newline on message identifier
+						if (((word&0x7FF)-((word>>11)&0x7FF))>20){ 					//Newline on message identifier
    218f8:	e0bfff17 	ldw	r2,-4(fp)
    218fc:	10c1ffcc 	andi	r3,r2,2047
    21900:	e0bfff17 	ldw	r2,-4(fp)
    21904:	1005d2fa 	srai	r2,r2,11
    21908:	1081ffcc 	andi	r2,r2,2047
    2190c:	1885c83a 	sub	r2,r3,r2
-   21910:	108002d0 	cmplti	r2,r2,11
+   21910:	10800550 	cmplti	r2,r2,21
    21914:	10000a1e 	bne	r2,zero,21940 <main+0x1fc>
 								printf("%08x %08x \n", (word&0x7FF), ((word>>11)&0x7FF));
    21918:	e0bfff17 	ldw	r2,-4(fp)

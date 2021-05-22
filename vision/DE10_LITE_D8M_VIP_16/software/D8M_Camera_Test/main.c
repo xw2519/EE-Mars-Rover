@@ -28,7 +28,7 @@
 
 #define EXPOSURE_INIT 0x0FFEFF
 #define EXPOSURE_STEP 0x1000
-#define GAIN_INIT     0x033F
+#define GAIN_INIT     0x01BF
 #define GAIN_STEP     0x040
 #define DEFAULT_LEVEL 3
 
@@ -149,6 +149,7 @@ int main(){
 		alt_u32 exposureTime      = EXPOSURE_INIT;
 		alt_u16 gain              = GAIN_INIT;
 
+
 		OV8865SetExposure(exposureTime);
 		OV8865SetGain(gain);
 		Focus_Init();
@@ -163,7 +164,7 @@ int main(){
 				//Read messages from the image processor and print them on the terminal
 				while ((IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_STATUS)>>8) & 0xff) { 	//Find out if there are words to read
 						int word = IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_MSG); 			//Get next word from message buffer
-						if (((word&0x7FF)-((word>>11)&0x7FF))>10){ 					//Newline on message identifier
+						if (((word&0x7FF)-((word>>11)&0x7FF))>20){ 					//Newline on message identifier
 								printf("%08x %08x \n", (word&0x7FF), ((word>>11)&0x7FF));
 						}
 				}
