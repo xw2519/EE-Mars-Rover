@@ -72,28 +72,3 @@ html, body {
     background-color: #d8dae5;
   }
   
-  /* Sensor display design */
-  
-  .BatteryReading {
-    outline-color: aqua;
-    font-size: 16px;
-    text-align: left;  
-  }
-  
-  .DistanceRemaining {
-    outline-color: aqua;
-    font-size: 16px;
-    text-align: left;  
-  }
-  
-  .Time {
-    outline-color: aqua;
-    font-size: 16px;
-    text-align: left;  
-  }
-  
-  .DistanceTravelled {
-    outline-color: aqua;
-    font-size: 16px;
-    text-align: left;  
-  }

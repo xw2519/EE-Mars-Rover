@@ -1,0 +1,54 @@
+/* Sensor Panel */
+
+.SensorPanel {
+    position: relative;
+    top: 5%;
+
+    font-size: 20px;
+    color: black;
+    text-align: left; 
+}
+
+.Time {
+    display: grid;
+    grid-template-columns: 0.5fr 0.5fr;
+    grid-template-rows: auto;
+
+    position: relative;
+    top: 15%;
+
+    background-color: #d8dae5;
+}
+
+.Battery {
+    display: grid;
+    grid-template-columns: 0.5fr 0.5fr;
+    grid-template-rows: auto;
+
+    position: relative;
+    top: 25%;
+
+    background-color: #d8dae5;
+}
+
+.DistanceRemaining {
+    display: grid;
+    grid-template-columns: 0.5fr 0.5fr;
+    grid-template-rows: auto;
+
+    position: relative;
+    top: 35%;
+
+    background-color: #d8dae5;
+}
+
+.DistanceTravelled {
+    display: grid;
+    grid-template-columns: 0.5fr 0.5fr;
+    grid-template-rows: auto;
+
+    position: relative;
+    top: 45%;
+
+    background-color: #d8dae5;
+}
