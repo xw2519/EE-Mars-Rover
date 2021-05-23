@@ -3,10 +3,12 @@ import React from 'react';
 
 import NavUI from './NavUI';
 import SensorReadings from './SensorPanel';
+import TerminalPanel from './TerminalPanel';
 
 import './dashboard.css';
 import './NavUI.css';
 import './SensorPanel.css';
+import './TerminalPanel.css';
 
 class Dashboard extends React.Component {
     
@@ -32,7 +34,7 @@ class Dashboard extends React.Component {
         
                     <div className="grid Map"> Map </div>
 
-                    <div className="grid Terminal"> Terminal </div>
+                    <div className="grid Terminal"> <TerminalPanel/> </div>
         
                     <div className="grid RoverSettings"> Rover Quick Settings </div>
         

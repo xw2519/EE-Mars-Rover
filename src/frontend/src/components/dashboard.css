@@ -63,7 +63,7 @@ html, body {
   .Terminal {
     grid-column: 3 / 4;
     grid-row: 2 / 10;
-    background-color: #d8dae5;
+    background-color: black;
   }
   
   .CommandSettings {
