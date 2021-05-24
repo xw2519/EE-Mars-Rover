@@ -3,26 +3,20 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title='Mars Command Server')
 
-origins = [
-    "http://localhost:3000",
-    "localhost:3000"
-]
-
-# Handle cross origin requests i.e. requests from frontend domain
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"]
-)
-
-# Establish websocket with client website by upgrading HTTP connection
-@app.websocket("/ws_server")
+# Establish websocket with clients by upgrading HTTP connection
+@app.websocket("/ws/server")
 async def websocket_endpoint(websocket: WebSocket):
-    print('[Server]: Establishing websocket connection')
+    print('[Server]: Establishing websocket connection with command')
     await websocket.accept()
     while True:
         data = await websocket.receive_text()
         print(data)
 
+@app.websocket("/ws/rover")
+async def websocket_endpoint(websocket: WebSocket):
+    print('[Server]: Establishing websocket connection with command')
+    await websocket.accept()
+    while True:
+        data = await websocket.receive_text()
+        print(data)
+        

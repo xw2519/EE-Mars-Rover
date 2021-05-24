@@ -2,13 +2,18 @@ import React from 'react';
 import {Helmet} from "react-helmet";
 import ws_server from '../components/socketConfig'
 
-import DateTime from './util/time'
-
 class TerminalPanel extends React.Component {
-    
-    /* Serve landing page */
+
+    TerminalDisplay = () => {
+        console.log = function(message) {
+            document.getElementById('log').innerHTML = message;
+        };
+        console.log("test")
+        console.log('your result');
+    }
+
     render() {
-        
+
         return (
             <>
 
@@ -16,10 +21,9 @@ class TerminalPanel extends React.Component {
                     System Terminal
                 </div>
                 
-                <div className="TerminalDisplay">
-          
-                </div>
-
+                {this.TerminalDisplay}
+                
+                <div id="log">  </div>
             </>
         );
     }

@@ -32,8 +32,8 @@ class SensorReadings extends React.Component {
                     <div className="DistanceTravelledTitle"> Distance Travelled: </div>
                     <div className="DistanceTravelledValue"> <output name="DistanceTravelled"> </output> [cm] </div>
                 </div>
-
             </div>
+
             </>
         );
     }
