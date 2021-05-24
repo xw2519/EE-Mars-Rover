@@ -42,12 +42,22 @@ wire         sop, eop, in_valid, out_ready;
 
 assign grey = red[7:1] + green[7:2] + blue[7:2];
 // Detect ball pixels
-wire   ball_detect;
-assign ball_detect = ((red>=160)|(green>=192)|(blue>=128)|((red<32)&(green<32)&(blue>=32)));
+wire   ball_detect, bright_detect, blue_detect, greenblue_detect, pinkred_detect, red_detect;
+assign bright_detect = (red>=160)|(green>=192)|(blue>=128);
+assign blue_detect = (red<32)&(green<32)&(blue>=32);
+assign greenblue_detect = (red<32)&(green>=32)&(blue<64);
+assign pinkred_detect = (red>=192)&(green<128)&(blue<128);
+assign red_detect = (red>=64)&(green<64)&(blue<32);
+assign ball_detect = (bright_detect|blue_detect|greenblue_detect|pinkred_detect|red_detect)&(y>=288);
 
 // Highlight detected areas
 wire [23:0] ball_high;
-assign ball_high = ((red>=160)|(green>=192)|(blue>=128)|((red<32)&(green<32)&(blue>=32)))&(y>=288) ? {8'hdd, 8'hdd, 8'hdd} : {8'h0, 8'h0, 8'h0};
+assign ball_high = red_detect ? {8'hdd, 8'h0, 8'h0} :
+pinkred_detect ? {8'hdd, 8'h0, 8'hdd} :
+greenblue_detect ? {8'h0, 8'hdd, 8'h0} :
+blue_detect ? {8'h0, 8'h0, 8'hdd} :
+bright_detect ? {8'hdd, 8'hdd, 8'hdd} :
+ {8'h0, 8'h0, 8'h0};
 
 // Show bounding box
 wire [23:0] new_image;
@@ -55,9 +65,8 @@ wire bb_active;
 assign bb_active = (x == left) | (x == right) | (y == top) | (y == bottom);
 assign new_image = bb_active ? bb_col : ball_high;
 
-// Switch output pixels depending on mode switch
-// Don't modify the start-of-packet word - it's a packet discriptor
-// Don't modify data in non-video packets
+// Switch output pixels depending on mode
+// Don't modify the start-of-packet word or data in non-video packets
 assign {red_out, green_out, blue_out} = (mode & ~sop & packet_video) ? new_image : {red,green,blue};
 
 //////////////////////////////////////////////////////////////////////// - Generate image coordinates
@@ -82,7 +91,7 @@ always@(posedge clk) begin
 	end
 end
 
-////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////// - Processing to find balls
 
 //Find first and last pixels with balls
 reg [10:0] x_min, y_min, x_max, y_max;
@@ -101,6 +110,7 @@ always@(posedge clk) begin
 	end
 end
 
+//Group columns to find balls
 reg [IMAGE_W-1:0] ball_in_col;
 always @(posedge clk) begin
 	if(sop & in_valid) begin
@@ -111,6 +121,7 @@ always @(posedge clk) begin
 	end
 end
 
+//During last line of pixels, send data as messages
 reg in_ball, send_msg;
 reg [10:0] ball_min, ball_max;
 always@(posedge clk) begin
@@ -132,7 +143,7 @@ always@(posedge clk) begin
 	end
 end
 
-////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////// - Process colours
 
 //Process bounding box at the end of the frame.
 reg [10:0] left, right, top, bottom;
@@ -153,7 +164,7 @@ always@(posedge clk) begin
 	end
 end
 
-////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////// - Send messages
 
 //Generate output messages for CPU
 reg [31:0] msg_buf_in;

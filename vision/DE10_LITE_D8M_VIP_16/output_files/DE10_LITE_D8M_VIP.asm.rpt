@@ -1,5 +1,5 @@
 Assembler report for DE10_LITE_D8M_VIP
-Sat May 22 05:59:23 2021
+Mon May 24 05:53:44 2021
 Quartus Prime Version 16.0.0 Build 211 04/27/2016 SJ Lite Edition
 
 
@@ -39,7 +39,7 @@ agreement for further details.
 +---------------------------------------------------------------+
 ; Assembler Summary                                             ;
 +-----------------------+---------------------------------------+
-; Assembler Status      ; Successful - Sat May 22 05:59:23 2021 ;
+; Assembler Status      ; Successful - Mon May 24 05:53:44 2021 ;
 ; Revision Name         ; DE10_LITE_D8M_VIP                     ;
 ; Top-level Entity Name ; DE10_LITE_D8M_VIP                     ;
 ; Family                ; MAX 10                                ;
@@ -81,8 +81,8 @@ agreement for further details.
 ; Option         ; Setting                                                                          ;
 +----------------+----------------------------------------------------------------------------------+
 ; Device         ; 10M50DAF484C7G                                                                   ;
-; JTAG usercode  ; 0x009A19B5                                                                       ;
-; Checksum       ; 0x009A19B5                                                                       ;
+; JTAG usercode  ; 0x00994C5A                                                                       ;
+; Checksum       ; 0x00994C5A                                                                       ;
 +----------------+----------------------------------------------------------------------------------+
 
 
@@ -92,14 +92,14 @@ agreement for further details.
 Info: *******************************************************************
 Info: Running Quartus Prime Assembler
     Info: Version 16.0.0 Build 211 04/27/2016 SJ Lite Edition
-    Info: Processing started: Sat May 22 05:59:20 2021
+    Info: Processing started: Mon May 24 05:53:40 2021
 Info: Command: quartus_asm --read_settings_files=off --write_settings_files=off DE10_LITE_D8M_VIP -c DE10_LITE_D8M_VIP
 Info (115031): Writing out detailed assembly data for power analysis
 Info (115030): Assembler is generating device programming files
 Info (115017): Design contains a time-limited core -- only a single, time-limited programming file can be generated
 Info: Quartus Prime Assembler was successful. 0 errors, 0 warnings
-    Info: Peak virtual memory: 4926 megabytes
-    Info: Processing ended: Sat May 22 05:59:24 2021
+    Info: Peak virtual memory: 4925 megabytes
+    Info: Processing ended: Mon May 24 05:53:44 2021
     Info: Elapsed time: 00:00:04
     Info: Total CPU time (on all processors): 00:00:03
 
