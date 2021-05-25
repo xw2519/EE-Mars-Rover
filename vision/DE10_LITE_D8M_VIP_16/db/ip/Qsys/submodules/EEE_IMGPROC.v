@@ -40,14 +40,14 @@ wire         sop, eop, in_valid, out_ready;
 
 //////////////////////////////////////////////////////////////////////// - Detect ball pixels, generate VGA output
 
-assign grey = red[7:1] + green[7:2] + blue[7:2];
+assign grey = red[7:2] + green[7:1] + blue[7:2];
 // Detect ball pixels
 wire   ball_detect, bright_detect, blue_detect, greenblue_detect, pinkred_detect, red_detect;
 assign bright_detect = (red>=160)|(green>=192)|(blue>=128);
 assign blue_detect = (red<32)&(green<32)&(blue>=32);
 assign greenblue_detect = (red<32)&(green>=32)&(blue<64);
 assign pinkred_detect = (red>=192)&(green<128)&(blue<128);
-assign red_detect = (red>=64)&(green<64)&(blue<32);
+assign red_detect = (red>=128)&(green<96)&(blue<64);
 assign ball_detect = (bright_detect|blue_detect|greenblue_detect|pinkred_detect|red_detect)&(y>=288);
 
 // Highlight detected areas
@@ -146,8 +146,16 @@ end
 //////////////////////////////////////////////////////////////////////// - Process colours
 
 //Process bounding box at the end of the frame.
+`define RED_ID "R"
+`define PINKRED_ID "P"
+`define GREENBLUE_ID "G"
+`define BLUE_ID "B"
+
+reg [1:0] msg_state;
+reg [7:0] msg_id;
 reg [10:0] left, right, top, bottom;
 reg [7:0] frame_count;
+
 always@(posedge clk) begin
 	if (eop & in_valid & packet_video) begin  //Ignore non-video packets
 		//Latch edges for display overlay on next frame
@@ -158,10 +166,34 @@ always@(posedge clk) begin
 
 		//Start message writer FSM once every MSG_INTERVAL frames, if there is room in the FIFO
 		frame_count <= frame_count - 1;
-		if (frame_count == 0 && msg_buf_size < MESSAGE_BUF_MAX - 3) begin
-			frame_count <= MSG_INTERVAL-1;
+		if (frame_count == 0) frame_count <= MSG_INTERVAL-1;
+
+		if(msg_buf_size < MESSAGE_BUF_MAX-2) begin
+			case(frame_count)
+				8'h3b: begin
+					msg_id <= `RED_ID;
+					msg_state <= 2'b01;
+				end
+				8'h3a: begin
+					msg_id <= `PINKRED_ID;
+					msg_state <= 2'b01;
+				end
+				8'h39: begin
+					msg_id <= `GREENBLUE_ID;
+					msg_state <= 2'b01;
+				end
+				8'h38: begin
+					msg_id <= `BLUE_ID;
+					msg_state <= 2'b01;
+				end
+				default: begin
+					msg_id <= `RED_ID;
+					msg_state <= 2'b0;
+				end
+			endcase
 		end
 	end
+	if (msg_state != 2'b00) msg_state <= msg_state + 2'b01;
 end
 
 //////////////////////////////////////////////////////////////////////// - Send messages
@@ -174,9 +206,25 @@ wire msg_buf_rd, msg_buf_flush;
 wire [7:0] msg_buf_size;
 wire msg_buf_empty;
 
-always@(*) begin
-	msg_buf_in = {10'h0, ball_min, ball_max};
-	msg_buf_wr = send_msg  & (frame_count==0) & (msg_buf_size < MESSAGE_BUF_MAX);
+always@(*) begin	//Write words to FIFO as state machine advances
+	case(msg_state)
+		2'b00: begin
+			msg_buf_in = {10'h0, ball_min, ball_max};
+			msg_buf_wr = send_msg  & (frame_count==0) & (msg_buf_size < MESSAGE_BUF_MAX - 1);
+		end
+		2'b01: begin
+			msg_buf_in = {2'h0, msg_id, x_min, x_max};
+			msg_buf_wr = 1'b1;
+		end
+		2'b10: begin
+			msg_buf_in = {2'h3, msg_id, y_min, y_max};
+			msg_buf_wr = 1'b1;
+		end
+		2'b11: begin
+			msg_buf_in = 32'b0;
+			msg_buf_wr = 1'b0;
+		end
+	endcase
 end
 
 ////////////////////////////////////////////////////////////////////////

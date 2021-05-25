@@ -18,7 +18,6 @@
 #include <unistd.h>
 
 //EEE_IMGPROC defines
-#define EEE_IMGPROC_MSG_START ('R'<<16 | 'B'<<8 | 'B')
 
 //offsets
 #define EEE_IMGPROC_STATUS 0
@@ -28,7 +27,7 @@
 
 #define EXPOSURE_INIT 0x0FFEFF
 #define EXPOSURE_STEP 0x1000
-#define GAIN_INIT     0x027F
+#define GAIN_INIT     0x05FF
 #define GAIN_STEP     0x040
 #define DEFAULT_LEVEL 3
 
@@ -155,7 +154,7 @@ int main(){
 
     alt_u16 sweep = 0;
     alt_u16 x_min, x_max;
-    alt_u8 ball_count;
+    alt_u8 ball_count, filter_id;
     alt_u8 stop;
 
 		while(1){
@@ -168,18 +167,25 @@ int main(){
 				//Read messages from the image processor and print them on the terminal
 				while ((IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_STATUS)>>8) & 0xff) { 	//Find out if there are words to read
 						int word = IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_MSG); 			//Get next word from message buffer
-            x_min =(word>>11)&0x7FF;
+            x_min = (word>>11)&0x7FF;
             x_max = word&0x7FF;
-						if ((x_max-x_min)>20){
-                if(x_min < sweep){
-                    printf("\nCount is %x\n", ball_count);
-                    ball_count = 1;
-                }else{
-                    ball_count++;
-                }
-                sweep = x_max;
-                printf("%03d ", 2560/(x_max-x_min));
-						}
+            if(!(word&(0xFFC00000))){
+  						if ((x_max-x_min)>20){
+                  if(x_min < sweep){
+                      printf("\nCount is %x\n", ball_count);
+                      ball_count = 1;
+                  }else{
+                      ball_count++;
+                  }
+                  sweep = x_max;
+                  printf("%03d ", 2560/(x_max-x_min));
+  						}
+            }else{
+              if(word&0xC0000000){ printf("\nY "); }
+              else{ printf("\nX "); }
+              filter_id = (word&0x3FC00000) >> 22;
+              printf("%c %03x %03x\n", filter_id, x_max, x_min);
+            }
 				}
 
        //Update the bounding box colour
