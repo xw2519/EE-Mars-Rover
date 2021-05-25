@@ -4,11 +4,13 @@ import React from 'react';
 import NavUI from './NavUI';
 import SensorReadings from './SensorPanel';
 import TerminalPanel from './TerminalPanel';
+import Canvas from './canvas';
 
 import './dashboard.css';
 import './NavUI.css';
 import './SensorPanel.css';
 import './TerminalPanel.css';
+import './canvas.css'
 
 class Dashboard extends React.Component {
     
@@ -32,7 +34,7 @@ class Dashboard extends React.Component {
         
                     <div className="grid SensorReading"> Sensor Panel <SensorReadings/> </div>
         
-                    <div className="grid Map"> Map </div>
+                    <div className="grid Map"> <Canvas/> </div>
 
                     <div className="grid Terminal"> <TerminalPanel/> </div>
         

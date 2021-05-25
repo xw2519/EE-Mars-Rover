@@ -17,13 +17,14 @@ class TerminalPanel extends React.Component {
         return (
             <>
 
-                <div className="TerminalHeader">
-                    System Terminal
-                </div>
-                
-                {this.TerminalDisplay}
-                
-                <div id="log">  </div>
+            <div className="TerminalHeader">
+                System Terminal
+            </div>
+            
+            {this.TerminalDisplay}
+            
+            <div id="log">  </div>
+            
             </>
         );
     }

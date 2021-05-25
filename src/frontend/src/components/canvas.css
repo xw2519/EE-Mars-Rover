@@ -1,0 +1,12 @@
+.Canvas {
+    background-color: blue;
+    position: relative;
+    height: auto;
+    width: auto;
+}
+
+.App-canvas {
+    background-color: black;
+    position: relative;
+    height: 100%;
+}
