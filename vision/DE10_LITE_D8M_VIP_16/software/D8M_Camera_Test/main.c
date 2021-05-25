@@ -172,12 +172,13 @@ int main(){
             x_max = word&0x7FF;
 						if ((x_max-x_min)>20){
                 if(x_min < sweep){
-                    printf("Count is %x\n", ball_count);
+                    printf("\nCount is %x\n", ball_count);
                     ball_count = 1;
                 }else{
                     ball_count++;
                 }
                 sweep = x_max;
+                printf("%03d ", 2560/(x_max-x_min));
 						}
 				}
 

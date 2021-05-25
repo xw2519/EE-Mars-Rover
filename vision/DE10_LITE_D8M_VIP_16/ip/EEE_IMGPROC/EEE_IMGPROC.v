@@ -40,7 +40,7 @@ wire         sop, eop, in_valid, out_ready;
 
 //////////////////////////////////////////////////////////////////////// - Detect ball pixels, generate VGA output
 
-assign grey = red[7:1] + green[7:2] + blue[7:2];
+assign grey = red[7:2] + green[7:1] + blue[7:2];
 // Detect ball pixels
 wire   ball_detect, bright_detect, blue_detect, greenblue_detect, pinkred_detect, red_detect;
 assign bright_detect = (red>=160)|(green>=192)|(blue>=128);
