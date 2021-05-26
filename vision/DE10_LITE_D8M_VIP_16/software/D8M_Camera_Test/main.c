@@ -25,9 +25,7 @@
 #define EEE_IMGPROC_ID     2
 #define EEE_IMGPROC_BBCOL  3
 
-#define EXPOSURE_INIT 0x0FFEFF
-#define EXPOSURE_STEP 0x1000
-#define GAIN_INIT     0x05FF
+#define GAIN_INIT     0x7FF
 #define GAIN_STEP     0x040
 #define DEFAULT_LEVEL 3
 
@@ -145,45 +143,58 @@ int main(){
 		alt_u8  manual_focus_step = 10;
 		alt_u16 current_focus     = 300;
 		int     boundingBoxColour = 0;
-		alt_u32 exposureTime      = EXPOSURE_INIT;
+		alt_u32 exposureTime      = 0x0FFEFF;
 		alt_u16 gain              = GAIN_INIT;
 
 		OV8865SetExposure(exposureTime);
 		OV8865SetGain(gain);
 		Focus_Init();
 
-    alt_u16 sweep = 0;
     alt_u16 x_min, x_max;
     alt_u8 ball_count, filter_id;
     alt_u8 stop;
+    alt_u8 calibration = 0;
 
 		while(1){
 
 				fprintf(ctrl_uart, "Looping message to control.\n");
 
 				// touch KEY0 to trigger Auto focus
-				if((IORD(KEY_BASE,0)&0x03) == 0x02){ current_focus = Focus_Window(320,240); }
+				if((IORD(KEY_BASE,0)&0x03) == 0x01){ current_focus = Focus_Window(320,240); }
+        if((IORD(KEY_BASE,0)&0x03) == 0x02){
+          calibration = 0;
+          gain = 0x7FF;
+          OV8865SetGain(gain);
+          printf("\nGain = %x ", gain);
+        }
 
 				//Read messages from the image processor and print them on the terminal
 				while ((IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_STATUS)>>8) & 0xff) { 	//Find out if there are words to read
 						int word = IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_MSG); 			//Get next word from message buffer
             x_min = (word>>11)&0x7FF;
             x_max = word&0x7FF;
+            filter_id = (word&0x3FC00000) >> 22;
+            if((!(word&0xC0000000))&(filter_id == 'R')){
+              printf("\nCount is %x Calib. is %d\n", ball_count, calibration);
+              if(calibration<4){
+                if(ball_count){
+                  gain -= GAIN_STEP;
+            		  OV8865SetGain(gain);
+            		  printf("\nGain = %x ", gain);
+                }else{
+                  calibration++;
+                }
+              }
+              ball_count = 0;
+            }
             if(!(word&(0xFFC00000))){
   						if ((x_max-x_min)>20){
-                  if(x_min < sweep){
-                      printf("\nCount is %x\n", ball_count);
-                      ball_count = 1;
-                  }else{
-                      ball_count++;
-                  }
-                  sweep = x_max;
+                  ball_count++;
                   printf("%03d ", 2560/(x_max-x_min));
   						}
             }else{
               if(word&0xC0000000){ printf("\nY "); }
               else{ printf("\nX "); }
-              filter_id = (word&0x3FC00000) >> 22;
               printf("%c %03x %03x\n", filter_id, x_max, x_min);
             }
 				}
@@ -195,16 +206,6 @@ int main(){
        //Process input commands
        int in = getchar();
        switch (in) {
-       	   case 'e': {
-       		   exposureTime += EXPOSURE_STEP;
-       		   OV8865SetExposure(exposureTime);
-       		   printf("\nExposure = %x ", exposureTime);
-       	   	   break;}
-       	   case 'd': {
-       		   exposureTime -= EXPOSURE_STEP;
-       		   OV8865SetExposure(exposureTime);
-       		   printf("\nExposure = %x ", exposureTime);
-       	   	   break;}
        	   case 't': {
        		   gain += GAIN_STEP;
        		   OV8865SetGain(gain);

@@ -43,21 +43,21 @@ wire         sop, eop, in_valid, out_ready;
 assign grey = red[7:2] + green[7:1] + blue[7:2];
 // Detect ball pixels
 wire   ball_detect, bright_detect, blue_detect, greenblue_detect, pinkred_detect, red_detect;
-assign bright_detect = (red>=160)|(green>=192)|(blue>=128);
-assign blue_detect = (red<32)&(green<32)&(blue>=32);
-assign greenblue_detect = (red<32)&(green>=32)&(blue<64);
-assign pinkred_detect = (red>=192)&(green<128)&(blue<128);
-assign red_detect = (red>=128)&(green<96)&(blue<64);
-assign ball_detect = (bright_detect|blue_detect|greenblue_detect|pinkred_detect|red_detect)&(y>=288);
+assign bright_detect    = (red>=160)|(green>=192)|(blue>=128);
+assign blue_detect      = (red<32)&(green<32)&(blue>=32);
+assign greenblue_detect = (red<64)&(green>=96)&(blue<128);
+assign pinkred_detect   = (red>=192)&(green<128)&(blue<128);
+assign red_detect       = (red>=144)&(green<96)&(blue<64);
+assign ball_detect      = (bright_detect|blue_detect|greenblue_detect|pinkred_detect|red_detect)&(y>=288);
 
 // Highlight detected areas
 wire [23:0] ball_high;
-assign ball_high = red_detect ? {8'hdd, 8'h0, 8'h0} :
-pinkred_detect ? {8'hdd, 8'h0, 8'hdd} :
-greenblue_detect ? {8'h0, 8'hdd, 8'h0} :
-blue_detect ? {8'h0, 8'h0, 8'hdd} :
-bright_detect ? {8'hdd, 8'hdd, 8'hdd} :
- {8'h0, 8'h0, 8'h0};
+assign ball_high = red_detect       ? {8'hdd, 8'h00, 8'h00} :
+									 pinkred_detect   ? {8'hdd, 8'h00, 8'hdd} :
+									 greenblue_detect ? {8'h00, 8'hdd, 8'h00} :
+									 blue_detect      ? {8'h00, 8'h00, 8'hdd} :
+									 bright_detect    ? {8'hdd, 8'hdd, 8'hdd} :
+ 									                    {8'h00, 8'h00, 8'h00} ;
 
 // Show bounding box
 wire [23:0] new_image;
@@ -93,10 +93,18 @@ end
 
 //////////////////////////////////////////////////////////////////////// - Processing to find balls
 
-//Find first and last pixels with balls
+//Find first and last pixels that triger a filter
 reg [10:0] x_min, y_min, x_max, y_max;
+wire boundary_detect;
+assign boundary_detect = (frame_count == MSG_INTERVAL-1) ?       red_detect :
+												 (frame_count == MSG_INTERVAL-2) ?   pinkred_detect :
+												 (frame_count == MSG_INTERVAL-3) ? greenblue_detect :
+												 (frame_count == MSG_INTERVAL-4) ?      blue_detect :
+												 (frame_count == MSG_INTERVAL-5) ?    bright_detect :
+												 																	      ball_detect ;
+
 always@(posedge clk) begin
-	if (ball_detect & in_valid) begin	//Update bounds when the pixel is red
+	if (boundary_detect & (y>=288) & in_valid) begin	//Update bounds
 		if (x < x_min) x_min <= x;
 		if (x > x_max) x_max <= x;
 		if (y < y_min) y_min <= y;
@@ -150,6 +158,7 @@ end
 `define PINKRED_ID "P"
 `define GREENBLUE_ID "G"
 `define BLUE_ID "B"
+`define BRIGHT_ID "L"
 
 reg [1:0] msg_state;
 reg [7:0] msg_id;
@@ -184,6 +193,10 @@ always@(posedge clk) begin
 				end
 				8'h38: begin
 					msg_id <= `BLUE_ID;
+					msg_state <= 2'b01;
+				end
+				8'h37: begin
+					msg_id <= `BRIGHT_ID;
 					msg_state <= 2'b01;
 				end
 				default: begin
