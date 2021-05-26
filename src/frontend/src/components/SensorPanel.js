@@ -9,6 +9,15 @@ class SensorReadings extends React.Component {
     /* Serve landing page */
     render() {
         
+        ws_server.onmessage = (e) => {  
+            //Sensor panel readings
+            document.getElementById("BatteryLeft").innerHTML = parseInt(e.data);
+            document.getElementById("DistanceLeft").innerHTML = parseInt(e.data);
+            document.getElementById("DistanceTravelled").innerHTML = parseInt(e.data);
+
+            console.log(e.data)
+        }
+
         return (
             <>
 
@@ -20,17 +29,17 @@ class SensorReadings extends React.Component {
                 
                 <div className = "Battery"> 
                     <div className="BatteryTitle"> Battery Remaining: </div>
-                    <div className="BatteryValue"> <output name="BatteryLeft"> </output> % </div>
+                    <div className="BatteryValue"> <output name="BatteryLeft" id="BatteryLeft"> </output> % </div>
                 </div>
 
                 <div className = "DistanceRemaining"> 
                     <div className="DistanceRemainingTitle"> Distance Remaining: </div>
-                    <div className="DistanceRemainingValue"> <output name="DistanceLeft"> </output> [cm] </div>
+                    <div className="DistanceRemainingValue"> <output name="DistanceLeft" id="DistanceLeft"> </output> [cm] </div>
                 </div>
 
                 <div className = "DistanceTravelled"> 
                     <div className="DistanceTravelledTitle"> Distance Travelled: </div>
-                    <div className="DistanceTravelledValue"> <output name="DistanceTravelled"> </output> [cm] </div>
+                    <div className="DistanceTravelledValue"> <output name="DistanceTravelled" id="DistanceTravelled"> </output> [cm] </div>
                 </div>
             </div>
 

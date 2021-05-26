@@ -1,6 +1,8 @@
 import React from 'react';
 import ws_server from '../components/socketConfig'
 
+// Add in angle and stuffies 
+
 class NavUI extends React.Component {
     NavUp = () => {
         console.log("UP");
