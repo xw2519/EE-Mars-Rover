@@ -151,6 +151,21 @@ alt_u8 filter_index(alt_u8 filter_id){
   }
 }
 
+alt_u8 get_filter_id(alt_u8 index){
+  switch(index){
+    case 0: {
+      return 'R';}
+    case 1: {
+      return 'P';}
+    case 2: {
+      return 'G';}
+    case 3: {
+      return 'B';}
+    case 4: {
+      return 'L';}
+  }
+}
+
 
 int main(){
 
@@ -250,10 +265,6 @@ int main(){
                 filter_x_max[filter_index(filter_id)] = x_max;
               }
 
-              if(word&0xC0000000){ printf("\nY "); }
-              else{ printf("\nX "); }
-              printf("%c %03x %03x\n", filter_id, x_max, x_min);
-
             }else if((x_max-x_min)>20){                              //The word is about ball data, append to arrays and increment ball_count
               appendArray(&ball_x_min, x_min);
               appendArray(&ball_x_max, x_max);
@@ -262,11 +273,18 @@ int main(){
 				}
 
         if(process){
-          printf("Counted %d balls, distances: ", ball_x_min.used);
+          printf("Counted %d balls.\n\n", ball_x_min.used);
           for(alt_u8 i=0; i<(ball_x_min.used); i++){
-            printf("%03d ", (2560/(ball_x_max.data[i] - ball_x_min.data[i])));
+            printf("Ball %d:\n", i+1);
+            printf("    Distance: %03d\n", (2560/(ball_x_max.data[i] - ball_x_min.data[i])));
+            printf("    Filters triggered: ");
+            for(alt_u8 j=0; j<5; j++){
+              if(!( (filter_x_min[j] > ball_x_max.data[i]) || (filter_x_max[j] < ball_x_min.data[i]) )){
+                printf("%c ", get_filter_id(j));
+              }
+            }
+            printf("\n\n");
           }
-          printf("\n\n");
 
           process = 0;
           ball_count = 0;
