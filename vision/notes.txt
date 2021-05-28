@@ -1,0 +1,60 @@
+- Added uart over IO0 and IO1 to communicate with control subsystem.
+
+- Set camera to always use minimum zoom and maximum exposure,
+could implement variable exposure and gain later.
+
+- Use colours to decide if a pixel is part of a ball.
+
+- Exploit the fact that the environment is a flat plane.
+Only need to use x coordinates of beginning and end of balls, message system modified.
+The top of the video feed can be removed, only contains background if balls are on the ground.
+
+- Need sine to determine distance from obstacles.
+Using fixed point approximation instead of sending data to command
+to reduce latency.
+
+- Finding balls in the video feed.
+There is no random access to pixel data, it is impossible to compare individual pixels.
+Pixels will have to be passed through filters to find pixels that belong to balls.
+Conditions are required that are true for balls but not the environment.
+
+All balls    : (red>=160)|(green>=192)|(blue>=128)
+Yellow       : Find bright pixels using as brightness "green[7:1] + red[7:2] + blue[7:2]".
+Pink + Red   : (red>=192)&(green<128)&(blue<128)
+Red          : (red>=64)   & (((red>>1)+(red>>3))>=green)  & ((red>>1)>=blue)
+Green/Blue   : (green>=32) & (((green>>1)+(green>>2))>=red) & (green>=(blue>>1))
+Blue         : (blue>=48)  & (blue>=red) & (blue>=green) & (blue<144)
+Red (Light)  : (red>=144)&(green<96) &(blue<64)
+Red (Dark)   : (red>=64) &(green<64) &(blue<32)
+Green/Blue(L): (red<64)  &(green>=96)&(blue<128)
+Green/Blue(D): (red<32)  &(green>=32)&(blue<64)
+Blue (Light) :
+Blue (Dark)  : (red<32)  &(green<32) &(blue>=32)
+
+------ Random snips of code that might be useful later ------
+assign ball_high = ((red>green+16)&(red>blue+16)) ? {8'hff, 8'h0, 8'h0} :
+ ((green>red+16)&(green>blue+16)) ? {8'h0, 8'hff, 8'h0} :
+ ((blue>red+16)&(blue>green+16)) ? {8'h0, 8'h0, 8'hff} :
+ {8'h0, 8'h0, 8'h0};
+assign ball_high = ((red>=56)&(green<64)&(blue<32)) ? {8'hff, 8'h0, 8'h0} :
+ ((red>=192)&(green<128)&(blue<128)) ? {8'hcc, 8'h0, 8'hcc} :
+ ((red<64)&(green>=64)&(blue>=64)) ? {8'h0, 8'hcc, 8'hcc} :
+ ((red<32)&(green<32)&(blue>=32)) ? {8'h0, 8'h0, 8'hff} :
+ ((red>=192)&(green>=192)&(blue<128)) ? {8'hcc, 8'hcc, 8'h0} :
+ {8'h0, 8'h0, 8'h0};
+assign ball_high = (red>=240) ? {8'hff, 8'h0, 8'h0} :
+ (green>=240) ? {8'h0, 8'hff, 8'h0} :
+ (blue>=240) ? {8'h0, 8'h0, 8'hff} :
+ {8'h0, 8'h0, 8'h0};
+------ End random code ------
+
+- For calculating distance from size, use d = 2560/x.
+This takes size(x) in pixels and returns distance(d) in cm.
+
+- Expanded message system to send colour and position data.
+
+- Rover has large blindspots.
+Turn to look for obstacles before moving forwards.
+Can never detect obstacles <20cm when starting.
+
+- Added automated calibration when KEY0 is pressed.

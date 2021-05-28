@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <EnsembleReport name="Qsys" kind="system" version="16.0" fabric="QSYS">
  <!-- Format version 16.0 211 (Future versions may contain additional information.) -->
- <!-- 2021.05.26.05:33:40 -->
+ <!-- 2021.05.28.03:53:38 -->
  <!-- A collection of modules and connections -->
  <parameter name="clockCrossingAdapter">
   <type>com.altera.sopcmodel.ensemble.EClockAdapter</type>
@@ -53,7 +53,7 @@
  </parameter>
  <parameter name="generationId">
   <type>int</type>
-  <value>1622003551</value>
+  <value>1622170344</value>
   <derived>false</derived>
   <enabled>true</enabled>
   <visible>true</visible>
@@ -14120,7 +14120,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="instSlaveMapParam">
    <type>java.lang.String</type>
-   <value><![CDATA[<address-map><slave name='onchip_memory2_0.s1' start='0x20000' end='0x386A0' type='altera_avalon_onchip_memory2.s1' /><slave name='nios2_gen2.debug_mem_slave' start='0x40800' end='0x41000' type='altera_nios2_gen2.debug_mem_slave' /></address-map>]]></value>
+   <value><![CDATA[<address-map><slave name='onchip_memory2_0.s1' start='0x20000' end='0x3F400' type='altera_avalon_onchip_memory2.s1' /><slave name='nios2_gen2.debug_mem_slave' start='0x40800' end='0x41000' type='altera_nios2_gen2.debug_mem_slave' /></address-map>]]></value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -14140,7 +14140,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="dataSlaveMapParam">
    <type>java.lang.String</type>
-   <value><![CDATA[<address-map><slave name='control_uart.s1' start='0x0' end='0x20' type='altera_avalon_uart.s1' /><slave name='onchip_memory2_0.s1' start='0x20000' end='0x386A0' type='altera_avalon_onchip_memory2.s1' /><slave name='nios2_gen2.debug_mem_slave' start='0x40800' end='0x41000' type='altera_nios2_gen2.debug_mem_slave' /><slave name='timer.s1' start='0x41000' end='0x41020' type='altera_avalon_timer.s1' /><slave name='TERASIC_AUTO_FOCUS_0.mm_ctrl' start='0x41020' end='0x41040' type='TERASIC_AUTO_FOCUS.mm_ctrl' /><slave name='i2c_opencores_camera.avalon_slave_0' start='0x41040' end='0x41060' type='i2c_opencores.avalon_slave_0' /><slave name='i2c_opencores_mipi.avalon_slave_0' start='0x41060' end='0x41080' type='i2c_opencores.avalon_slave_0' /><slave name='mipi_pwdn_n.s1' start='0x41080' end='0x41090' type='altera_avalon_pio.s1' /><slave name='mipi_reset_n.s1' start='0x41090' end='0x410A0' type='altera_avalon_pio.s1' /><slave name='key.s1' start='0x410A0' end='0x410B0' type='altera_avalon_pio.s1' /><slave name='sw.s1' start='0x410B0' end='0x410C0' type='altera_avalon_pio.s1' /><slave name='led.s1' start='0x410C0' end='0x410D0' type='altera_avalon_pio.s1' /><slave name='altpll_0.pll_slave' start='0x410D0' end='0x410E0' type='altpll.pll_slave' /><slave name='sysid_qsys.control_slave' start='0x410E0' end='0x410E8' type='altera_avalon_sysid_qsys.control_slave' /><slave name='jtag_uart.avalon_jtag_slave' start='0x410E8' end='0x410F0' type='altera_avalon_jtag_uart.avalon_jtag_slave' /><slave name='EEE_IMGPROC_0.s1' start='0x42000' end='0x42020' type='EEE_IMGPROC.s1' /></address-map>]]></value>
+   <value><![CDATA[<address-map><slave name='control_uart.s1' start='0x0' end='0x20' type='altera_avalon_uart.s1' /><slave name='onchip_memory2_0.s1' start='0x20000' end='0x3F400' type='altera_avalon_onchip_memory2.s1' /><slave name='nios2_gen2.debug_mem_slave' start='0x40800' end='0x41000' type='altera_nios2_gen2.debug_mem_slave' /><slave name='timer.s1' start='0x41000' end='0x41020' type='altera_avalon_timer.s1' /><slave name='TERASIC_AUTO_FOCUS_0.mm_ctrl' start='0x41020' end='0x41040' type='TERASIC_AUTO_FOCUS.mm_ctrl' /><slave name='i2c_opencores_camera.avalon_slave_0' start='0x41040' end='0x41060' type='i2c_opencores.avalon_slave_0' /><slave name='i2c_opencores_mipi.avalon_slave_0' start='0x41060' end='0x41080' type='i2c_opencores.avalon_slave_0' /><slave name='mipi_pwdn_n.s1' start='0x41080' end='0x41090' type='altera_avalon_pio.s1' /><slave name='mipi_reset_n.s1' start='0x41090' end='0x410A0' type='altera_avalon_pio.s1' /><slave name='key.s1' start='0x410A0' end='0x410B0' type='altera_avalon_pio.s1' /><slave name='sw.s1' start='0x410B0' end='0x410C0' type='altera_avalon_pio.s1' /><slave name='led.s1' start='0x410C0' end='0x410D0' type='altera_avalon_pio.s1' /><slave name='altpll_0.pll_slave' start='0x410D0' end='0x410E0' type='altpll.pll_slave' /><slave name='sysid_qsys.control_slave' start='0x410E0' end='0x410E8' type='altera_avalon_sysid_qsys.control_slave' /><slave name='jtag_uart.avalon_jtag_slave' start='0x410E8' end='0x410F0' type='altera_avalon_jtag_uart.avalon_jtag_slave' /><slave name='EEE_IMGPROC_0.s1' start='0x42000' end='0x42020' type='EEE_IMGPROC.s1' /></address-map>]]></value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -15784,7 +15784,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.SIZE_VALUE</name>
-   <value>100000</value>
+   <value>128000</value>
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.WRITABLE</name>
@@ -15900,7 +15900,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="memorySize">
    <type>long</type>
-   <value>100000</value>
+   <value>128000</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -16176,7 +16176,7 @@ parameters are a RESULT of the module parameters. -->
    </parameter>
    <parameter name="addressSpan">
     <type>java.math.BigInteger</type>
-    <value>100000</value>
+    <value>128000</value>
     <derived>true</derived>
     <enabled>true</enabled>
     <visible>false</visible>
@@ -16264,7 +16264,7 @@ parameters are a RESULT of the module parameters. -->
    </parameter>
    <parameter name="explicitAddressSpan">
     <type>java.math.BigInteger</type>
-    <value>100000</value>
+    <value>128000</value>
     <derived>false</derived>
     <enabled>true</enabled>
     <visible>true</visible>
@@ -18323,7 +18323,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.TIMESTAMP</name>
-   <value>1622003551</value>
+   <value>1622170344</value>
   </assignment>
   <assignment>
    <name>embeddedsw.dts.compatible</name>
@@ -18343,7 +18343,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.dts.params.timestamp</name>
-   <value>1622003551</value>
+   <value>1622170344</value>
   </assignment>
   <assignment>
    <name>embeddedsw.dts.vendor</name>
@@ -18359,7 +18359,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="timestamp">
    <type>int</type>
-   <value>1622003551</value>
+   <value>1622170344</value>
    <derived>true</derived>
    <enabled>false</enabled>
    <visible>false</visible>
@@ -24528,7 +24528,7 @@ parameters are a RESULT of the module parameters. -->
     <slaveName>s1</slaveName>
     <name>onchip_memory2_0.s1</name>
     <baseAddress>0</baseAddress>
-    <span>100000</span>
+    <span>128000</span>
    </memoryBlock>
   </interface>
   <interface name="sw_s1" kind="avalon_master" version="16.0">
@@ -32400,5 +32400,5 @@ parameters are a RESULT of the module parameters. -->
   <version>16.0</version>
  </plugin>
  <reportVersion>16.0 211</reportVersion>
- <uniqueIdentifier>005056C0000800000179A6F2290B</uniqueIdentifier>
+ <uniqueIdentifier>005056C0000800000179B0E33C8E</uniqueIdentifier>
 </EnsembleReport>

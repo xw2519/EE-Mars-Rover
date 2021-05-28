@@ -2,8 +2,8 @@
 <sch:Settings xmlns:sch="http://www.altera.com/embeddedsw/bsp/schema">
         <BspType>hal</BspType>
         <BspVersion>default</BspVersion>
-        <BspGeneratedTimeStamp>26-May-2021 05:38:40</BspGeneratedTimeStamp>
-        <BspGeneratedUnixTimeStamp>1622003920739</BspGeneratedUnixTimeStamp>
+        <BspGeneratedTimeStamp>28-May-2021 03:58:21</BspGeneratedTimeStamp>
+        <BspGeneratedUnixTimeStamp>1622170701717</BspGeneratedUnixTimeStamp>
         <BspGeneratedLocation>E:\DE10_LITE_D8M_VIP_16\software\D8M_Camera_Test_bsp</BspGeneratedLocation>
         <BspSettingsFile>settings.bsp</BspSettingsFile>
         <SopcDesignFile>..\..\Qsys.sopcinfo</SopcDesignFile>
@@ -930,8 +930,8 @@
         </MemoryMap>
         <MemoryMap>
                 <slaveDescriptor>onchip_memory2_0</slaveDescriptor>
-                <addressRange>0x00020000 - 0x0003869F</addressRange>
-                <addressSpan>100000</addressSpan>
+                <addressRange>0x00020000 - 0x0003F3FF</addressRange>
+                <addressSpan>128000</addressSpan>
                 <attributes>memory</attributes>
         </MemoryMap>
         <MemoryMap>

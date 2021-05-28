@@ -3,3 +3,5 @@ docs/project specification/project specification.fdb_latexmk
 docs/project specification/project specification.fls
 docs/project specification/project specification.log
 docs/project specification/project specification.synctex.gz
+vision/DE10_LITE_D8M_VIP_16/db/*
+vision/DE10_LITE_D8M_VIP_16/incremental_db/*

@@ -30,7 +30,7 @@ module EEE_IMGPROC(
 parameter IMAGE_W = 11'd640;
 parameter IMAGE_H = 11'd480;
 parameter MESSAGE_BUF_MAX = 256;
-parameter MSG_INTERVAL = 60;
+parameter MSG_INTERVAL = 20;
 parameter BB_COL_DEFAULT = 24'h00ff00;
 
 wire [7:0]   red, green, blue, grey;
@@ -42,18 +42,18 @@ wire         sop, eop, in_valid, out_ready;
 
 assign grey = red[7:2] + green[7:1] + blue[7:2];
 // Detect ball pixels
-wire   ball_detect, bright_detect, blue_detect, greenblue_detect, pinkred_detect, red_detect;
+wire   ball_detect, bright_detect, blue_detect, greenblue_detect, pink_detect, red_detect;
 assign bright_detect    = (red>=160)|(green>=192)|(blue>=128);
-assign blue_detect      = (red<32)&(green<32)&(blue>=32);
-assign greenblue_detect = (red<64)&(green>=96)&(blue<128);
-assign pinkred_detect   = (red>=192)&(green<128)&(blue<128);
-assign red_detect       = (red>=144)&(green<96)&(blue<64);
-assign ball_detect      = (bright_detect|blue_detect|greenblue_detect|pinkred_detect|red_detect)&(y>=288);
+assign blue_detect      = (blue>=48)&(blue>=red)&(blue>=green)&(blue<144);
+assign greenblue_detect = (green>=32)&(((green>>1)+(green>>3))>=red)&(green>=(blue>>1));
+assign pink_detect      = (red>=192)&(green<128)&(blue<128);
+assign red_detect       = (red>=64)&(((red>>1)+(red>>3))>=green)&((red>>1)>=blue);
+assign ball_detect      = (bright_detect|blue_detect|greenblue_detect|pink_detect|red_detect)&(y>=288);
 
 // Highlight detected areas
 wire [23:0] ball_high;
 assign ball_high = red_detect       ? {8'hdd, 8'h00, 8'h00} :
-									 pinkred_detect   ? {8'hdd, 8'h00, 8'hdd} :
+									 pink_detect      ? {8'hdd, 8'h00, 8'hdd} :
 									 greenblue_detect ? {8'h00, 8'hdd, 8'h00} :
 									 blue_detect      ? {8'h00, 8'h00, 8'hdd} :
 									 bright_detect    ? {8'hdd, 8'hdd, 8'hdd} :
@@ -97,7 +97,7 @@ end
 reg [10:0] x_min, y_min, x_max, y_max;
 wire boundary_detect;
 assign boundary_detect = (frame_count == MSG_INTERVAL-1) ?       red_detect :
-												 (frame_count == MSG_INTERVAL-2) ?   pinkred_detect :
+												 (frame_count == MSG_INTERVAL-2) ?      pink_detect :
 												 (frame_count == MSG_INTERVAL-3) ? greenblue_detect :
 												 (frame_count == MSG_INTERVAL-4) ?      blue_detect :
 												 (frame_count == MSG_INTERVAL-5) ?    bright_detect :
@@ -155,7 +155,7 @@ end
 
 //Process bounding box at the end of the frame.
 `define RED_ID "R"
-`define PINKRED_ID "P"
+`define PINK_ID "P"
 `define GREENBLUE_ID "G"
 `define BLUE_ID "B"
 `define BRIGHT_ID "L"
@@ -179,23 +179,23 @@ always@(posedge clk) begin
 
 		if(msg_buf_size < MESSAGE_BUF_MAX-2) begin
 			case(frame_count)
-				8'h3b: begin
+				MSG_INTERVAL-1: begin
 					msg_id <= `RED_ID;
 					msg_state <= 2'b01;
 				end
-				8'h3a: begin
-					msg_id <= `PINKRED_ID;
+				MSG_INTERVAL-2: begin
+					msg_id <= `PINK_ID;
 					msg_state <= 2'b01;
 				end
-				8'h39: begin
+				MSG_INTERVAL-3: begin
 					msg_id <= `GREENBLUE_ID;
 					msg_state <= 2'b01;
 				end
-				8'h38: begin
+				MSG_INTERVAL-4: begin
 					msg_id <= `BLUE_ID;
 					msg_state <= 2'b01;
 				end
-				8'h37: begin
+				MSG_INTERVAL-5: begin
 					msg_id <= `BRIGHT_ID;
 					msg_state <= 2'b01;
 				end
