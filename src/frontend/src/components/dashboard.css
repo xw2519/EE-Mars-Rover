@@ -65,7 +65,13 @@ html, body {
     grid-row: 2 / 10;
     background-color: black;
   }
-  
+
+  .TerminalLog {
+    position: relative;
+    text-align: left;
+    font-size: 15px;
+  }
+
   .CommandSettings {
     grid-column: 3 / 4;
     grid-row: 10 / 18;

@@ -3,7 +3,63 @@
 .NavButtons {
     text-align: center;
     position: relative;
-    top: 30%
+    top: 20%
+}
+
+.Utility {
+    text-align: center;
+    position: relative;
+    left: 40%
+}
+
+.Start {
+    border-radius: 4px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+}
+
+.Boost {
+    border-radius: 4px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+}
+
+.Top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.Up {
+    display:inline-block;
+    border-radius: 4px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+}
+
+.Left-Up {
+    display:inline-block;
+    border-radius: 4px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+}
+
+.Right-Up {
+    display:inline-block;
+    border-radius: 4px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+}
+
+.Middle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .Halt {
@@ -28,14 +84,27 @@
     width:60px;
 }
 
-.Up {
+.Bottom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.Down {
     border-radius: 4px;
     font-size: 16px;
     height:60px;
     width:60px;
 }
 
-.Down {
+.Left-Down {
+    border-radius: 4px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+}
+
+.Right-Down {
     border-radius: 4px;
     font-size: 16px;
     height:60px;

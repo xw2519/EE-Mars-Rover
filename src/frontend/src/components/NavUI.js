@@ -6,37 +6,32 @@ import ws_server from '../components/socketConfig'
 class NavUI extends React.Component {
     NavUp = () => {
         console.log("UP");
-
-        // Websocket communication 
         ws_server.send("UP");
     }
 
     NavDown = () => {
         console.log("DOWN");
-
-        // Websocket communication 
         ws_server.send("DOWN");
     }
 
     NavRight = () => {
         console.log("RIGHT");
-
-        // Websocket communication 
         ws_server.send("RIGHT");
     }
 
     NavLeft = () => {
         console.log("LEFT");
-
-        // Websocket communication 
         ws_server.send("LEFT");
     }
 
     NavHalt = () => {
         console.log("HALT");
-
-        // Websocket communication 
         ws_server.send("HALT");
+    }
+
+    Start = () => {
+        console.log("START");
+        ws_server.send("START");
     }
     
     /* Serve landing page */
@@ -45,8 +40,15 @@ class NavUI extends React.Component {
         return (
     
             <div className="NavButtons">
+                <div className="Utility"> 
+                    <button className = "Start" onClick={this.Start}> Start </button>
+                    <button className = "Boost" onClick={this.Start}> Boost </button>
+                </div>
+
                 <div className="Top"> 
+                    <button className = "Left-Up" onClick={this.NavUp}> Left-Up </button>
                     <button className = "Up" onClick={this.NavUp}> Up </button>
+                    <button className = "Right-Up" onClick={this.NavUp}> Right-Up </button>
                 </div>
                 <div className="Middle"> 
                     <button className = "Left" onClick={this.NavLeft}> Left </button>
@@ -54,7 +56,9 @@ class NavUI extends React.Component {
                     <button className = "Right" onClick={this.NavRight}> Right </button>
                 </div>
                 <div className="Bottom"> 
+                    <button className = "Left-Down" onClick={this.NavDown}> Left-Down </button>
                     <button className = "Down" onClick={this.NavDown}> Down </button>
+                    <button className = "Right-Down" onClick={this.NavDown}> Right-Down </button>
                 </div>
             </div>
 
