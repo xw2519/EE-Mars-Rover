@@ -244,15 +244,17 @@ int main(){
             if((word&0xC0000000)&&(filter_id == 'L')){                //Last part of data from image processor arrives
 
               if(calibration<CALIBRATION_MAX){                       //If calibrating, reduce gain if ball_count is not zero
-                if(ball_count & (gain>GAIN_STEP)){
+                if(ball_count && (gain>GAIN_STEP)){
                   gain -= GAIN_STEP;
             		  OV8865SetGain(gain);
-            		  printf("\nGain = %x ", gain);
+            		  printf("Gain = %x\n", gain);
                 }else{
                   calibration++;
                 }
+                printf("Calibration = %d\n", calibration);
               }
-              process = 1;                                           //Start processing the data
+              if(calibration == CALIBRATION_MAX){ process = 1; }     //Start processing the data
+              else{ ball_count = 0; }
             }
 
             if(word&0xFFC00000){                                     //The word is about filter data, append to arrays
@@ -265,9 +267,15 @@ int main(){
                 filter_x_max[filter_index(filter_id)] = x_max;
               }
 
+              /*if(word&0xC0000000){ printf("\nY "); }
+              else{ printf("\nX "); }
+              printf("%c %03x %03x\n", filter_id, x_max, x_min);*/
+
             }else if((x_max-x_min)>20){                              //The word is about ball data, append to arrays and increment ball_count
-              appendArray(&ball_x_min, x_min);
-              appendArray(&ball_x_max, x_max);
+              if((ball_x_min.used<8)&&(calibration == CALIBRATION_MAX)){
+                appendArray(&ball_x_min, x_min);
+                appendArray(&ball_x_max, x_max);
+              }
               ball_count++;
             }
 				}
@@ -288,13 +296,11 @@ int main(){
 
           process = 0;
           ball_count = 0;
-          freeArray(&ball_x_min);
-          freeArray(&ball_x_max);
-          initArray(&ball_x_min, 4);
-          initArray(&ball_x_max, 4);
+          ball_x_min.used = 0;
+          ball_x_max.used = 0;
         }
 
-        getchar();
+        //getchar();
   			//Main loop delay
   			usleep(10000);
 		}
