@@ -186,7 +186,6 @@ int main(){
 		FILE* ctrl_uart;
 	  ctrl_uart = fopen("/dev/control_uart", "r+");
 
-		fprintf(ctrl_uart, "Starting control uart...\n");
 		printf("Started control uart...\n");
 
 	  usleep(2000);
@@ -223,11 +222,10 @@ int main(){
 
 		while(1){
 
-				fprintf(ctrl_uart, "looping message\n");
-
 				// touch KEY0 to trigger Auto focus, KEY1 to trigger gain sdjustment
 				if((IORD(KEY_BASE,0)&0x03) == 0x01){
-          current_focus = Focus_Window(320,240);
+          //current_focus = Focus_Window(320,240);
+          if(ctrl_uart){ fprintf(ctrl_uart, "control message\n"); }
         }
         if((IORD(KEY_BASE,0)&0x03) == 0x02){
           calibration = 0;
