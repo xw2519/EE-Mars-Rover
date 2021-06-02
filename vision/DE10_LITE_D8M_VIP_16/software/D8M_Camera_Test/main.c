@@ -25,8 +25,8 @@
 #define EEE_IMGPROC_ID     2
 #define EEE_IMGPROC_BBCOL  3
 
-#define GAIN_STEP      0x040
-#define EXPOSURE_STEP 0x1000
+#define GAIN_STEP       0x40
+#define EXPOSURE_STEP  0x100
 #define CALIBRATION_MAX    8
 
 #define MIPI_REG_PHYClkCtl		0x0056
@@ -52,7 +52,7 @@ typedef struct{
 FILE*   ctrl_uart;
 
 alt_u16 gain          =   0x7FF;
-alt_u32 exposure      = 0xFFEFF;
+alt_u32 exposure      =  0x2000;
 alt_u16 current_focus =     300;
 
 alt_u16 x_min, x_max, distance;
@@ -199,14 +199,17 @@ void sys_timer_isr(){
   // touch KEY0 to trigger Auto focus, KEY1 to trigger gain sdjustment
   if((IORD(KEY_BASE,0)&0x03) == 0x01){
     //current_focus = Focus_Window(320,240);
-    if(ctrl_uart){ fprintf(ctrl_uart, "button pressed\n"); }
     printf("button pressed\n");
+    if(ctrl_uart){ fprintf(ctrl_uart, "on"); }
   }
   if((IORD(KEY_BASE,0)&0x03) == 0x02){
     calibration = 0;
     gain = 0x7FF;
     OV8865SetGain(gain);
     printf("\nGain = %x ", gain);
+    exposure = 0x2000;
+    OV8865SetExposure(exposure);
+    printf("Exposure = %x\n", exposure);
   }
 
   //Read messages from the image processor and process them
@@ -222,14 +225,13 @@ void sys_timer_isr(){
           if(ball_count && (exposure>EXPOSURE_STEP)){
             if(gain>GAIN_STEP){
               gain -= GAIN_STEP;
+              OV8865SetGain(gain);
+              printf("Gain = %x\n", gain);
             }else{
-              gain = 0x07FF;
               exposure -= EXPOSURE_STEP;
               OV8865SetExposure(exposure);
               printf("Exposure = %x\n", exposure);
             }
-            OV8865SetGain(gain);
-            printf("Gain = %x\n", gain);
           }else{
             calibration++;
           }
@@ -334,8 +336,8 @@ int main(){
         else{ state = 0; }
         if(state == 2){
           state = 0;
-          if(ctrl_uart){ fprintf(ctrl_uart, "on received\n"); }
           printf("on received\n");
+          if(ctrl_uart){ fprintf(ctrl_uart, "on"); }
         }
 
       }
