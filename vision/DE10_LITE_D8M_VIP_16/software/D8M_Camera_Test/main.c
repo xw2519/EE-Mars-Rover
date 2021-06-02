@@ -42,6 +42,28 @@
 #define MIPI_REG_FrmErrCnt		0x0080
 #define MIPI_REG_MDLErrCnt		0x0090
 
+typedef struct{
+  alt_u16 *data;
+  size_t used;
+  size_t size;
+} Array;
+
+
+FILE*   ctrl_uart;
+
+alt_u16 gain          =   0x7FF;
+alt_u32 exposure      = 0xFFEFF;
+alt_u16 current_focus =     300;
+
+alt_u16 x_min, x_max, distance;
+alt_u8  ball_count, filter_id;
+alt_u8  calibration = 0, process = 0;
+alt_u16 filter_x_min[5], filter_x_max[5], filter_y_min[5], filter_y_max[5];
+Array   ball_x_min, ball_x_max;
+
+alt_u8  prompt, state = 0;
+
+
 void mipi_clear_error(void){
   MipiBridgeRegWrite(MIPI_REG_CSIStatus,0x01FF); // clear error
 	MipiBridgeRegWrite(MIPI_REG_MDLSynErr,0x0000); // clear error
@@ -106,12 +128,6 @@ bool MIPI_Init(void){
 }
 
 
-typedef struct{
-  alt_u16 *data;
-  size_t used;
-  size_t size;
-} Array;
-
 void initArray(Array *a, size_t init_size){
 
   a->data = malloc(init_size * sizeof(alt_u16));
@@ -168,6 +184,106 @@ alt_u8 get_filter_id(alt_u8 index){
 }
 
 
+void timer_init(void* isr){
+
+    IOWR_ALTERA_AVALON_TIMER_CONTROL(TIMER_BASE, 0x0003);
+    IOWR_ALTERA_AVALON_TIMER_STATUS(TIMER_BASE, 0);
+    IOWR_ALTERA_AVALON_TIMER_PERIODL(TIMER_BASE, 0xC000);
+    IOWR_ALTERA_AVALON_TIMER_PERIODH(TIMER_BASE, 0x0000);
+    alt_irq_register(TIMER_IRQ, 0, isr);
+    IOWR_ALTERA_AVALON_TIMER_CONTROL(TIMER_BASE, 0x0007);
+}
+
+void sys_timer_isr(){
+
+  // touch KEY0 to trigger Auto focus, KEY1 to trigger gain sdjustment
+  if((IORD(KEY_BASE,0)&0x03) == 0x01){
+    //current_focus = Focus_Window(320,240);
+    if(ctrl_uart){ fprintf(ctrl_uart, "button pressed\n"); }
+    printf("button pressed\n");
+  }
+  if((IORD(KEY_BASE,0)&0x03) == 0x02){
+    calibration = 0;
+    gain = 0x7FF;
+    OV8865SetGain(gain);
+    printf("\nGain = %x ", gain);
+  }
+
+  //Read messages from the image processor and process them
+  while ((IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_STATUS)>>8) & 0xff) { 	//Find out if there are words to read
+      int word = IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_MSG); 			//Get next word from message buffer
+      x_min = (word>>11)&0x7FF;
+      x_max = word&0x7FF;
+      filter_id = (word&0x3FC00000) >> 22;
+
+      if((word&0xC0000000)&&(filter_id == 'L')){                //Last part of data from image processor arrives
+
+        if(calibration<CALIBRATION_MAX){                       //If calibrating, reduce gain if ball_count is not zero
+          if(ball_count && (exposure>EXPOSURE_STEP)){
+            if(gain>GAIN_STEP){
+              gain -= GAIN_STEP;
+            }else{
+              gain = 0x07FF;
+              exposure -= EXPOSURE_STEP;
+              OV8865SetExposure(exposure);
+              printf("Exposure = %x\n", exposure);
+            }
+            OV8865SetGain(gain);
+            printf("Gain = %x\n", gain);
+          }else{
+            calibration++;
+          }
+          printf("Calibration = %d\n", calibration);
+        }
+        if(calibration == CALIBRATION_MAX){ process = 1; }     //Start processing the data
+        else{ ball_count = 0; }
+      }
+
+      if(word&0xFFC00000){                                     //The word is about filter data, append to arrays
+
+        if(word&0xC0000000){
+          filter_y_min[filter_index(filter_id)] = x_min;
+          filter_y_max[filter_index(filter_id)] = x_max;
+        }else{
+          filter_x_min[filter_index(filter_id)] = x_min;
+          filter_x_max[filter_index(filter_id)] = x_max;
+        }
+
+        /*if(word&0xC0000000){ printf("\nY "); }
+        else{ printf("\nX "); }
+        printf("%c %03x %03x\n", filter_id, x_max, x_min);*/
+
+      }else if((x_max-x_min)>20){                              //The word is about ball data, append to arrays and increment ball_count
+        if((ball_x_min.used<8)&&(calibration == CALIBRATION_MAX)){
+          appendArray(&ball_x_min, x_min);
+          appendArray(&ball_x_max, x_max);
+        }
+        ball_count++;
+      }
+  }
+
+  if(process){
+    printf("Counted %d balls.\n\n", ball_x_min.used);
+    for(alt_u8 i=0; i<(ball_x_min.used); i++){
+      printf("Ball %d:\n", i+1);
+      printf("    Distance: %03d\n", (2560/(ball_x_max.data[i] - ball_x_min.data[i])));
+      printf("    Filters triggered: ");
+      for(alt_u8 j=0; j<5; j++){
+        if(!( (filter_x_min[j] > ball_x_max.data[i]) || (filter_x_max[j] < ball_x_min.data[i]) )){
+          printf("%c ", get_filter_id(j));
+        }
+      }
+      printf("\n\n");
+    }
+
+    process = 0;
+    ball_count = 0;
+    ball_x_min.used = 0;
+    ball_x_max.used = 0;
+  }
+
+}
+
 int main(){
 
 		fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);
@@ -182,12 +298,6 @@ int main(){
 	  IOWR(MIPI_RESET_N_BASE, 0x00, 0xFF);
 
 	  printf("Image Processor ID: %x\n",IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_ID));
-
-		FILE* ctrl_uart;
-	  ctrl_uart = fopen("/dev/control_uart", "r+");
-
-		printf("Started control uart...\n");
-
 	  usleep(2000);
 
 		// MIPI Init
@@ -200,115 +310,36 @@ int main(){
 		usleep(1000*1000);
 		mipi_show_error_info();
 
-		//////////////////////////////////////////////////////////
-		alt_u16 gain          =   0x7FF;
-    alt_u32 exposure      = 0xFFEFF;
-    alt_u16 current_focus =     300;
+	  ctrl_uart = fopen("/dev/control_uart", "r+");
+		printf("Started control uart...\n");
+
+    initArray(&ball_x_min, 4);
+    initArray(&ball_x_max, 4);
+
 
 		OV8865SetExposure(exposure);
 		OV8865SetGain(gain);
 		Focus_Init();
 
-    //////////////////////////////////////////////////////////
-    alt_u16 x_min, x_max, distance;
-    alt_u8 ball_count, filter_id;
-    alt_u8 calibration = 0, process = 0;
 
-    Array ball_x_min, ball_x_max;
-    alt_u16 filter_x_min[5], filter_x_max[5], filter_y_min[5], filter_y_max[5];
+    timer_init(sys_timer_isr);
 
-    initArray(&ball_x_min, 4);
-    initArray(&ball_x_max, 4);
 
 		while(1){
 
-				// touch KEY0 to trigger Auto focus, KEY1 to trigger gain sdjustment
-				if((IORD(KEY_BASE,0)&0x03) == 0x01){
-          //current_focus = Focus_Window(320,240);
-          if(ctrl_uart){ fprintf(ctrl_uart, "control message\n"); }
-        }
-        if((IORD(KEY_BASE,0)&0x03) == 0x02){
-          calibration = 0;
-          gain = 0x7FF;
-          OV8865SetGain(gain);
-          printf("\nGain = %x ", gain);
-        }
-
-				//Read messages from the image processor and process them
-				while ((IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_STATUS)>>8) & 0xff) { 	//Find out if there are words to read
-						int word = IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_MSG); 			//Get next word from message buffer
-            x_min = (word>>11)&0x7FF;
-            x_max = word&0x7FF;
-            filter_id = (word&0x3FC00000) >> 22;
-
-            if((word&0xC0000000)&&(filter_id == 'L')){                //Last part of data from image processor arrives
-
-              if(calibration<CALIBRATION_MAX){                       //If calibrating, reduce gain if ball_count is not zero
-                if(ball_count && (exposure>EXPOSURE_STEP)){
-                  if(gain>GAIN_STEP){
-                    gain -= GAIN_STEP;
-                  }else{
-                    gain = 0x07FF;
-                    exposure -= EXPOSURE_STEP;
-                    OV8865SetExposure(exposure);
-                    printf("Exposure = %x\n", exposure);
-                  }
-            		  OV8865SetGain(gain);
-            		  printf("Gain = %x\n", gain);
-                }else{
-                  calibration++;
-                }
-                printf("Calibration = %d\n", calibration);
-              }
-              if(calibration == CALIBRATION_MAX){ process = 1; }     //Start processing the data
-              else{ ball_count = 0; }
-            }
-
-            if(word&0xFFC00000){                                     //The word is about filter data, append to arrays
-
-              if(word&0xC0000000){
-                filter_y_min[filter_index(filter_id)] = x_min;
-                filter_y_max[filter_index(filter_id)] = x_max;
-              }else{
-                filter_x_min[filter_index(filter_id)] = x_min;
-                filter_x_max[filter_index(filter_id)] = x_max;
-              }
-
-              /*if(word&0xC0000000){ printf("\nY "); }
-              else{ printf("\nX "); }
-              printf("%c %03x %03x\n", filter_id, x_max, x_min);*/
-
-            }else if((x_max-x_min)>20){                              //The word is about ball data, append to arrays and increment ball_count
-              if((ball_x_min.used<8)&&(calibration == CALIBRATION_MAX)){
-                appendArray(&ball_x_min, x_min);
-                appendArray(&ball_x_max, x_max);
-              }
-              ball_count++;
-            }
-				}
-
-        if(process){
-          printf("Counted %d balls.\n\n", ball_x_min.used);
-          for(alt_u8 i=0; i<(ball_x_min.used); i++){
-            printf("Ball %d:\n", i+1);
-            printf("    Distance: %03d\n", (2560/(ball_x_max.data[i] - ball_x_min.data[i])));
-            printf("    Filters triggered: ");
-            for(alt_u8 j=0; j<5; j++){
-              if(!( (filter_x_min[j] > ball_x_max.data[i]) || (filter_x_max[j] < ball_x_min.data[i]) )){
-                printf("%c ", get_filter_id(j));
-              }
-            }
-            printf("\n\n");
-          }
-
-          process = 0;
-          ball_count = 0;
-          ball_x_min.used = 0;
-          ball_x_max.used = 0;
+      if(ctrl_uart){
+        prompt = getc(ctrl_uart);
+        if(prompt == 'o'){ state = 1; }
+        else if((prompt == 'n') && (state == 1)){ state = 2; }
+        else{ state = 0; }
+        if(state == 2){
+          state = 0;
+          if(ctrl_uart){ fprintf(ctrl_uart, "on received\n"); }
+          printf("on received\n");
         }
 
-  			//Main loop delay
-  			usleep(10000);
+      }
 		}
+
 		return 0;
 }
