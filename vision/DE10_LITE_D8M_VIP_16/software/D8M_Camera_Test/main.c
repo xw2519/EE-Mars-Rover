@@ -26,6 +26,7 @@
 #define EEE_IMGPROC_BBCOL  3
 
 #define GAIN_STEP      0x040
+#define EXPOSURE_STEP 0x1000
 #define CALIBRATION_MAX    8
 
 #define MIPI_REG_PHYClkCtl		0x0056
@@ -201,10 +202,11 @@ int main(){
 		mipi_show_error_info();
 
 		//////////////////////////////////////////////////////////
-		alt_u16 gain          = 0x7FF;
-    alt_u16 current_focus =   300;
+		alt_u16 gain          =   0x7FF;
+    alt_u32 exposure      = 0xFFEFF;
+    alt_u16 current_focus =     300;
 
-		OV8865SetExposure(0x0FFEFF);
+		OV8865SetExposure(exposure);
 		OV8865SetGain(gain);
 		Focus_Init();
 
@@ -221,7 +223,7 @@ int main(){
 
 		while(1){
 
-				fprintf(ctrl_uart, "Looping message to control.\n");
+				fprintf(ctrl_uart, "looping message\n");
 
 				// touch KEY0 to trigger Auto focus, KEY1 to trigger gain sdjustment
 				if((IORD(KEY_BASE,0)&0x03) == 0x01){
@@ -244,8 +246,15 @@ int main(){
             if((word&0xC0000000)&&(filter_id == 'L')){                //Last part of data from image processor arrives
 
               if(calibration<CALIBRATION_MAX){                       //If calibrating, reduce gain if ball_count is not zero
-                if(ball_count && (gain>GAIN_STEP)){
-                  gain -= GAIN_STEP;
+                if(ball_count && (exposure>EXPOSURE_STEP)){
+                  if(gain>GAIN_STEP){
+                    gain -= GAIN_STEP;
+                  }else{
+                    gain = 0x07FF;
+                    exposure -= EXPOSURE_STEP;
+                    OV8865SetExposure(exposure);
+                    printf("Exposure = %x\n", exposure);
+                  }
             		  OV8865SetGain(gain);
             		  printf("Gain = %x\n", gain);
                 }else{
@@ -300,7 +309,6 @@ int main(){
           ball_x_max.used = 0;
         }
 
-        //getchar();
   			//Main loop delay
   			usleep(10000);
 		}

@@ -178,8 +178,8 @@ Qsys u0 (
 		
 		.eee_imgproc_0_conduit_mode_new_signal     (SW[0]),
 		
-		.control_uart_external_connection_rxd      (ARDUINO_IO[0]),
-		.control_uart_external_connection_txd      (ARDUINO_IO[1])
+		.control_uart_external_connection_rxd      (ARDUINO_IO[1]),
+		.control_uart_external_connection_txd      (ARDUINO_IO[0])
 	);
 
 FpsMonitor uFps(
