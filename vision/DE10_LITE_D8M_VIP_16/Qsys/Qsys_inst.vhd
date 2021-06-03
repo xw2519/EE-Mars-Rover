@@ -14,8 +14,8 @@
 			clk_clk                                   : in    std_logic                     := 'X';             -- clk
 			clk_sdram_clk                             : out   std_logic;                                        -- clk
 			clk_vga_clk                               : out   std_logic;                                        -- clk
-			control_uart_external_connection_rxd      : in    std_logic                     := 'X';             -- rxd
-			control_uart_external_connection_txd      : out   std_logic;                                        -- txd
+			control_uart_external_interface_RXD       : in    std_logic                     := 'X';             -- RXD
+			control_uart_external_interface_TXD       : out   std_logic;                                        -- TXD
 			d8m_xclkin_clk                            : out   std_logic;                                        -- clk
 			eee_imgproc_0_conduit_mode_new_signal     : in    std_logic                     := 'X';             -- new_signal
 			i2c_opencores_camera_export_scl_pad_io    : inout std_logic                     := 'X';             -- scl_pad_io
@@ -63,8 +63,8 @@
 			clk_clk                                   => CONNECTED_TO_clk_clk,                                   --                              clk.clk
 			clk_sdram_clk                             => CONNECTED_TO_clk_sdram_clk,                             --                        clk_sdram.clk
 			clk_vga_clk                               => CONNECTED_TO_clk_vga_clk,                               --                          clk_vga.clk
-			control_uart_external_connection_rxd      => CONNECTED_TO_control_uart_external_connection_rxd,      -- control_uart_external_connection.rxd
-			control_uart_external_connection_txd      => CONNECTED_TO_control_uart_external_connection_txd,      --                                 .txd
+			control_uart_external_interface_RXD       => CONNECTED_TO_control_uart_external_interface_RXD,       --  control_uart_external_interface.RXD
+			control_uart_external_interface_TXD       => CONNECTED_TO_control_uart_external_interface_TXD,       --                                 .TXD
 			d8m_xclkin_clk                            => CONNECTED_TO_d8m_xclkin_clk,                            --                       d8m_xclkin.clk
 			eee_imgproc_0_conduit_mode_new_signal     => CONNECTED_TO_eee_imgproc_0_conduit_mode_new_signal,     --       eee_imgproc_0_conduit_mode.new_signal
 			i2c_opencores_camera_export_scl_pad_io    => CONNECTED_TO_i2c_opencores_camera_export_scl_pad_io,    --      i2c_opencores_camera_export.scl_pad_io

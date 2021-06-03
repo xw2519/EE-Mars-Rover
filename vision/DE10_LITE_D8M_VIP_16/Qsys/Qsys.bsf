@@ -48,8 +48,8 @@ agreement for further details.
 	(port
 		(pt 0 360)
 		(input)
-		(text "control_uart_external_connection_rxd" (rect 0 0 149 12)(font "Arial" (font_size 8)))
-		(text "control_uart_external_connection_rxd" (rect 4 349 220 360)(font "Arial" (font_size 8)))
+		(text "control_uart_external_interface_RXD" (rect 0 0 151 12)(font "Arial" (font_size 8)))
+		(text "control_uart_external_interface_RXD" (rect 4 349 214 360)(font "Arial" (font_size 8)))
 		(line (pt 0 360)(pt 240 360)(line_width 1))
 	)
 	(port
@@ -195,8 +195,8 @@ agreement for further details.
 	(port
 		(pt 0 376)
 		(output)
-		(text "control_uart_external_connection_txd" (rect 0 0 148 12)(font "Arial" (font_size 8)))
-		(text "control_uart_external_connection_txd" (rect 4 365 220 376)(font "Arial" (font_size 8)))
+		(text "control_uart_external_interface_TXD" (rect 0 0 148 12)(font "Arial" (font_size 8)))
+		(text "control_uart_external_interface_TXD" (rect 4 365 214 376)(font "Arial" (font_size 8)))
 		(line (pt 0 376)(pt 240 376)(line_width 1))
 	)
 	(port
@@ -353,9 +353,9 @@ agreement for further details.
 		(text "clk" (rect 321 67 660 144)(font "Arial" (color 0 0 0)))
 		(text "clk_vga" (rect 337 83 716 179)(font "Arial" (color 128 0 0)(font_size 9)))
 		(text "clk" (rect 321 107 660 224)(font "Arial" (color 0 0 0)))
-		(text "control_uart_external_connection" (rect 48 331 288 675)(font "Arial" (color 128 0 0)(font_size 9)))
-		(text "rxd" (rect 245 355 508 720)(font "Arial" (color 0 0 0)))
-		(text "txd" (rect 245 371 508 752)(font "Arial" (color 0 0 0)))
+		(text "control_uart_external_interface" (rect 58 331 302 675)(font "Arial" (color 128 0 0)(font_size 9)))
+		(text "RXD" (rect 245 355 508 720)(font "Arial" (color 0 0 0)))
+		(text "TXD" (rect 245 371 508 752)(font "Arial" (color 0 0 0)))
 		(text "d8m_xclkin" (rect 337 123 734 259)(font "Arial" (color 128 0 0)(font_size 9)))
 		(text "clk" (rect 321 147 660 304)(font "Arial" (color 0 0 0)))
 		(text "eee_imgproc_0_conduit_mode" (rect 62 387 280 787)(font "Arial" (color 128 0 0)(font_size 9)))

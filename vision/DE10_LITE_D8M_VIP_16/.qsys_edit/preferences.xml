@@ -9,7 +9,6 @@
    <export preferredWidth="267" />
   </columns>
  </systemtable>
- <library
-   expandedCategories="Project,Library/University Program/Communications,Library/Interface Protocols/Serial,Library/University Program,Library,Library/Interface Protocols" />
+ <library expandedCategories="Library,Project" />
  <window width="1936" height="1056" x="-8" y="-8" />
 </preferences>

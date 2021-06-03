@@ -14,8 +14,8 @@ module Qsys (
 	clk_clk,
 	clk_sdram_clk,
 	clk_vga_clk,
-	control_uart_external_connection_rxd,
-	control_uart_external_connection_txd,
+	control_uart_external_interface_RXD,
+	control_uart_external_interface_TXD,
 	d8m_xclkin_clk,
 	eee_imgproc_0_conduit_mode_new_signal,
 	i2c_opencores_camera_export_scl_pad_io,
@@ -59,8 +59,8 @@ module Qsys (
 	input		clk_clk;
 	output		clk_sdram_clk;
 	output		clk_vga_clk;
-	input		control_uart_external_connection_rxd;
-	output		control_uart_external_connection_txd;
+	input		control_uart_external_interface_RXD;
+	output		control_uart_external_interface_TXD;
 	output		d8m_xclkin_clk;
 	input		eee_imgproc_0_conduit_mode_new_signal;
 	inout		i2c_opencores_camera_export_scl_pad_io;

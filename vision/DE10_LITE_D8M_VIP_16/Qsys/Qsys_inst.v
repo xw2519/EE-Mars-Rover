@@ -13,8 +13,8 @@
 		.clk_clk                                   (<connected-to-clk_clk>),                                   //                              clk.clk
 		.clk_sdram_clk                             (<connected-to-clk_sdram_clk>),                             //                        clk_sdram.clk
 		.clk_vga_clk                               (<connected-to-clk_vga_clk>),                               //                          clk_vga.clk
-		.control_uart_external_connection_rxd      (<connected-to-control_uart_external_connection_rxd>),      // control_uart_external_connection.rxd
-		.control_uart_external_connection_txd      (<connected-to-control_uart_external_connection_txd>),      //                                 .txd
+		.control_uart_external_interface_RXD       (<connected-to-control_uart_external_interface_RXD>),       //  control_uart_external_interface.RXD
+		.control_uart_external_interface_TXD       (<connected-to-control_uart_external_interface_TXD>),       //                                 .TXD
 		.d8m_xclkin_clk                            (<connected-to-d8m_xclkin_clk>),                            //                       d8m_xclkin.clk
 		.eee_imgproc_0_conduit_mode_new_signal     (<connected-to-eee_imgproc_0_conduit_mode_new_signal>),     //       eee_imgproc_0_conduit_mode.new_signal
 		.i2c_opencores_camera_export_scl_pad_io    (<connected-to-i2c_opencores_camera_export_scl_pad_io>),    //      i2c_opencores_camera_export.scl_pad_io

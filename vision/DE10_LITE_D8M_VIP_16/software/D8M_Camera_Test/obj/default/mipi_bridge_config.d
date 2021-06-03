@@ -13,6 +13,7 @@ obj/default/mipi_bridge_config.o: mipi_bridge_config.c I2C_core.h \
  ../D8M_Camera_Test_bsp//HAL/inc/sys/alt_irq.h \
  ../D8M_Camera_Test_bsp//HAL/inc/nios2.h ../D8M_Camera_Test_bsp/system.h \
  ../D8M_Camera_Test_bsp/linker.h \
+ ../D8M_Camera_Test_bsp//HAL/inc/priv/alt_legacy_irq.h \
  ../D8M_Camera_Test_bsp//HAL/inc/sys/alt_alarm.h \
  ../D8M_Camera_Test_bsp//HAL/inc/sys/alt_llist.h \
  ../D8M_Camera_Test_bsp//HAL/inc/priv/alt_alarm.h \
@@ -55,6 +56,8 @@ terasic_includes.h:
 ../D8M_Camera_Test_bsp/system.h:
 
 ../D8M_Camera_Test_bsp/linker.h:
+
+../D8M_Camera_Test_bsp//HAL/inc/priv/alt_legacy_irq.h:
 
 ../D8M_Camera_Test_bsp//HAL/inc/sys/alt_alarm.h:
 

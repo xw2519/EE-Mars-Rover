@@ -2,6 +2,7 @@
 #include "altera_avalon_timer_regs.h"
 #include "altera_avalon_timer.h"
 #include "altera_avalon_pio_regs.h"
+#include "altera_up_avalon_rs232.h"
 #include "sys/alt_irq.h"
 #include <stdlib.h>
 #include <string.h>
@@ -49,7 +50,8 @@ typedef struct{
 } Array;
 
 
-FILE*   ctrl_uart;
+//FILE*   ctrl_uart;
+alt_up_rs232_dev* ctrl_uart;
 
 alt_u16 gain          =   0x7FF;
 alt_u32 exposure      =  0x2000;
@@ -62,7 +64,7 @@ alt_u8  calibration = 0, process = 0;
 alt_u8  filters_triggered;
 Array   ball_x_min, ball_x_max, ball_triggered;
 
-alt_u8  prompt, state = 0;
+alt_u8  prompt, parity_bit, state = 0;
 
 
 void mipi_clear_error(void){
@@ -201,7 +203,16 @@ void sys_timer_isr(){
   if((IORD(KEY_BASE,0)&0x03) == 0x01){
     current_focus = Focus_Window(320,240);
     printf("button pressed ");
-    if(ctrl_uart){ printf("%d\n", fprintf(ctrl_uart, "hello")); }
+    //if(ctrl_uart){ printf("%d\n", fprintf(ctrl_uart, "hello")); }
+    if(ctrl_uart){
+      if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)>5){
+        alt_up_rs232_write_data(ctrl_uart, 'h');
+        alt_up_rs232_write_data(ctrl_uart, 'h');
+        alt_up_rs232_write_data(ctrl_uart, 'h');
+        alt_up_rs232_write_data(ctrl_uart, 'h');
+        alt_up_rs232_write_data(ctrl_uart, 'h');
+      }
+    }
   }
   if((IORD(KEY_BASE,0)&0x03) == 0x02){
     calibration = 0;
@@ -367,7 +378,8 @@ int main(){
 		usleep(1000*1000);
 		mipi_show_error_info();
 
-	  ctrl_uart = fopen("/dev/control_uart", "r+");
+	  //ctrl_uart = fopen("/dev/control_uart", "r+");
+    ctrl_uart = alt_up_rs232_open_dev("/dev/control_uart");
 		if(ctrl_uart){ printf("Started control uart...\n"); }
 
     initArray(&ball_x_min, 4);
@@ -386,7 +398,11 @@ int main(){
 		while(1){
 
       if(ctrl_uart){
-        prompt = getc(ctrl_uart);
+        if(alt_up_rs232_get_used_space_in_read_FIFO(ctrl_uart)){
+          alt_up_rs232_read_data(ctrl_uart, &prompt, &parity_bit);
+          printf("%c", prompt);
+        }
+        /*prompt = getc(ctrl_uart);
         printf("%c", prompt);
         if(prompt == 'o'){ state = 1; }
         else if((prompt == 'n') && (state == 1)){ state = 2; }
@@ -395,7 +411,7 @@ int main(){
           state = 0;
           //printf("on received\n");
           //if(ctrl_uart){ fprintf(ctrl_uart, "on"); }
-        }
+        }*/
 
       }
 		}
