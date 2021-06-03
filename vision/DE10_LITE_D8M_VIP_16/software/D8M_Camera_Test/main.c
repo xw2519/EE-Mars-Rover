@@ -56,10 +56,11 @@ alt_u32 exposure      =  0x2000;
 alt_u16 current_focus =     300;
 
 alt_u16 x_min, x_max, distance;
-alt_u8  ball_count, filter_id;
-alt_u8  calibration = 0, process = 0;
 alt_u16 filter_x_min[5], filter_x_max[5], filter_y_min[5], filter_y_max[5];
-Array   ball_x_min, ball_x_max;
+alt_u8  balls_detected, filter_id;
+alt_u8  calibration = 0, process = 0;
+alt_u8  filters_triggered;
+Array   ball_x_min, ball_x_max, ball_triggered;
 
 alt_u8  prompt, state = 0;
 
@@ -198,16 +199,17 @@ void sys_timer_isr(){
 
   // touch KEY0 to trigger Auto focus, KEY1 to trigger gain sdjustment
   if((IORD(KEY_BASE,0)&0x03) == 0x01){
-    //current_focus = Focus_Window(320,240);
+    current_focus = Focus_Window(320,240);
     printf("button pressed\n");
     if(ctrl_uart){ fprintf(ctrl_uart, "on"); }
   }
   if((IORD(KEY_BASE,0)&0x03) == 0x02){
     calibration = 0;
-    gain = 0x7FF;
+    gain        = 0x7FF;
+    exposure    = 0x2000;
+
     OV8865SetGain(gain);
     printf("\nGain = %x ", gain);
-    exposure = 0x2000;
     OV8865SetExposure(exposure);
     printf("Exposure = %x\n", exposure);
   }
@@ -221,8 +223,8 @@ void sys_timer_isr(){
 
       if((word&0xC0000000)&&(filter_id == 'L')){                //Last part of data from image processor arrives
 
-        if(calibration<CALIBRATION_MAX){                       //If calibrating, reduce gain if ball_count is not zero
-          if(ball_count && (exposure>EXPOSURE_STEP)){
+        if(calibration<CALIBRATION_MAX){                        //If calibrating, reduce gain if ball count is not zero
+          if(balls_detected && (exposure>EXPOSURE_STEP)){
             if(gain>GAIN_STEP){
               gain -= GAIN_STEP;
               OV8865SetGain(gain);
@@ -237,8 +239,8 @@ void sys_timer_isr(){
           }
           printf("Calibration = %d\n", calibration);
         }
-        if(calibration == CALIBRATION_MAX){ process = 1; }     //Start processing the data
-        else{ ball_count = 0; }
+        if(calibration == CALIBRATION_MAX){ process = 1; }     //Start processing the data if calibrated
+        else{ balls_detected = 0; }
       }
 
       if(word&0xFFC00000){                                     //The word is about filter data, append to arrays
@@ -255,33 +257,63 @@ void sys_timer_isr(){
         else{ printf("\nX "); }
         printf("%c %03x %03x\n", filter_id, x_max, x_min);*/
 
-      }else if((x_max-x_min)>20){                              //The word is about ball data, append to arrays and increment ball_count
+      }else if((x_max-x_min)>20){                              //The word is about ball data, append to arrays and increment ball count
         if((ball_x_min.used<8)&&(calibration == CALIBRATION_MAX)){
           appendArray(&ball_x_min, x_min);
           appendArray(&ball_x_max, x_max);
         }
-        ball_count++;
+        balls_detected = 1;
       }
   }
 
   if(process){
-    printf("Counted %d balls.\n\n", ball_x_min.used);
+    printf("Counted %d balls.\n\n", ball_x_min.used);                                                // 1) Ball count
     for(alt_u8 i=0; i<(ball_x_min.used); i++){
       printf("Ball %d:\n", i+1);
-      printf("    Distance: %03d\n", (2560/(ball_x_max.data[i] - ball_x_min.data[i])));
+      printf("    Distance: %03d\n", (2560/(ball_x_max.data[i] - ball_x_min.data[i])));              // 2) Distance to each ball
       printf("    Filters triggered: ");
+      filters_triggered = 0;
       for(alt_u8 j=0; j<5; j++){
         if(!( (filter_x_min[j] > ball_x_max.data[i]) || (filter_x_max[j] < ball_x_min.data[i]) )){
+          filters_triggered |= 1 << j;
           printf("%c ", get_filter_id(j));
         }
       }
+      appendArray(&ball_triggered, filters_triggered);
       printf("\n\n");
+    }
+    for(alt_u8 i=0; i<(ball_x_min.used); i++){                                                       // 3) Colour of each ball
+      if((i==0) || (i==(ball_x_min.used-1))){
+        if(ball_triggered.data[i]&0x8){
+          printf("blue ");
+        }else if(ball_triggered.data[i]&0x2){
+          printf("pink ");
+        }else if(ball_triggered.data[i]&0x1){
+          printf("red ");
+        }else if(ball_triggered.data[i]&0x4){
+          printf("green ");
+        }else{
+          printf("yellow ");
+        }
+      }else{
+        if((ball_triggered.data[i]&0x8) && !((ball_triggered.data[i-1]&0x8) && (ball_triggered.data[i+1]&0x8))){
+          printf("blue ");
+        }else if((ball_triggered.data[i]&0x2) && !((ball_triggered.data[i-1]&0x2) && (ball_triggered.data[i+1]&0x2))){
+          printf("pink ");
+        }else if((ball_triggered.data[i]&0x1) && !((ball_triggered.data[i-1]&0x1) && (ball_triggered.data[i+1]&0x1))){
+          printf("red ");
+        }else if((ball_triggered.data[i]&0x4) && !((ball_triggered.data[i-1]&0x4) && (ball_triggered.data[i+1]&0x4))){
+          printf("green ");
+        }else{
+          printf("yellow ");
+        }
+      }
     }
 
     process = 0;
-    ball_count = 0;
     ball_x_min.used = 0;
     ball_x_max.used = 0;
+    ball_triggered.used = 0;
   }
 
 }
@@ -317,6 +349,7 @@ int main(){
 
     initArray(&ball_x_min, 4);
     initArray(&ball_x_max, 4);
+    initArray(&ball_triggered, 4);
 
 
 		OV8865SetExposure(exposure);
