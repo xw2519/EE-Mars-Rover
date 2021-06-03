@@ -56,7 +56,7 @@ alt_u32 exposure      =  0x2000;
 alt_u16 current_focus =     300;
 
 alt_u16 x_min, x_max, distance;
-alt_u16 filter_x_min[5], filter_x_max[5], filter_y_min[5], filter_y_max[5];
+alt_u16 filter_x_min[5], filter_x_max[5], filter_y_min[5], filter_y_max[5], filter_y_diff[5];
 alt_u8  balls_detected, filter_id;
 alt_u8  calibration = 0, process = 0;
 alt_u8  filters_triggered;
@@ -197,11 +197,11 @@ void timer_init(void* isr){
 
 void sys_timer_isr(){
 
-  // touch KEY0 to trigger Auto focus, KEY1 to trigger gain sdjustment
+  // touch KEY0 to trigger Auto focus, KEY1 to trigger gain adjustment
   if((IORD(KEY_BASE,0)&0x03) == 0x01){
     current_focus = Focus_Window(320,240);
-    printf("button pressed\n");
-    if(ctrl_uart){ fprintf(ctrl_uart, "on"); }
+    printf("button pressed ");
+    if(ctrl_uart){ printf("%d\n", fprintf(ctrl_uart, "hello")); }
   }
   if((IORD(KEY_BASE,0)&0x03) == 0x02){
     calibration = 0;
@@ -267,7 +267,7 @@ void sys_timer_isr(){
   }
 
   if(process){
-    printf("Counted %d balls.\n\n", ball_x_min.used);                                                // 1) Ball count
+    /*printf("Counted %d balls.\n\n", ball_x_min.used);                                                // 1) Ball count
     for(alt_u8 i=0; i<(ball_x_min.used); i++){
       printf("Ball %d:\n", i+1);
       printf("    Distance: %03d\n", (2560/(ball_x_max.data[i] - ball_x_min.data[i])));              // 2) Distance to each ball
@@ -282,18 +282,41 @@ void sys_timer_isr(){
       appendArray(&ball_triggered, filters_triggered);
       printf("\n\n");
     }
+
+    for(alt_u8 i=0; i<5; i++){
+      if(filter_y_max[i] == 0){
+        filter_y_diff[i] = 0;
+      }else{
+        filter_y_diff[i] = filter_y_max[i] - filter_y_min[i];
+      }
+    }
+
     for(alt_u8 i=0; i<(ball_x_min.used); i++){                                                       // 3) Colour of each ball
-      if((i==0) || (i==(ball_x_min.used-1))){
-        if(ball_triggered.data[i]&0x8){
-          printf("blue ");
-        }else if(ball_triggered.data[i]&0x2){
-          printf("pink ");
-        }else if(ball_triggered.data[i]&0x1){
+      //if((i==0) || (i==(ball_x_min.used-1))){
+        if((ball_triggered.data[i]&0xF)&&(filter_y_diff[4]>filter_y_diff[0])&&(filter_y_diff[4]>filter_y_diff[1])&&(filter_y_diff[4]>filter_y_diff[2])&&(filter_y_diff[4]>filter_y_diff[3])){
+          printf("yellow ");
+        }else if((ball_triggered.data[i]&0x8) && (ball_triggered.data[i]&0x4)){
+          if((filter_y_diff[3])>(filter_y_diff[2])){
+            printf("blue ");
+          }else{
+            printf("green ");
+          }
+        }else if((ball_triggered.data[i]&0x1) && (ball_triggered.data[i]&0x2)){
+          if((filter_y_diff[0])>(filter_y_diff[1])){
+            printf("red ");
+          }else{
+            printf("pink ");
+          }
+        }else if((ball_triggered.data[i]&0x1) && !(ball_triggered.data[i]&0x2)){
           printf("red ");
-        }else if(ball_triggered.data[i]&0x4){
+        }else if(!(ball_triggered.data[i]&0x1) && (ball_triggered.data[i]&0x2)){
+          printf("pink ");
+        }else if((ball_triggered.data[i]&0x8) && !(ball_triggered.data[i]&0x4)){
+          printf("blue ");
+        }else if(!(ball_triggered.data[i]&0x8) && (ball_triggered.data[i]&0x4)){
           printf("green ");
         }else{
-          printf("yellow ");
+          printf("unknown ");
         }
       }else{
         if((ball_triggered.data[i]&0x8) && !((ball_triggered.data[i-1]&0x8) && (ball_triggered.data[i+1]&0x8))){
@@ -308,7 +331,7 @@ void sys_timer_isr(){
           printf("yellow ");
         }
       }
-    }
+    }*/
 
     process = 0;
     ball_x_min.used = 0;
@@ -345,7 +368,7 @@ int main(){
 		mipi_show_error_info();
 
 	  ctrl_uart = fopen("/dev/control_uart", "r+");
-		printf("Started control uart...\n");
+		if(ctrl_uart){ printf("Started control uart...\n"); }
 
     initArray(&ball_x_min, 4);
     initArray(&ball_x_max, 4);
@@ -364,13 +387,14 @@ int main(){
 
       if(ctrl_uart){
         prompt = getc(ctrl_uart);
+        printf("%c", prompt);
         if(prompt == 'o'){ state = 1; }
         else if((prompt == 'n') && (state == 1)){ state = 2; }
         else{ state = 0; }
         if(state == 2){
           state = 0;
-          printf("on received\n");
-          if(ctrl_uart){ fprintf(ctrl_uart, "on"); }
+          //printf("on received\n");
+          //if(ctrl_uart){ fprintf(ctrl_uart, "on"); }
         }
 
       }

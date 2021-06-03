@@ -4,7 +4,7 @@
  * Machine generated for CPU 'nios2_gen2' in SOPC Builder design 'Qsys'
  * SOPC Builder design path: ../../Qsys.sopcinfo
  *
- * Generated: Wed Jun 02 13:36:34 BST 2021
+ * Generated: Thu Jun 03 14:07:04 BST 2021
  */
 
 /*
@@ -160,7 +160,7 @@
  */
 
 #define ALT_MODULE_CLASS_EEE_IMGPROC_0 EEE_IMGPROC
-#define EEE_IMGPROC_0_BASE 0x42000
+#define EEE_IMGPROC_0_BASE 0x41020
 #define EEE_IMGPROC_0_IRQ -1
 #define EEE_IMGPROC_0_IRQ_INTERRUPT_CONTROLLER_ID -1
 #define EEE_IMGPROC_0_NAME "/dev/EEE_IMGPROC_0"
@@ -184,19 +184,19 @@
 #define ALT_NUM_INTERNAL_INTERRUPT_CONTROLLERS 1
 #define ALT_NUM_INTERRUPT_CONTROLLERS 1
 #define ALT_STDERR "/dev/jtag_uart"
-#define ALT_STDERR_BASE 0x410e8
+#define ALT_STDERR_BASE 0x41128
 #define ALT_STDERR_DEV jtag_uart
 #define ALT_STDERR_IS_JTAG_UART
 #define ALT_STDERR_PRESENT
 #define ALT_STDERR_TYPE "altera_avalon_jtag_uart"
 #define ALT_STDIN "/dev/jtag_uart"
-#define ALT_STDIN_BASE 0x410e8
+#define ALT_STDIN_BASE 0x41128
 #define ALT_STDIN_DEV jtag_uart
 #define ALT_STDIN_IS_JTAG_UART
 #define ALT_STDIN_PRESENT
 #define ALT_STDIN_TYPE "altera_avalon_jtag_uart"
 #define ALT_STDOUT "/dev/jtag_uart"
-#define ALT_STDOUT_BASE 0x410e8
+#define ALT_STDOUT_BASE 0x41128
 #define ALT_STDOUT_DEV jtag_uart
 #define ALT_STDOUT_IS_JTAG_UART
 #define ALT_STDOUT_PRESENT
@@ -210,7 +210,7 @@
  */
 
 #define ALT_MODULE_CLASS_TERASIC_AUTO_FOCUS_0 TERASIC_AUTO_FOCUS
-#define TERASIC_AUTO_FOCUS_0_BASE 0x41020
+#define TERASIC_AUTO_FOCUS_0_BASE 0x41060
 #define TERASIC_AUTO_FOCUS_0_IRQ -1
 #define TERASIC_AUTO_FOCUS_0_IRQ_INTERRUPT_CONTROLLER_ID -1
 #define TERASIC_AUTO_FOCUS_0_NAME "/dev/TERASIC_AUTO_FOCUS_0"
@@ -223,7 +223,7 @@
  *
  */
 
-#define ALTPLL_0_BASE 0x410d0
+#define ALTPLL_0_BASE 0x41110
 #define ALTPLL_0_IRQ -1
 #define ALTPLL_0_IRQ_INTERRUPT_CONTROLLER_ID -1
 #define ALTPLL_0_NAME "/dev/altpll_0"
@@ -238,8 +238,8 @@
  */
 
 #define ALT_MODULE_CLASS_control_uart altera_avalon_uart
-#define CONTROL_UART_BASE 0x0
-#define CONTROL_UART_BAUD 115200
+#define CONTROL_UART_BASE 0x41000
+#define CONTROL_UART_BAUD 1200
 #define CONTROL_UART_DATA_BITS 8
 #define CONTROL_UART_FIXED_BAUD 1
 #define CONTROL_UART_FREQ 50000000
@@ -274,7 +274,7 @@
  */
 
 #define ALT_MODULE_CLASS_i2c_opencores_camera i2c_opencores
-#define I2C_OPENCORES_CAMERA_BASE 0x41040
+#define I2C_OPENCORES_CAMERA_BASE 0x41080
 #define I2C_OPENCORES_CAMERA_IRQ 1
 #define I2C_OPENCORES_CAMERA_IRQ_INTERRUPT_CONTROLLER_ID 0
 #define I2C_OPENCORES_CAMERA_NAME "/dev/i2c_opencores_camera"
@@ -288,7 +288,7 @@
  */
 
 #define ALT_MODULE_CLASS_i2c_opencores_mipi i2c_opencores
-#define I2C_OPENCORES_MIPI_BASE 0x41060
+#define I2C_OPENCORES_MIPI_BASE 0x410a0
 #define I2C_OPENCORES_MIPI_IRQ 0
 #define I2C_OPENCORES_MIPI_IRQ_INTERRUPT_CONTROLLER_ID 0
 #define I2C_OPENCORES_MIPI_NAME "/dev/i2c_opencores_mipi"
@@ -302,7 +302,7 @@
  */
 
 #define ALT_MODULE_CLASS_jtag_uart altera_avalon_jtag_uart
-#define JTAG_UART_BASE 0x410e8
+#define JTAG_UART_BASE 0x41128
 #define JTAG_UART_IRQ 2
 #define JTAG_UART_IRQ_INTERRUPT_CONTROLLER_ID 0
 #define JTAG_UART_NAME "/dev/jtag_uart"
@@ -320,7 +320,7 @@
  */
 
 #define ALT_MODULE_CLASS_key altera_avalon_pio
-#define KEY_BASE 0x410a0
+#define KEY_BASE 0x410e0
 #define KEY_BIT_CLEARING_EDGE_REGISTER 0
 #define KEY_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define KEY_CAPTURE 0
@@ -347,7 +347,7 @@
  */
 
 #define ALT_MODULE_CLASS_led altera_avalon_pio
-#define LED_BASE 0x410c0
+#define LED_BASE 0x41100
 #define LED_BIT_CLEARING_EDGE_REGISTER 0
 #define LED_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define LED_CAPTURE 0
@@ -374,7 +374,7 @@
  */
 
 #define ALT_MODULE_CLASS_mipi_pwdn_n altera_avalon_pio
-#define MIPI_PWDN_N_BASE 0x41080
+#define MIPI_PWDN_N_BASE 0x410c0
 #define MIPI_PWDN_N_BIT_CLEARING_EDGE_REGISTER 0
 #define MIPI_PWDN_N_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define MIPI_PWDN_N_CAPTURE 0
@@ -401,7 +401,7 @@
  */
 
 #define ALT_MODULE_CLASS_mipi_reset_n altera_avalon_pio
-#define MIPI_RESET_N_BASE 0x41090
+#define MIPI_RESET_N_BASE 0x410d0
 #define MIPI_RESET_N_BIT_CLEARING_EDGE_REGISTER 0
 #define MIPI_RESET_N_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define MIPI_RESET_N_CAPTURE 0
@@ -457,7 +457,7 @@
  */
 
 #define ALT_MODULE_CLASS_sw altera_avalon_pio
-#define SW_BASE 0x410b0
+#define SW_BASE 0x410f0
 #define SW_BIT_CLEARING_EDGE_REGISTER 0
 #define SW_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define SW_CAPTURE 0
@@ -484,13 +484,13 @@
  */
 
 #define ALT_MODULE_CLASS_sysid_qsys altera_avalon_sysid_qsys
-#define SYSID_QSYS_BASE 0x410e0
+#define SYSID_QSYS_BASE 0x41120
 #define SYSID_QSYS_ID 0
 #define SYSID_QSYS_IRQ -1
 #define SYSID_QSYS_IRQ_INTERRUPT_CONTROLLER_ID -1
 #define SYSID_QSYS_NAME "/dev/sysid_qsys"
 #define SYSID_QSYS_SPAN 8
-#define SYSID_QSYS_TIMESTAMP 1622636907
+#define SYSID_QSYS_TIMESTAMP 1622725091
 #define SYSID_QSYS_TYPE "altera_avalon_sysid_qsys"
 
 
@@ -501,7 +501,7 @@
 
 #define ALT_MODULE_CLASS_timer altera_avalon_timer
 #define TIMER_ALWAYS_RUN 0
-#define TIMER_BASE 0x41000
+#define TIMER_BASE 0x41040
 #define TIMER_COUNTER_SIZE 32
 #define TIMER_FIXED_PERIOD 0
 #define TIMER_FREQ 50000000
