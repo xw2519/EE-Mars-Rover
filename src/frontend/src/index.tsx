@@ -1,13 +1,27 @@
-import React from "react";
+import React, { useState } from 'react';
 import { render } from 'react-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 
-import Dashboard from "./components/dashboard";
+import Login from './components/Login';
+import Dashboard from "./components/Main_dashboard";
 
 function App() {
+  const [token, setToken] = useState();
+
+  if(!token) {
+    return <Login setToken={setToken} />
+  }
   
   return (
-    
-    <Dashboard />
+    <div className="wrapper">
+      <BrowserRouter>
+        <Switch>
+          <Route path="/Dashboard">
+            <Dashboard />
+          </Route>
+        </Switch>
+      </BrowserRouter>
+    </div>
   )
 }
 

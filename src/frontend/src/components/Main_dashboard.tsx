@@ -1,20 +1,19 @@
 import React from 'react';
 
 import * as react_console_logger from 'react-console-logger';
-
 import ParentSize from '@visx/responsive/lib/components/ParentSize';
+import {Helmet} from "react-helmet";
 
 import NavUI from './NavUI';
 import SensorReadings from './SensorPanel';
 import RoverSettings from './RoverSettings';
+import Example from './Mapping';
 
-import Example from './canvas';
-
-import './dashboard.css';
+import './Main_dashboard.css';
 import './NavUI.css';
 import './RoverSettings.css';
 import './SensorPanel.css';
-import './canvas.css';
+import './Mapping.css';
 
 const myLogger = new react_console_logger.Logger();
 
@@ -24,15 +23,18 @@ class Dashboard extends React.Component {
     render() {
         return (
             <>
-            <title> Mars Rover Command Center </title>
-
+            <Helmet>
+                <title> Mars Rover Command Center </title>
+            </Helmet>
+            
             <div className="App">
 
                 <div className="container">
+                    
                     <div className="HeaderTitle">
                         <h1> Mars Rover Command Center </h1>
                     </div>
-        
+                    
                     <div className="grid SensorReading"> Sensor Panel <SensorReadings/> </div>
         
                     <div className="grid Map"> 
