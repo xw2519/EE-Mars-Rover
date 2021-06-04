@@ -2,8 +2,11 @@ import React from 'react';
 
 import * as react_console_logger from 'react-console-logger';
 
+import ParentSize from '@visx/responsive/lib/components/ParentSize';
+
 import NavUI from './NavUI';
 import SensorReadings from './SensorPanel';
+import Example from './canvas';
 
 import './dashboard.css';
 import './NavUI.css';
@@ -16,7 +19,6 @@ class Dashboard extends React.Component {
   
     /* Serve landing page */
     render() {
-    
         return (
             <>
             <title> Mars Rover Command Center </title>
@@ -30,7 +32,10 @@ class Dashboard extends React.Component {
         
                     <div className="grid SensorReading"> Sensor Panel <SensorReadings/> </div>
         
-                    <div className="grid Map"> </div>
+                    <div className="grid Map"> 
+                        <ParentSize>{({ width, height }) => <Example width={width} height={height} />}</ParentSize>
+                   
+                    </div>
 
                     <div className="grid Terminal"> 
                         <div className="TerminalHeader">

@@ -27,6 +27,8 @@ html, body {
     color: #D1E8E2;
     padding: 10px;
     font-size: 3rem;
+    height: auto;
+    width: auto;
   }
 
   .HeaderTitle {
@@ -55,13 +57,17 @@ html, body {
     grid-column: 2 / 3;
     grid-row: 2 / 12;
     background-color: #272727;
+    min-height: 0px; 
+    height: auto;
+    width: auto;
   }
 
   .NavigationUI {
     grid-column: 2 / 3;
     grid-row: 12 / 18;
     background-color: #272727;
-}
+    max-height: 600px; 
+  }
 
   .Terminal {
     grid-column: 3 / 4;

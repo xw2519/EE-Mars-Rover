@@ -34,7 +34,6 @@ class ClientManager:
         self.connection: WebSocket
     
     async def connect(self, websocket_client: WebSocket):
-        print('Executing')
         await websocket_client.accept()
         self.connection = websocket_client
     
