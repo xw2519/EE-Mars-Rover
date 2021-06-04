@@ -1,12 +1,14 @@
 import React from 'react';
-import ws_server from '../components/socketConfig';
+import ws_server from './util/socketConfig';
 
-import { Icon, Intent } from '@blueprintjs/core';
-import { IconNames } from '@blueprintjs/icons';
+import { Icon } from '@blueprintjs/core';
 
 // Add in angle and stuffies 
+interface NavUIProps {
+    myLogger: any;
+}
 
-class NavUI extends React.Component {
+class NavUI extends React.Component<NavUIProps, {}> {
     NavUp = () => {
         console.log("UP");
         ws_server.send("F0010");
@@ -59,7 +61,7 @@ class NavUI extends React.Component {
                 </div>
                 <div className="Middle"> 
                     <button className = "Left" onClick={this.NavLeft}> <Icon icon="arrow-left" color="#D1E8E2" />  </button>
-                    <button className = "Halt" onClick={this.NavHalt}> <Icon icon="ban-circle" color="#D1E8E2" iconSize="18" /> </button>
+                    <button className = "Halt" onClick={this.NavHalt}> <Icon icon="ban-circle" color="#D1E8E2" iconSize={18} /> </button>
                     <button className = "Right" onClick={this.NavRight}> <Icon icon="arrow-right" color="#D1E8E2" /></button>
                 </div>
                 <div className="Bottom"> 

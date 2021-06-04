@@ -1,6 +1,5 @@
 import React from 'react';
-import {Helmet} from "react-helmet";
-import ws_server from '../components/socketConfig'
+import ws_server from './util/socketConfig'
 
 import DateTime from './util/time'
 
@@ -12,9 +11,9 @@ class SensorReadings extends React.Component {
         ws_server.onmessage = (e) => {  
             //Sensor panel readings
             var sensor_values = JSON.parse(e.data); 
-            document.getElementById("BatteryLeft").innerHTML = sensor_values.battery_remain;
-            document.getElementById("DistanceLeft").innerHTML = sensor_values.dist_remain;
-            document.getElementById("DistanceTravelled").innerHTML = sensor_values.dist_travel;
+            document.getElementById("BatteryLeft")!.innerHTML = sensor_values.battery_remain;
+            document.getElementById("DistanceLeft")!.innerHTML = sensor_values.dist_remain;
+            document.getElementById("DistanceTravelled")!.innerHTML = sensor_values.dist_travel;
         }
 
         return (

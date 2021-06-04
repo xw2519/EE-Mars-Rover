@@ -8,7 +8,7 @@ import SensorReadings from './SensorPanel';
 import './dashboard.css';
 import './NavUI.css';
 import './SensorPanel.css';
-import './canvas.css'
+import './canvas.css';
 
 const myLogger = new react_console_logger.Logger();
 
