@@ -4,7 +4,7 @@
  * Machine generated for CPU 'nios2_gen2' in SOPC Builder design 'Qsys'
  * SOPC Builder design path: ../../Qsys.sopcinfo
  *
- * Generated: Thu Jun 03 14:58:54 BST 2021
+ * Generated: Fri Jun 04 04:35:05 BST 2021
  */
 
 /*
@@ -239,7 +239,7 @@
 
 #define ALT_MODULE_CLASS_control_uart altera_up_avalon_rs232
 #define CONTROL_UART_BASE 0x41100
-#define CONTROL_UART_IRQ 4
+#define CONTROL_UART_IRQ 0
 #define CONTROL_UART_IRQ_INTERRUPT_CONTROLLER_ID 0
 #define CONTROL_UART_NAME "/dev/control_uart"
 #define CONTROL_UART_SPAN 8
@@ -264,7 +264,7 @@
 
 #define ALT_MODULE_CLASS_i2c_opencores_camera i2c_opencores
 #define I2C_OPENCORES_CAMERA_BASE 0x41060
-#define I2C_OPENCORES_CAMERA_IRQ 1
+#define I2C_OPENCORES_CAMERA_IRQ 2
 #define I2C_OPENCORES_CAMERA_IRQ_INTERRUPT_CONTROLLER_ID 0
 #define I2C_OPENCORES_CAMERA_NAME "/dev/i2c_opencores_camera"
 #define I2C_OPENCORES_CAMERA_SPAN 32
@@ -278,7 +278,7 @@
 
 #define ALT_MODULE_CLASS_i2c_opencores_mipi i2c_opencores
 #define I2C_OPENCORES_MIPI_BASE 0x41080
-#define I2C_OPENCORES_MIPI_IRQ 0
+#define I2C_OPENCORES_MIPI_IRQ 1
 #define I2C_OPENCORES_MIPI_IRQ_INTERRUPT_CONTROLLER_ID 0
 #define I2C_OPENCORES_MIPI_NAME "/dev/i2c_opencores_mipi"
 #define I2C_OPENCORES_MIPI_SPAN 32
@@ -292,7 +292,7 @@
 
 #define ALT_MODULE_CLASS_jtag_uart altera_avalon_jtag_uart
 #define JTAG_UART_BASE 0x41110
-#define JTAG_UART_IRQ 2
+#define JTAG_UART_IRQ 3
 #define JTAG_UART_IRQ_INTERRUPT_CONTROLLER_ID 0
 #define JTAG_UART_NAME "/dev/jtag_uart"
 #define JTAG_UART_READ_DEPTH 64
@@ -479,7 +479,7 @@
 #define SYSID_QSYS_IRQ_INTERRUPT_CONTROLLER_ID -1
 #define SYSID_QSYS_NAME "/dev/sysid_qsys"
 #define SYSID_QSYS_SPAN 8
-#define SYSID_QSYS_TIMESTAMP 1622727924
+#define SYSID_QSYS_TIMESTAMP 1622777249
 #define SYSID_QSYS_TYPE "altera_avalon_sysid_qsys"
 
 
@@ -494,7 +494,7 @@
 #define TIMER_COUNTER_SIZE 32
 #define TIMER_FIXED_PERIOD 0
 #define TIMER_FREQ 50000000
-#define TIMER_IRQ 3
+#define TIMER_IRQ 4
 #define TIMER_IRQ_INTERRUPT_CONTROLLER_ID 0
 #define TIMER_LOAD_VALUE 49999
 #define TIMER_MULT 0.001

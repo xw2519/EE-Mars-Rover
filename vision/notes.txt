@@ -58,3 +58,8 @@ Turn to look for obstacles before moving forwards.
 Can never detect obstacles <20cm when starting.
 
 - Added automated calibration when KEY0 is pressed.
+
+- Several filters detect parts of several balls, created a system to interpret
+filters triggered and find the colour of balls.
+
+- UART over IO0(TX) and IO1(RX) works when connected to itself.

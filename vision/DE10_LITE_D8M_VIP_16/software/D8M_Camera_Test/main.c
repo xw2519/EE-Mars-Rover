@@ -50,7 +50,6 @@ typedef struct{
 } Array;
 
 
-//FILE*   ctrl_uart;
 alt_up_rs232_dev* ctrl_uart;
 
 alt_u16 gain          =   0x7FF;
@@ -64,7 +63,7 @@ alt_u8  calibration = 0, process = 0;
 alt_u8  filters_triggered;
 Array   ball_x_min, ball_x_max, ball_triggered;
 
-alt_u8  prompt, parity_bit, state = 0;
+alt_u8  prompt, parity;
 
 
 void mipi_clear_error(void){
@@ -191,8 +190,8 @@ void timer_init(void* isr){
 
     IOWR_ALTERA_AVALON_TIMER_CONTROL(TIMER_BASE, 0x0003);
     IOWR_ALTERA_AVALON_TIMER_STATUS(TIMER_BASE, 0);
-    IOWR_ALTERA_AVALON_TIMER_PERIODL(TIMER_BASE, 0xC000);
-    IOWR_ALTERA_AVALON_TIMER_PERIODH(TIMER_BASE, 0x0000);
+    IOWR_ALTERA_AVALON_TIMER_PERIODL(TIMER_BASE, 0x0000);
+    IOWR_ALTERA_AVALON_TIMER_PERIODH(TIMER_BASE, 0x000F);
     alt_irq_register(TIMER_IRQ, 0, isr);
     IOWR_ALTERA_AVALON_TIMER_CONTROL(TIMER_BASE, 0x0007);
 }
@@ -202,17 +201,14 @@ void sys_timer_isr(){
   // touch KEY0 to trigger Auto focus, KEY1 to trigger gain adjustment
   if((IORD(KEY_BASE,0)&0x03) == 0x01){
     current_focus = Focus_Window(320,240);
+
     printf("button pressed ");
-    //if(ctrl_uart){ printf("%d\n", fprintf(ctrl_uart, "hello")); }
     if(ctrl_uart){
-      if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)>5){
-        alt_up_rs232_write_data(ctrl_uart, 'h');
-        alt_up_rs232_write_data(ctrl_uart, 'h');
-        alt_up_rs232_write_data(ctrl_uart, 'h');
-        alt_up_rs232_write_data(ctrl_uart, 'h');
+      if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)){
         alt_up_rs232_write_data(ctrl_uart, 'h');
       }
     }
+
   }
   if((IORD(KEY_BASE,0)&0x03) == 0x02){
     calibration = 0;
@@ -220,19 +216,20 @@ void sys_timer_isr(){
     exposure    = 0x2000;
 
     OV8865SetGain(gain);
-    printf("\nGain = %x ", gain);
     OV8865SetExposure(exposure);
+
+    printf("\nGain = %x ", gain);
     printf("Exposure = %x\n", exposure);
   }
 
   //Read messages from the image processor and process them
   while ((IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_STATUS)>>8) & 0xff) { 	//Find out if there are words to read
-      int word = IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_MSG); 			//Get next word from message buffer
-      x_min = (word>>11)&0x7FF;
-      x_max = word&0x7FF;
-      filter_id = (word&0x3FC00000) >> 22;
+      int word  = IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_MSG); 			//Get next word from message buffer
+      x_min     = (word>>11) & 0x7FF;
+      x_max     =  word      & 0x7FF;
+      filter_id = (word>>22) & 0x0FF;
 
-      if((word&0xC0000000)&&(filter_id == 'L')){                //Last part of data from image processor arrives
+      if((word&0xC0000000)&&(filter_id == 'L')){                //When last part of data from image processor arrives
 
         if(calibration<CALIBRATION_MAX){                        //If calibrating, reduce gain if ball count is not zero
           if(balls_detected && (exposure>EXPOSURE_STEP)){
@@ -247,15 +244,15 @@ void sys_timer_isr(){
             }
           }else{
             calibration++;
+            printf("Calibration = %d\n", calibration);
           }
-          printf("Calibration = %d\n", calibration);
         }
-        if(calibration == CALIBRATION_MAX){ process = 1; }     //Start processing the data if calibrated
+
+        if(calibration >= CALIBRATION_MAX){ process = 1; }     //Start processing the data if calibrated
         else{ balls_detected = 0; }
       }
 
-      if(word&0xFFC00000){                                     //The word is about filter data, append to arrays
-
+      if(filter_id){                                          //The word is about filter data, append to arrays
         if(word&0xC0000000){
           filter_y_min[filter_index(filter_id)] = x_min;
           filter_y_max[filter_index(filter_id)] = x_max;
@@ -263,11 +260,9 @@ void sys_timer_isr(){
           filter_x_min[filter_index(filter_id)] = x_min;
           filter_x_max[filter_index(filter_id)] = x_max;
         }
-
         /*if(word&0xC0000000){ printf("\nY "); }
         else{ printf("\nX "); }
         printf("%c %03x %03x\n", filter_id, x_max, x_min);*/
-
       }else if((x_max-x_min)>20){                              //The word is about ball data, append to arrays and increment ball count
         if((ball_x_min.used<8)&&(calibration == CALIBRATION_MAX)){
           appendArray(&ball_x_min, x_min);
@@ -278,7 +273,8 @@ void sys_timer_isr(){
   }
 
   if(process){
-    /*printf("Counted %d balls.\n\n", ball_x_min.used);                                                // 1) Ball count
+    printf("Counted %d balls.\n\n", ball_x_min.used);                                                // 1) Ball count
+
     for(alt_u8 i=0; i<(ball_x_min.used); i++){
       printf("Ball %d:\n", i+1);
       printf("    Distance: %03d\n", (2560/(ball_x_max.data[i] - ball_x_min.data[i])));              // 2) Distance to each ball
@@ -329,7 +325,7 @@ void sys_timer_isr(){
         }else{
           printf("unknown ");
         }
-      }else{
+      /*}else{
         if((ball_triggered.data[i]&0x8) && !((ball_triggered.data[i-1]&0x8) && (ball_triggered.data[i+1]&0x8))){
           printf("blue ");
         }else if((ball_triggered.data[i]&0x2) && !((ball_triggered.data[i-1]&0x2) && (ball_triggered.data[i+1]&0x2))){
@@ -341,8 +337,8 @@ void sys_timer_isr(){
         }else{
           printf("yellow ");
         }
-      }
-    }*/
+      }*/
+    }
 
     process = 0;
     ball_x_min.used = 0;
@@ -350,6 +346,7 @@ void sys_timer_isr(){
     ball_triggered.used = 0;
   }
 
+  IOWR_ALTERA_AVALON_TIMER_STATUS(TIMER_BASE, 0);
 }
 
 int main(){
@@ -378,7 +375,6 @@ int main(){
 		usleep(1000*1000);
 		mipi_show_error_info();
 
-	  //ctrl_uart = fopen("/dev/control_uart", "r+");
     ctrl_uart = alt_up_rs232_open_dev("/dev/control_uart");
 		if(ctrl_uart){ printf("Started control uart...\n"); }
 
@@ -391,30 +387,20 @@ int main(){
 		OV8865SetGain(gain);
 		Focus_Init();
 
-
     timer_init(sys_timer_isr);
 
 
 		while(1){
-
       if(ctrl_uart){
+        alt_up_rs232_enable_read_interrupt(ctrl_uart);
         if(alt_up_rs232_get_used_space_in_read_FIFO(ctrl_uart)){
-          alt_up_rs232_read_data(ctrl_uart, &prompt, &parity_bit);
-          printf("%c", prompt);
-        }
-        /*prompt = getc(ctrl_uart);
-        printf("%c", prompt);
-        if(prompt == 'o'){ state = 1; }
-        else if((prompt == 'n') && (state == 1)){ state = 2; }
-        else{ state = 0; }
-        if(state == 2){
-          state = 0;
-          //printf("on received\n");
-          //if(ctrl_uart){ fprintf(ctrl_uart, "on"); }
-        }*/
 
+          alt_up_rs232_read_data(ctrl_uart, &prompt, &parity);
+          alt_up_rs232_disable_read_interrupt(ctrl_uart);
+          printf("UART received: %c\n", prompt);
+
+        }
       }
 		}
-
 		return 0;
 }

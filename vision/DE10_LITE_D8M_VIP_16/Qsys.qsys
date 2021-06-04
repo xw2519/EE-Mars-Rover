@@ -677,7 +677,7 @@
   <parameter name="AUTO_CLK_CLOCK_RATE" value="50000000" />
   <parameter name="AUTO_DEVICE_FAMILY" value="MAX 10" />
   <parameter name="avalon_bus_type" value="Memory Mapped" />
-  <parameter name="baud" value="300" />
+  <parameter name="baud" value="115200" />
   <parameter name="clk_rate" value="50000000" />
   <parameter name="data_bits" value="8" />
   <parameter name="parity" value="None" />
@@ -1307,35 +1307,35 @@
    version="16.0"
    start="nios2_gen2.irq"
    end="control_uart.interrupt">
-  <parameter name="irqNumber" value="4" />
- </connection>
- <connection
-   kind="interrupt"
-   version="16.0"
-   start="nios2_gen2.irq"
-   end="i2c_opencores_mipi.interrupt_sender">
   <parameter name="irqNumber" value="0" />
  </connection>
  <connection
    kind="interrupt"
    version="16.0"
    start="nios2_gen2.irq"
-   end="i2c_opencores_camera.interrupt_sender">
+   end="i2c_opencores_mipi.interrupt_sender">
   <parameter name="irqNumber" value="1" />
  </connection>
  <connection
    kind="interrupt"
    version="16.0"
    start="nios2_gen2.irq"
-   end="jtag_uart.irq">
+   end="i2c_opencores_camera.interrupt_sender">
   <parameter name="irqNumber" value="2" />
  </connection>
  <connection
    kind="interrupt"
    version="16.0"
    start="nios2_gen2.irq"
-   end="timer.irq">
+   end="jtag_uart.irq">
   <parameter name="irqNumber" value="3" />
+ </connection>
+ <connection
+   kind="interrupt"
+   version="16.0"
+   start="nios2_gen2.irq"
+   end="timer.irq">
+  <parameter name="irqNumber" value="4" />
  </connection>
  <connection
    kind="reset"

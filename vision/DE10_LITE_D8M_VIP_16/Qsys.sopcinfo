@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <EnsembleReport name="Qsys" kind="Qsys" version="1.0" fabric="QSYS">
  <!-- Format version 16.0 211 (Future versions may contain additional information.) -->
- <!-- 2021.06.03.14:45:25 -->
+ <!-- 2021.06.04.04:27:29 -->
  <!-- A collection of modules and connections -->
  <parameter name="AUTO_GENERATION_ID">
   <type>java.lang.Integer</type>
-  <value>1622727924</value>
+  <value>1622777249</value>
   <derived>false</derived>
   <enabled>true</enabled>
   <visible>false</visible>
@@ -6566,7 +6566,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="baud">
    <type>int</type>
-   <value>300</value>
+   <value>115200</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -15109,35 +15109,35 @@ parameters are a RESULT of the module parameters. -->
     <moduleName>control_uart</moduleName>
     <slaveName>interrupt</slaveName>
     <name>control_uart.interrupt</name>
-    <interruptNumber>4</interruptNumber>
+    <interruptNumber>0</interruptNumber>
    </interrupt>
    <interrupt>
     <isBridge>false</isBridge>
     <moduleName>i2c_opencores_mipi</moduleName>
     <slaveName>interrupt_sender</slaveName>
     <name>i2c_opencores_mipi.interrupt_sender</name>
-    <interruptNumber>0</interruptNumber>
+    <interruptNumber>1</interruptNumber>
    </interrupt>
    <interrupt>
     <isBridge>false</isBridge>
     <moduleName>i2c_opencores_camera</moduleName>
     <slaveName>interrupt_sender</slaveName>
     <name>i2c_opencores_camera.interrupt_sender</name>
-    <interruptNumber>1</interruptNumber>
+    <interruptNumber>2</interruptNumber>
    </interrupt>
    <interrupt>
     <isBridge>false</isBridge>
     <moduleName>jtag_uart</moduleName>
     <slaveName>irq</slaveName>
     <name>jtag_uart.irq</name>
-    <interruptNumber>2</interruptNumber>
+    <interruptNumber>3</interruptNumber>
    </interrupt>
    <interrupt>
     <isBridge>false</isBridge>
     <moduleName>timer</moduleName>
     <slaveName>irq</slaveName>
     <name>timer.irq</name>
-    <interruptNumber>3</interruptNumber>
+    <interruptNumber>4</interruptNumber>
    </interrupt>
   </interface>
   <interface name="debug_reset_request" kind="reset_source" version="16.0">
@@ -18265,7 +18265,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.TIMESTAMP</name>
-   <value>1622727924</value>
+   <value>1622777249</value>
   </assignment>
   <assignment>
    <name>embeddedsw.dts.compatible</name>
@@ -18285,7 +18285,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.dts.params.timestamp</name>
-   <value>1622727924</value>
+   <value>1622777249</value>
   </assignment>
   <assignment>
    <name>embeddedsw.dts.vendor</name>
@@ -18301,7 +18301,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="timestamp">
    <type>int</type>
-   <value>1622727924</value>
+   <value>1622777249</value>
    <derived>true</derived>
    <enabled>false</enabled>
    <visible>false</visible>
@@ -21212,7 +21212,7 @@ parameters are a RESULT of the module parameters. -->
    end="control_uart.interrupt">
   <parameter name="irqNumber">
    <type>int</type>
-   <value>4</value>
+   <value>0</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -21247,7 +21247,7 @@ parameters are a RESULT of the module parameters. -->
    end="i2c_opencores_mipi.interrupt_sender">
   <parameter name="irqNumber">
    <type>int</type>
-   <value>0</value>
+   <value>1</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -21282,7 +21282,7 @@ parameters are a RESULT of the module parameters. -->
    end="i2c_opencores_camera.interrupt_sender">
   <parameter name="irqNumber">
    <type>int</type>
-   <value>1</value>
+   <value>2</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -21317,7 +21317,7 @@ parameters are a RESULT of the module parameters. -->
    end="jtag_uart.irq">
   <parameter name="irqNumber">
    <type>int</type>
-   <value>2</value>
+   <value>3</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -21352,7 +21352,7 @@ parameters are a RESULT of the module parameters. -->
    end="timer.irq">
   <parameter name="irqNumber">
    <type>int</type>
-   <value>3</value>
+   <value>4</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
