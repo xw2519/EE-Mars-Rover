@@ -5,6 +5,9 @@ from typing import List
 import json
 import itertools as it
 
+import motor.motor_asyncio
+from bson import ObjectId
+
 app = FastAPI(title='Mars Command Server')
 
 '''
@@ -18,10 +21,15 @@ Web client to server - JSON:
     - Functions 
     - Logging entry
 '''
-received_data: str
+
+received_data = ""
+received_data_rover = ""
 
 # Client based functions
 class ClientManager:
+    '''
+    Website connection functions
+    '''
     def __init__(self):
         self.connection: WebSocket
     
@@ -32,9 +40,11 @@ class ClientManager:
     
     async def send_to_client(self, data: str):
         await self.connection.send_text(data)
-        
-# Rover based functions
+    
 class RoverManager:
+    '''
+    Rover connection functions
+    '''
     def __init__(self):
         self.connection: WebSocket
     
@@ -47,10 +57,14 @@ class RoverManager:
         
 # Session based functions
 class Session:
+    '''
+    Session (connection instance) functions
+    '''
     def __init__(self):
         self.client_connection = ClientManager()
         self.rover_connection = RoverManager()
-
+        
+        
         
 '''
 Main server operations
@@ -60,13 +74,19 @@ session_instance = Session()
 
 @app.websocket("/ws/server")
 async def websocket_client(websocket: WebSocket):
+    '''
+    Handle server <-> website websocket connection
+    '''
     print('[Server]: Establishing command client websocket connection')
     await session_instance.client_connection.connect(websocket)
     
     try:
         while True:
             received_data = await websocket.receive_text()
-            await session_instance.rover_connection.send_to_rover(received_data)
+            
+            if (received_data != ""):
+                await session_instance.rover_connection.send_to_rover(received_data)
+            
             print(received_data)
             
     except WebSocketDisconnect:
@@ -74,15 +94,16 @@ async def websocket_client(websocket: WebSocket):
 
 @app.websocket("/ws/rover")
 async def websocket_endpoint(websocket: WebSocket):
+    '''
+    Handle server <-> rover websocket connection
+    '''
     print('[Server]: Establishing websocket connection with rover')
     await session_instance.rover_connection.connect(websocket)
     
     try:
         while True:
-            data = await websocket.receive_text()
-            print(received_data)
-            
-            await websocket.send_text(received_data)
+            received_data_rover = await websocket.receive_text()
+            print(received_data_rover)
             
     except WebSocketDisconnect:
         print('[Server]: Command client websocket connection terminated')

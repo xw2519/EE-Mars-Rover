@@ -5,7 +5,7 @@
     top: 5%;
 
     font-size: 20px;
-    color: black;
+    color: #D1E8E2;
     text-align: left; 
 }
 
@@ -17,7 +17,7 @@
     position: relative;
     top: 15%;
 
-    background-color: #d8dae5;
+    background-color: #272727;
 }
 
 .Battery {
@@ -28,7 +28,7 @@
     position: relative;
     top: 25%;
 
-    background-color: #d8dae5;
+    background-color: #272727;
 }
 
 .DistanceRemaining {
@@ -39,7 +39,7 @@
     position: relative;
     top: 35%;
 
-    background-color: #d8dae5;
+    background-color: #272727;
 }
 
 .DistanceTravelled {
@@ -50,5 +50,5 @@
     position: relative;
     top: 45%;
 
-    background-color: #d8dae5;
+    background-color: #272727;
 }

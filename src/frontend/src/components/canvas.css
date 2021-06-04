@@ -1,12 +1,6 @@
-.Canvas {
-    background-color: blue;
+.canvas {
+    background-color: #FFF;
     position: relative;
-    height: auto;
-    width: auto;
-}
-
-.App-canvas {
-    background-color: black;
-    position: relative;
+    width: 100%;
     height: 100%;
 }

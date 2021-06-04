@@ -1,9 +1,12 @@
 /* Navigation Interface */
+.button {
+    transition-duration: 0.4s;
+}
 
 .NavButtons {
     text-align: center;
     position: relative;
-    top: 20%
+    top: 5%
 }
 
 .Utility {
@@ -34,26 +37,26 @@
 
 .Up {
     display:inline-block;
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 16px;
     height:60px;
     width:60px;
+    padding: 15px 15px;
+    border: 5px solid #272727;
+    background-color: #272727;
+    color: #D1E8E2;
 }
 
-.Left-Up {
+.Up:hover {
     display:inline-block;
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 16px;
     height:60px;
     width:60px;
-}
-
-.Right-Up {
-    display:inline-block;
-    border-radius: 4px;
-    font-size: 16px;
-    height:60px;
-    width:60px;
+    padding: 15px 15px;
+    border: 3px solid #D1E8E2;
+    background-color: #272727;
+    color: #D1E8E2;
 }
 
 .Middle {
@@ -63,25 +66,75 @@
 }
 
 .Halt {
-    text-align: center;
-    border-radius: 4px;
+    display:inline-block;
+    border-radius: 8px;
     font-size: 16px;
     height:60px;
     width:60px;
+    padding: 15px 15px;
+    border: 5px solid #272727;
+    background-color: #272727;
+    color: #D1E8E2;
+}
+
+.Halt:hover {
+    display:inline-block;
+    border-radius: 8px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+    padding: 15px 15px;
+    border: 3px solid #D1E8E2;
+    background-color: #272727;
+    color: #D1E8E2;
 }
 
 .Right {
-    border-radius: 4px;
+    display:inline-block;
+    border-radius: 8px;
     font-size: 16px;
     height:60px;
     width:60px;
+    padding: 15px 15px;
+    border: 5px solid #272727;
+    background-color: #272727;
+    color: #D1E8E2;
+}
+
+.Right:hover {
+    display:inline-block;
+    border-radius: 8px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+    padding: 15px 15px;
+    border: 3px solid #D1E8E2;
+    background-color: #272727;
+    color: #D1E8E2;
 }
 
 .Left {
-    border-radius: 4px;
+    display:inline-block;
+    border-radius: 8px;
     font-size: 16px;
     height:60px;
     width:60px;
+    padding: 15px 15px;
+    border: 5px solid #272727;
+    background-color: #272727;
+    color: #D1E8E2;
+}
+
+.Left:hover {
+    display:inline-block;
+    border-radius: 8px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+    padding: 15px 15px;
+    border: 3px solid #D1E8E2;
+    background-color: #272727;
+    color: #D1E8E2;
 }
 
 .Bottom {
@@ -91,22 +144,25 @@
 }
 
 .Down {
-    border-radius: 4px;
+    display:inline-block;
+    border-radius: 8px;
     font-size: 16px;
     height:60px;
     width:60px;
+    padding: 15px 15px;
+    border: 5px solid #272727;
+    background-color: #272727;
+    color: #D1E8E2;
 }
 
-.Left-Down {
-    border-radius: 4px;
+.Down:hover {
+    display:inline-block;
+    border-radius: 8px;
     font-size: 16px;
     height:60px;
     width:60px;
-}
-
-.Right-Down {
-    border-radius: 4px;
-    font-size: 16px;
-    height:60px;
-    width:60px;
+    padding: 15px 15px;
+    border: 3px solid #D1E8E2;
+    background-color: #272727;
+    color: #D1E8E2;
 }

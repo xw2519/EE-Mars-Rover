@@ -1,32 +1,40 @@
 import React from 'react';
-import ws_server from '../components/socketConfig'
+import ws_server from '../components/socketConfig';
+
+import { Icon, Intent } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
 
 // Add in angle and stuffies 
 
 class NavUI extends React.Component {
     NavUp = () => {
         console.log("UP");
-        ws_server.send("UP");
+        ws_server.send("F0010");
+        this.props.myLogger.log('[Sending to rover]: FORWARD rover')
     }
 
     NavDown = () => {
         console.log("DOWN");
-        ws_server.send("DOWN");
+        ws_server.send("B0010");
+        this.props.myLogger.info('[Sending to rover]: REVERSE rover')
     }
 
     NavRight = () => {
         console.log("RIGHT");
-        ws_server.send("RIGHT");
+        ws_server.send("R9000");
+        this.props.myLogger.info('[Sending to rover]: Turn RIGHT')
     }
 
     NavLeft = () => {
         console.log("LEFT");
-        ws_server.send("LEFT");
+        ws_server.send("L9000");
+        this.props.myLogger.info('[Sending to rover]: Turn LEFT')
     }
 
     NavHalt = () => {
         console.log("HALT");
-        ws_server.send("HALT");
+        ws_server.send("S0000");
+        this.props.myLogger.info('[Sending to rover]: STOP rover')
     }
 
     Start = () => {
@@ -42,23 +50,22 @@ class NavUI extends React.Component {
             <div className="NavButtons">
                 <div className="Utility"> 
                     <button className = "Start" onClick={this.Start}> Start </button>
-                    <button className = "Boost" onClick={this.Start}> Boost </button>
                 </div>
 
                 <div className="Top"> 
-                    <button className = "Left-Up" onClick={this.NavUp}> Left-Up </button>
-                    <button className = "Up" onClick={this.NavUp}> Up </button>
-                    <button className = "Right-Up" onClick={this.NavUp}> Right-Up </button>
+                    
+                    <button  className = "Up" onClick={this.NavUp}> <Icon icon="arrow-up" color="#D1E8E2" />  </button>
+           
                 </div>
                 <div className="Middle"> 
-                    <button className = "Left" onClick={this.NavLeft}> Left </button>
-                    <button className = "Halt" onClick={this.NavHalt}> Halt </button>
-                    <button className = "Right" onClick={this.NavRight}> Right </button>
+                    <button className = "Left" onClick={this.NavLeft}> <Icon icon="arrow-left" color="#D1E8E2" />  </button>
+                    <button className = "Halt" onClick={this.NavHalt}> <Icon icon="ban-circle" color="#D1E8E2" iconSize="18" /> </button>
+                    <button className = "Right" onClick={this.NavRight}> <Icon icon="arrow-right" color="#D1E8E2" /></button>
                 </div>
                 <div className="Bottom"> 
-                    <button className = "Left-Down" onClick={this.NavDown}> Left-Down </button>
-                    <button className = "Down" onClick={this.NavDown}> Down </button>
-                    <button className = "Right-Down" onClick={this.NavDown}> Right-Down </button>
+
+                    <button className = "Down" onClick={this.NavDown}> <Icon icon="arrow-down" color="#D1E8E2" /> </button>
+    
                 </div>
             </div>
 
