@@ -22,7 +22,7 @@ class SensorReadings extends React.Component {
             <div className="SensorPanel">            
                 <div className = "Time"> 
                     <div className="TimeTitle"> Time: </div>
-                    <DateTime></DateTime>
+                    <div className="TimeValue"> <DateTime></DateTime> </div>
                 </div>
                 
                 <div className = "Battery"> 

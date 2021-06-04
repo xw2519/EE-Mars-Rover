@@ -20,13 +20,14 @@ interface CustomLink {
 const nodes: CustomNode[] = [
   { x: 50, y: 20 },
   { x: 200, y: 250 },
-  { x: 300, y: 40, color: '#26deb0' },
+  { x: 200, y: 500 },
+  { x: 300, y: 40, color: '#26deb0'},
 ];
 
 const links: CustomLink[] = [
   { source: nodes[0], target: nodes[1] },
   { source: nodes[1], target: nodes[2] },
-  { source: nodes[2], target: nodes[0], dashed: true },
+  { source: nodes[2], target: nodes[2], dashed: true },
 ];
 
 const graph = {
@@ -34,12 +35,13 @@ const graph = {
   links,
 };
 
-export const background = '#272727';
+export const background = '#1A1A1D';
 
 export default function Example({ width, height }: NetworkProps) {
   return width < 10 ? null : (
     <svg width={width} height={height}>
       <rect width={width} height={height} rx={14} fill={background} />
+
       <Graph<CustomLink, CustomNode>
         graph={graph}
         top={20}
@@ -60,6 +62,7 @@ export default function Example({ width, height }: NetworkProps) {
           />
         )}
       />
+
     </svg>
   );
 }

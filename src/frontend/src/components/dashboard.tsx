@@ -6,10 +6,13 @@ import ParentSize from '@visx/responsive/lib/components/ParentSize';
 
 import NavUI from './NavUI';
 import SensorReadings from './SensorPanel';
+import RoverSettings from './RoverSettings';
+
 import Example from './canvas';
 
 import './dashboard.css';
 import './NavUI.css';
+import './RoverSettings.css';
 import './SensorPanel.css';
 import './canvas.css';
 
@@ -58,7 +61,7 @@ class Dashboard extends React.Component {
 
                     </div>
         
-                    <div className="grid RoverSettings"> Rover Quick Settings </div>
+                    <div className="grid RoverSettings"> Rover Quick Settings <RoverSettings myLogger={myLogger}/> </div>
         
                     <div className="grid NavigationUI"> Navigation Panel <NavUI myLogger={myLogger}/> </div>
                     

@@ -50,9 +50,6 @@ class NavUI extends React.Component<NavUIProps, {}> {
         return (
     
             <div className="NavButtons">
-                <div className="Utility"> 
-                    <button className = "Start" onClick={this.Start}> Start </button>
-                </div>
 
                 <div className="Top"> 
                     

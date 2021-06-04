@@ -6,49 +6,79 @@
 
     font-size: 20px;
     color: #D1E8E2;
-    text-align: left; 
+    background-color: #272727;
+    text-align: center; 
 }
 
 .Time {
-    display: grid;
-    grid-template-columns: 0.5fr 0.5fr;
-    grid-template-rows: auto;
-
     position: relative;
     top: 15%;
+}
 
-    background-color: #272727;
+.TimeTitle {   
+    width: 40%;
+    margin-left: 10%;
+}
+
+.TimeValue {    
+    width: 60%;
+    margin-left: 35%;
+    margin-top: -3.5%;
 }
 
 .Battery {
-    display: grid;
-    grid-template-columns: 0.5fr 0.5fr;
-    grid-template-rows: auto;
-
     position: relative;
-    top: 25%;
+    margin-top: 5%;
 
     background-color: #272727;
+}
+
+.BatteryTitle {   
+    width: 40%;
+    margin-left: 10%;
+}
+
+.BatteryValue {    
+    width: 40%;
+    margin-left: 55%;
+    margin-top: -3.5%;
 }
 
 .DistanceRemaining {
-    display: grid;
-    grid-template-columns: 0.5fr 0.5fr;
-    grid-template-rows: auto;
-
     position: relative;
-    top: 35%;
+    margin-top: 5%;
 
     background-color: #272727;
 }
 
+.DistanceRemainingTitle {   
+    width: 40%;
+    margin-left: 10%;
+}
+
+.DistanceRemainingValue {    
+    width: 40%;
+    margin-left: 55%;
+    margin-top: -3.5%;
+}
+
 .DistanceTravelled {
-    display: grid;
-    grid-template-columns: 0.5fr 0.5fr;
-    grid-template-rows: auto;
 
     position: relative;
-    top: 45%;
+    margin-top: 5%;
 
     background-color: #272727;
+}
+
+.DistanceTravelledTitle {   
+    position: relative;
+    width: 40%;
+    margin-left: 10%;
+}
+
+.DistanceTravelledValue {    
+    position: relative;
+    width: 40%;
+    margin-left: 55%;
+    margin-top: -3.5%;
 }
