@@ -2,10 +2,6 @@ import { useState } from "react";
 import Switch from "react-switch";
 import ws_server from './util/socketConfig';
 
-interface NavUIProps {
-  myLogger: any;
-}
-
 const RoverSettings = (NavUIProps) => {
     const [checked, setChecked] = useState(false);
 

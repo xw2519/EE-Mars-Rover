@@ -14,10 +14,6 @@ async function loginUser(credentials) {
       .then(data => data.json())
 }
 
-interface LoginProps {
-    setToken: any; 
-}
-
 export default function Login({ setToken }) {
 
     const [username, setUserName] = useState();

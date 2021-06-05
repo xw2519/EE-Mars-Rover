@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 
 import * as react_console_logger from 'react-console-logger';
 import ParentSize from '@visx/responsive/lib/components/ParentSize';
@@ -17,64 +17,66 @@ import './Mapping.css';
 
 const myLogger = new react_console_logger.Logger();
 
-class Dashboard extends React.Component {
-  
+const Dashboard = () => {
+
     /* Serve landing page */
-    render() {
-        return (
-            <>
-            <Helmet>
-                <title> Mars Rover Command Center </title>
-            </Helmet>
-            
-            <div className="App">
 
-                <div className="container">
-                    
-                    <div className="HeaderTitle">
-                        <h1> Mars Rover Command Center </h1>
-                    </div>
-                    
-                    <div className="grid SensorReading"> Sensor Panel <SensorReadings/> </div>
-        
-                    <div className="grid Map"> 
-                        <ParentSize>{({ width, height }) => <Example width={width} height={height} />}</ParentSize>
-                   
-                    </div>
+    return (
+        <>
+        <Helmet>
+            <title> Mars Rover Command Center </title>
+        </Helmet>
 
-                    <div className="grid Terminal"> 
-                        <div className="TerminalHeader">
-                            System Terminal
-                        </div>
-                        <div className="TerminalLog">
-                        <react_console_logger.ConsoleLogger
-                                logger={myLogger}
-                                style={{
-                                    position: 'relative',
-                                    overflowY: 'scroll',
-                                    width: '95%',
-                                    lineHeight: 2,
-                                    background: '#272727',
-                                    infoColor: '#D1E8E2',
-                                    textAlign: 'left'
-                                }}
-                            />
-                        </div>
+        <div className="App">
 
-                    </div>
-        
-                    <div className="grid RoverSettings"> Rover Quick Settings <RoverSettings myLogger={myLogger}/> </div>
-        
-                    <div className="grid NavigationUI"> Navigation Panel <NavUI myLogger={myLogger}/> </div>
-                    
-                    <div className="grid CommandSettings"> UI Settings </div>
+            <div className="container">
+                
+                <div className="HeaderTitle">
+                    <h1> Mars Rover Command Center </h1>
+
+                </div>
+                
+                <div className="grid SensorReading"> Sensor Panel <SensorReadings/> </div>
+    
+                <div className="grid Map"> 
+                    <ParentSize>{({ width, height }) => <Example width={width} height={height} />}</ParentSize>
+                
                 </div>
 
-            </div>
+                <div className="grid Terminal"> 
+                    <div className="TerminalHeader">
+                        System Terminal
+                    </div>
+                    <div className="TerminalLog">
+                    <react_console_logger.ConsoleLogger
+                            logger={myLogger}
+                            style={{
+                                position: 'absolute',
+                                overflowY: 'scroll',
+                                width: '95%',
+                                height: '100%',
+                                lineHeight: 3,
+                                background: '#272727',
+                                infoColor: '#D1E8E2',
+                                textAlign: 'left'
+                            }}
+                        />
+                    </div>
+
+                </div>
     
-            </>
-        );
-    }
-  }
-  export default Dashboard;
+                <div className="grid RoverSettings"> Rover Quick Settings <RoverSettings myLogger={myLogger}/> </div>
+    
+                <div className="grid NavigationUI"> Navigation Panel <NavUI myLogger={myLogger}/> </div>
+                
+                <div className="grid CommandSettings"> UI Settings </div>
+            </div>
+
+        </div>
+
+        </>
+    );
+};
+  
+export default Dashboard;
   
