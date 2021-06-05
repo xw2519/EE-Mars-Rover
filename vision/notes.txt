@@ -1,3 +1,63 @@
+
+Project Management             ///////////////////////////////////////////////////////////////////////////////////
+
+18/5
+- Added UART
+
+20/5
+- Added ball detection
+
+21/5
+- Improved ball detection
+
+22/5
+- Added filters
+
+24/5
+- Improved filters
+
+25/5
+- Added distance calculation
+- Improved filters
+
+26/5
+- Added automatic gain adjustment
+
+28/5
+- Added dynamic arrays to store ball data (Used more on-chip memory)
+- Improved filters
+- Expanded message system for colour data
+
+31/5
+- Cleaned up temporary files and fixed bugs
+
+2/6
+- Added automatic exposure adjustment
+- Tested UART
+
+3/5
+- Changed UART IP, can transmit data
+- Added code to interpret filters and find ball colours
+
+4/5
+- UART fully functional
+- Improved filter interpretation
+
+
+Special Features               ///////////////////////////////////////////////////////////////////////////////////
+
+- Very simple hardware, no buffers or random access to data,
+most processing handled in software.
+
+- Automatic gain and exposure adjustment to adapt to different light levels.
+
+- Very low latency due to simple video pipeline.
+
+- Can accurately determine distance to balls under many lighting conditions due to filters.
+
+
+Notes                          ///////////////////////////////////////////////////////////////////////////////////
+
 - Added uart over IO0 and IO1 to communicate with control subsystem.
 
 - Set camera to always use minimum zoom and maximum exposure,
@@ -63,3 +123,7 @@ Can never detect obstacles <20cm when starting.
 filters triggered and find the colour of balls.
 
 - UART over IO0(TX) and IO1(RX) works when connected to itself.
+
+- Change pink and blue filters to reduce false positives.
+- Ensure yellow ball does not trigger any filters, or make a yellow filter.
+- Make additional filters that uniquely identify balls?

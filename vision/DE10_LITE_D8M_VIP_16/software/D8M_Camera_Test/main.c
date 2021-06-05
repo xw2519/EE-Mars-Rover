@@ -56,12 +56,11 @@ alt_u16 gain          =   0x7FF;
 alt_u32 exposure      =  0x2000;
 alt_u16 current_focus =     300;
 
-alt_u16 x_min, x_max, distance;
-alt_u16 filter_x_min[5], filter_x_max[5], filter_y_min[5], filter_y_max[5], filter_y_diff[5];
+alt_u16 x_min, x_max, distance, diameter, mid_pos, angle, colour;
+alt_u16 filter_x_min[5], filter_x_max[5], filter_y_min[5], filter_y_max[5];
 alt_u8  balls_detected, filter_id;
-alt_u8  calibration = 0, process = 0;
-alt_u8  filters_triggered;
-Array   ball_x_min, ball_x_max, ball_triggered;
+alt_u8  calibration = 0, process = 0;;
+Array   ball_x_min, ball_x_max, ball_colours;
 
 alt_u8  prompt, parity;
 
@@ -161,11 +160,11 @@ alt_u8 filter_index(alt_u8 filter_id){
       return 0;}
     case 'P': {
       return 1;}
-    case 'G': {
+    case 'Y': {
       return 2;}
-    case 'B': {
+    case 'G': {
       return 3;}
-    case 'L': {
+    case 'B': {
       return 4;}
   }
 }
@@ -177,11 +176,11 @@ alt_u8 get_filter_id(alt_u8 index){
     case 1: {
       return 'P';}
     case 2: {
-      return 'G';}
+      return 'Y';}
     case 3: {
-      return 'B';}
+      return 'G';}
     case 4: {
-      return 'L';}
+      return 'B';}
   }
 }
 
@@ -229,7 +228,7 @@ void sys_timer_isr(){
       x_max     =  word      & 0x7FF;
       filter_id = (word>>22) & 0x0FF;
 
-      if((word&0xC0000000)&&(filter_id == 'L')){                //When last part of data from image processor arrives
+      if((word&0xC0000000)&&(filter_id == 'B')){                //When last part of data from image processor arrives
 
         if(calibration<CALIBRATION_MAX){                        //If calibrating, reduce gain if ball count is not zero
           if(balls_detected && (exposure>EXPOSURE_STEP)){
@@ -276,74 +275,29 @@ void sys_timer_isr(){
     printf("Counted %d balls.\n\n", ball_x_min.used);                                                // 1) Ball count
 
     for(alt_u8 i=0; i<(ball_x_min.used); i++){
+      diameter = ball_x_max.data[i] - ball_x_min.data[i];
+      distance = 2560/diameter;
+      mid_pos  = (ball_x_min.data[i]>>1) + (ball_x_max.data[i]>>1);
+      if(mid_pos>320){ angle = ((((mid_pos-320)<<7)/distance)>>6) + ((((mid_pos-320)<<7)/distance)>>7); }
+      else           { angle = ((((320-mid_pos)<<7)/distance)>>6) + ((((320-mid_pos)<<7)/distance)>>7); }
       printf("Ball %d:\n", i+1);
-      printf("    Distance: %03d\n", (2560/(ball_x_max.data[i] - ball_x_min.data[i])));              // 2) Distance to each ball
-      printf("    Filters triggered: ");
-      filters_triggered = 0;
+      printf("    Distance: %03d\n", distance);                                                      // 2) Distance to each ball
+      printf("    Angle: %03d\n", angle);                                                            // 3) Angle to each ball
+      printf("    Colour: ");                                                                        // 4) Colour of ball
       for(alt_u8 j=0; j<5; j++){
         if(!( (filter_x_min[j] > ball_x_max.data[i]) || (filter_x_max[j] < ball_x_min.data[i]) )){
-          filters_triggered |= 1 << j;
-          printf("%c ", get_filter_id(j));
+          colour = get_filter_id(j);
+          printf("%c ", colour);
         }
       }
-      appendArray(&ball_triggered, filters_triggered);
+      appendArray(&ball_colours, colour);
       printf("\n\n");
-    }
-
-    for(alt_u8 i=0; i<5; i++){
-      if(filter_y_max[i] == 0){
-        filter_y_diff[i] = 0;
-      }else{
-        filter_y_diff[i] = filter_y_max[i] - filter_y_min[i];
-      }
-    }
-
-    for(alt_u8 i=0; i<(ball_x_min.used); i++){                                                       // 3) Colour of each ball
-      //if((i==0) || (i==(ball_x_min.used-1))){
-        if((ball_triggered.data[i]&0xF)&&(filter_y_diff[4]>filter_y_diff[0])&&(filter_y_diff[4]>filter_y_diff[1])&&(filter_y_diff[4]>filter_y_diff[2])&&(filter_y_diff[4]>filter_y_diff[3])){
-          printf("yellow ");
-        }else if((ball_triggered.data[i]&0x8) && (ball_triggered.data[i]&0x4)){
-          if((filter_y_diff[3])>(filter_y_diff[2])){
-            printf("blue ");
-          }else{
-            printf("green ");
-          }
-        }else if((ball_triggered.data[i]&0x1) && (ball_triggered.data[i]&0x2)){
-          if((filter_y_diff[0])>(filter_y_diff[1])){
-            printf("red ");
-          }else{
-            printf("pink ");
-          }
-        }else if((ball_triggered.data[i]&0x1) && !(ball_triggered.data[i]&0x2)){
-          printf("red ");
-        }else if(!(ball_triggered.data[i]&0x1) && (ball_triggered.data[i]&0x2)){
-          printf("pink ");
-        }else if((ball_triggered.data[i]&0x8) && !(ball_triggered.data[i]&0x4)){
-          printf("blue ");
-        }else if(!(ball_triggered.data[i]&0x8) && (ball_triggered.data[i]&0x4)){
-          printf("green ");
-        }else{
-          printf("unknown ");
-        }
-      /*}else{
-        if((ball_triggered.data[i]&0x8) && !((ball_triggered.data[i-1]&0x8) && (ball_triggered.data[i+1]&0x8))){
-          printf("blue ");
-        }else if((ball_triggered.data[i]&0x2) && !((ball_triggered.data[i-1]&0x2) && (ball_triggered.data[i+1]&0x2))){
-          printf("pink ");
-        }else if((ball_triggered.data[i]&0x1) && !((ball_triggered.data[i-1]&0x1) && (ball_triggered.data[i+1]&0x1))){
-          printf("red ");
-        }else if((ball_triggered.data[i]&0x4) && !((ball_triggered.data[i-1]&0x4) && (ball_triggered.data[i+1]&0x4))){
-          printf("green ");
-        }else{
-          printf("yellow ");
-        }
-      }*/
     }
 
     process = 0;
     ball_x_min.used = 0;
     ball_x_max.used = 0;
-    ball_triggered.used = 0;
+    ball_colours.used = 0;
   }
 
   IOWR_ALTERA_AVALON_TIMER_STATUS(TIMER_BASE, 0);
@@ -380,7 +334,7 @@ int main(){
 
     initArray(&ball_x_min, 4);
     initArray(&ball_x_max, 4);
-    initArray(&ball_triggered, 4);
+    initArray(&ball_colours, 4);
 
 
 		OV8865SetExposure(exposure);

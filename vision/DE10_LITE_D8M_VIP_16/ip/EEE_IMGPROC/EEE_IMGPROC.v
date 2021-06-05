@@ -33,16 +33,16 @@ parameter MESSAGE_BUF_MAX = 256;
 parameter MSG_INTERVAL = 20;
 parameter BB_COL_DEFAULT = 24'h00ff00;
 
-wire [7:0]   red, green, blue, grey;
-wire [7:0]   red_out, green_out, blue_out;
-
-wire         sop, eop, in_valid, out_ready;
+wire [7:0] red, green, blue;
+wire [7:0] red_out, green_out, blue_out;
+wire       sop, eop, in_valid, out_ready;
 
 //////////////////////////////////////////////////////////////////////// - Detect ball pixels, generate VGA output
 
-assign grey = red[7:2] + green[7:1] + blue[7:2];
 // Detect ball pixels
 wire   ball_detect, bright_detect, blue_detect, greenblue_detect, pink_detect, red_detect;
+wire   red_unique, pink_unique, yellow_unique, green_unique, blue_unique;
+
 assign bright_detect    = (red>=160)|(green>=192)|(blue>=128);
 assign blue_detect      = (blue>=48)&(blue>=red)&(blue>=green)&(blue<144);
 assign greenblue_detect = (green>=32)&(((green>>1)+(green>>3))>=red)&(green>=(blue>>1));
@@ -50,19 +50,27 @@ assign pink_detect      = (red>=192)&(green<128)&(blue<128);
 assign red_detect       = (red>=64)&(((red>>1)+(red>>3))>=green)&((red>>1)>=blue);
 assign ball_detect      = (bright_detect|blue_detect|greenblue_detect|pink_detect|red_detect)&(y>=288);
 
+assign    red_unique    = (red>=192)&(green< 128)&(blue< 128);
+assign   pink_unique    = (red>=192)&(green< 128)&(blue>=192);
+assign yellow_unique    = (red>=192)&(green>=192)&(blue< 128);
+assign  green_unique    = (red< 128)&(green>=192)&(blue>=192);
+assign   blue_unique    = (red< 128)&(green< 128)&(blue> 192);
+
 // Highlight detected areas
 wire [23:0] ball_high;
-assign ball_high = red_detect       ? {8'hdd, 8'h00, 8'h00} :
-									 pink_detect      ? {8'hdd, 8'h00, 8'hdd} :
-									 greenblue_detect ? {8'h00, 8'hdd, 8'h00} :
-									 blue_detect      ? {8'h00, 8'h00, 8'hdd} :
-									 bright_detect    ? {8'hdd, 8'hdd, 8'hdd} :
- 									                    {8'h00, 8'h00, 8'h00} ;
+assign ball_high = yellow_unique ? {8'hdd, 8'hdd, 8'h00} :
+									   pink_unique ? {8'hdd, 8'h00, 8'hdd} :
+									   blue_unique ? {8'h00, 8'h00, 8'hdd} :
+									    red_unique ? {8'hdd, 8'h00, 8'h00} :
+									  green_unique ? {8'h00, 8'hdd, 8'h00} :
+									   ball_detect ? {8'hdd, 8'hdd, 8'hdd} :
+ 									                 {8'h00, 8'h00, 8'h00} ;
 
 // Show bounding box
+wire        bb_active;
 wire [23:0] new_image;
-wire bb_active;
-assign bb_active = (x == left) | (x == right) | (y == top) | (y == bottom);
+
+assign bb_active = (x==left)|(x==right)|(y==top)|(y==bottom);
 assign new_image = bb_active ? bb_col : ball_high;
 
 // Switch output pixels depending on mode
@@ -96,12 +104,12 @@ end
 //Find first and last pixels that triger a filter
 reg [10:0] x_min, y_min, x_max, y_max;
 wire boundary_detect;
-assign boundary_detect = (frame_count == MSG_INTERVAL-1) ?       red_detect :
-												 (frame_count == MSG_INTERVAL-2) ?      pink_detect :
-												 (frame_count == MSG_INTERVAL-3) ? greenblue_detect :
-												 (frame_count == MSG_INTERVAL-4) ?      blue_detect :
-												 (frame_count == MSG_INTERVAL-5) ?    bright_detect :
-												 																	      ball_detect ;
+assign boundary_detect = (frame_count == MSG_INTERVAL-1) ?    red_unique :
+												 (frame_count == MSG_INTERVAL-2) ?   pink_unique :
+												 (frame_count == MSG_INTERVAL-3) ? yellow_unique :
+												 (frame_count == MSG_INTERVAL-4) ?  green_unique :
+												 (frame_count == MSG_INTERVAL-5) ?   blue_unique :
+												 																	   ball_detect ;
 
 always@(posedge clk) begin
 	if (boundary_detect & (y>=288) & in_valid) begin	//Update bounds
@@ -154,16 +162,16 @@ end
 //////////////////////////////////////////////////////////////////////// - Process colours
 
 //Process bounding box at the end of the frame.
-`define RED_ID "R"
-`define PINK_ID "P"
-`define GREENBLUE_ID "G"
-`define BLUE_ID "B"
-`define BRIGHT_ID "L"
+`define    RED_ID "R"
+`define   PINK_ID "P"
+`define YELLOW_ID "Y"
+`define  GREEN_ID "G"
+`define   BLUE_ID "B"
 
-reg [1:0] msg_state;
-reg [7:0] msg_id;
+reg [1:0]  msg_state;
+reg [7:0]  msg_id;
 reg [10:0] left, right, top, bottom;
-reg [7:0] frame_count;
+reg [7:0]  frame_count;
 
 always@(posedge clk) begin
 	if (eop & in_valid & packet_video) begin  //Ignore non-video packets
@@ -188,15 +196,15 @@ always@(posedge clk) begin
 					msg_state <= 2'b01;
 				end
 				MSG_INTERVAL-3: begin
-					msg_id <= `GREENBLUE_ID;
+					msg_id <= `YELLOW_ID;
 					msg_state <= 2'b01;
 				end
 				MSG_INTERVAL-4: begin
-					msg_id <= `BLUE_ID;
+					msg_id <= `GREEN_ID;
 					msg_state <= 2'b01;
 				end
 				MSG_INTERVAL-5: begin
-					msg_id <= `BRIGHT_ID;
+					msg_id <= `BLUE_ID;
 					msg_state <= 2'b01;
 				end
 				default: begin
