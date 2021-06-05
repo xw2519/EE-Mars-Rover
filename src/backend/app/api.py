@@ -10,6 +10,18 @@ from bson import ObjectId
 
 app = FastAPI(title='Mars Command Server')
 
+origins = [
+    "http://localhost:3000"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 '''
 Server to web client - JSON:
     - Battery remaining 
@@ -70,6 +82,11 @@ Main server operations
 '''       
         
 session_instance = Session()
+
+@app.post("/login")
+async def login_handler():
+    return {"token": "test123"}
+
 
 @app.websocket("/ws/server")
 async def websocket_client(websocket: WebSocket):
