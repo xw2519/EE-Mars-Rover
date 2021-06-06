@@ -13,17 +13,14 @@ function App() {
   }
   
   return (
-    <div className="wrapper">
-      <BrowserRouter>
-        <Switch>
-          <Route path="/Dashboard">
-            <Dashboard />
-          </Route>
-        </Switch>
-      </BrowserRouter>
-    </div>
+    <BrowserRouter>
+        <Route path="/Dashboard">
+          <Dashboard />
+        </Route>
+    </BrowserRouter>
   )
 }
 
 const rootElement = document.getElementById("root")
+
 render(<App />, rootElement)

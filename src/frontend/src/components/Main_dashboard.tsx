@@ -1,5 +1,3 @@
-import React, {useState} from 'react';
-
 import * as react_console_logger from 'react-console-logger';
 import ParentSize from '@visx/responsive/lib/components/ParentSize';
 import {Helmet} from "react-helmet";
