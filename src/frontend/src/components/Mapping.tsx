@@ -28,12 +28,18 @@ function LinkNodes(nodes: CustomNode[]) {
 
   for(let i = 0; i < (nodes.length-1); i++) {
 
-    if(i !== nodes.length) {
-      node_link = {source: nodes[i], target: nodes[(i+1)]}
+    // Link all nodes
+    if(i !== (nodes.length-1)) {
+
+      // Do not link obstacles
+      if(nodes[i+1].custom === "Obstacle") {
+        node_link = {source: nodes[i], target: nodes[(i)]}
+      }
+      else {
+        node_link = {source: nodes[i], target: nodes[(i+1)]}
+      }      
     }
-    else {
-      
-    } 
+
     links.push(node_link)
   }
 
@@ -82,9 +88,7 @@ export default function Example({ width, height}: NetworkProps) {
   function UpdateNodes() {
 
     // Add current rover location
-    var node: CustomNode = {x: (10+nodes[(nodes.length - 1)].x), y: (-10+nodes[(nodes.length - 1)].y), custom: 'Location'}
-
-    var node: CustomNode = {x: (20+nodes[(nodes.length - 1)].x), y: (-10+nodes[(nodes.length - 1)].y), custom: 'Rover'}
+    var node: CustomNode = {x: (20+nodes[(nodes.length - 1)].x), y: (-10+nodes[(nodes.length - 1)].y), custom: 'Obstacle'}
 
     // Change icon on previous rover location 
     for(let i = 0; i < (nodes.length); i++) {
@@ -108,8 +112,6 @@ export default function Example({ width, height}: NetworkProps) {
     links,
   };
 
-  console.log(links)
-
   return width < 10 ? null : (
     <div>
 
@@ -125,7 +127,7 @@ export default function Example({ width, height}: NetworkProps) {
           (custom === 'Rover') ? <RoverNode /> : ((custom === 'Location') ? <LocationNode /> : <ObstacleNode/>)
         }
 
-        linkComponent={({ link: { source, target, dashed } }) => (
+        linkComponent={({ link: { source, target } }) => (
           
           <line
             x1={source.x}

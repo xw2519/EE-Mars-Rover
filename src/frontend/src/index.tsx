@@ -13,11 +13,15 @@ function App() {
   }
   
   return (
-    <BrowserRouter>
-        <Route path="/Dashboard">
+    <div className="wrapper">
+      <BrowserRouter>
+        <Switch>
+        <Route path="/">
           <Dashboard />
-        </Route>
-    </BrowserRouter>
+          </Route>
+        </Switch>
+      </BrowserRouter>
+    </div>
   )
 }
 
