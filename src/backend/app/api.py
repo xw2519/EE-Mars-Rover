@@ -49,8 +49,8 @@ class ClientManager:
         await websocket_client.accept()
         self.connection = websocket_client
     
-    async def send_to_client(self, data: str):
-        await self.connection.send_text(data)
+    async def send_to_client(self, data_client: str):
+        await self.connection.send_text(data_client)
     
 class RoverManager:
     '''
@@ -63,8 +63,8 @@ class RoverManager:
         await websocket_client.accept()
         self.connection = websocket_client
     
-    async def send_to_rover(self, data: str):
-        await self.connection.send_text(data)
+    async def send_to_rover(self, data_rover: str):
+        await self.connection.send_text(data_rover)
         
 # Session based functions
 class Session:
@@ -119,6 +119,10 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             received_data_rover = await websocket.receive_text()
+            
+            if (received_data_rover != ""):
+                await session_instance.client_connection.send_to_client(received_data_rover)
+            
             print(received_data_rover)
             
     except WebSocketDisconnect:

@@ -36,6 +36,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "^4.0.3",
     "react-simple-flex-grid": "^1.3.21",
+    "react-svg-tooltip": "0.0.11",
     "react-switch": "^6.0.0",
     "recharts": "^2.0.9",
     "typescript": "^4.3.2",

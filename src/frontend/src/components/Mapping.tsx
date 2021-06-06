@@ -1,5 +1,7 @@
 import { Graph } from '@visx/network';
 import React, {useState} from 'react';
+import ws_server from './util/socketConfig'
+import { Tooltip } from "react-svg-tooltip";
 
 export type NetworkProps = {
   width: number;
@@ -48,20 +50,22 @@ function LinkNodes(nodes: CustomNode[]) {
 
 export default function Example({ width, height}: NetworkProps) {
 
-  const [nodes, set_nodes] = useState<CustomNode[]>([{x:0, y:0, custom:'Rover'}]);
+  const circleRef = React.createRef<SVGCircleElement>();
 
-  const RoverNode = ({ size = 40 }: { size?: number }) => (
-    <g transform={`translate(${-size / 2},${-size / 2})`}>
-      <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-current-location" width="40" height="30" viewBox="0 0 22 22" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" onClick={UpdateNodes}>
-      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-      <circle cx="12" cy="12" r="3"></circle>
-      <circle cx="12" cy="12" r="8"></circle>
-      <line x1="12" y1="2" x2="12" y2="4"></line>
-      <line x1="12" y1="20" x2="12" y2="22"></line>
-      <line x1="20" y1="12" x2="22" y2="12"></line>
-      <line x1="2" y1="12" x2="4" y2="12"></line>
+  const RoverNode = ( ) => (
+    <g transform={`translate(${-40 / 2},${-40 / 2})`}>
+      <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-current-location" width="40" height="30" viewBox="0 0 40 30" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" onClick={UpdateNodes}>
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <circle cx="12" cy="12" r="2" fill="currentColor"ref={circleRef}></circle>
+        <circle cx="12" cy="12" r="8" ></circle>
+        <line x1="12" y1="2" x2="12" y2="4"></line>
+        <line x1="12" y1="20" x2="12" y2="22"></line>
+        <line x1="20" y1="12" x2="22" y2="12"></line>
+        <line x1="2" y1="12" x2="4" y2="12"></line>
+
       </svg>
     </g>
+    
   );
 
   const LocationNode = ({ size = 40 }: { size?: number }) => (
@@ -72,8 +76,8 @@ export default function Example({ width, height}: NetworkProps) {
     </g>
   );
 
-  const ObstacleNode = ({ size = 40 }: { size?: number }) => (
-    <g transform={`translate(${-size / 2},${-size / 2})`}>
+  const ObstacleNode = ( color ) => (
+    <g transform={`translate(${-40 / 2},${-40 / 2})`}>
       <svg  xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-alert-octagon" width="30" height="30" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
       <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
       <path 
@@ -85,10 +89,12 @@ export default function Example({ width, height}: NetworkProps) {
     </g>
   );
 
+  const [nodes, set_nodes] = useState<CustomNode[]>([{x:0, y:0, custom:'Rover'}]);
+
   function UpdateNodes() {
 
     // Add current rover location
-    var node: CustomNode = {x: (20+nodes[(nodes.length - 1)].x), y: (-10+nodes[(nodes.length - 1)].y), custom: 'Obstacle'}
+    var node: CustomNode = {x: (20+nodes[(nodes.length - 1)].x), y: (-10+nodes[(nodes.length - 1)].y), custom: 'Rover'}
 
     // Change icon on previous rover location 
     for(let i = 0; i < (nodes.length); i++) {
@@ -99,6 +105,18 @@ export default function Example({ width, height}: NetworkProps) {
 
     // Update state
     set_nodes(nodes => [...nodes, node])
+  }
+
+  ws_server.onmessage = (e) => {  
+    
+    // Check if server JSON is intended for map
+    var server_message = JSON.parse(e.data); 
+
+    if(server_message.type === "Map") {
+      // Assign into CustomNode format and pass into "UpdateNodes function"
+
+    }
+
   }
 
   var links: CustomLink[] = [
@@ -112,6 +130,7 @@ export default function Example({ width, height}: NetworkProps) {
     links,
   };
 
+  // Return SVG map
   return width < 10 ? null : (
     <div>
 
@@ -124,7 +143,7 @@ export default function Example({ width, height}: NetworkProps) {
         left={425}
 
         nodeComponent={({ node: { custom, color }  }) =>
-          (custom === 'Rover') ? <RoverNode /> : ((custom === 'Location') ? <LocationNode /> : <ObstacleNode/>)
+          (custom === 'Rover') ? <RoverNode /> : ((custom === 'Location') ? <LocationNode /> : <ObstacleNode color={color} />)
         }
 
         linkComponent={({ link: { source, target } }) => (
