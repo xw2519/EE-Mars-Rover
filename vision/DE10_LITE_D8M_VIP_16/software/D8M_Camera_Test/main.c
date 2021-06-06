@@ -49,6 +49,14 @@ typedef struct{
   size_t size;
 } Array;
 
+// s - stop, send direction {sign, 2 digit decimal}
+// p - pause, send ball data
+// a - acknowledgement
+// c - continue
+// d - ball data following
+// r,p,y,g,b - ball colours
+// data transmission - {'b', colour, 2 digit perpendicular distance, 2 digit other distance}
+// \n - end transmission
 
 alt_up_rs232_dev* ctrl_uart;
 
@@ -60,7 +68,7 @@ alt_u16 x_min, x_max, distance, diameter, mid_pos, angle, colour;
 alt_u16 filter_x_min[5], filter_x_max[5], filter_y_min[5], filter_y_max[5];
 alt_u8  balls_detected, filter_id;
 alt_u8  calibration = 0, process = 0;;
-Array   ball_x_min, ball_x_max, ball_colours;
+Array   ball_x_min, ball_x_max;
 
 alt_u8  prompt, parity;
 
@@ -259,9 +267,6 @@ void sys_timer_isr(){
           filter_x_min[filter_index(filter_id)] = x_min;
           filter_x_max[filter_index(filter_id)] = x_max;
         }
-        /*if(word&0xC0000000){ printf("\nY "); }
-        else{ printf("\nX "); }
-        printf("%c %03x %03x\n", filter_id, x_max, x_min);*/
       }else if((x_max-x_min)>20){                              //The word is about ball data, append to arrays and increment ball count
         if((ball_x_min.used<8)&&(calibration == CALIBRATION_MAX)){
           appendArray(&ball_x_min, x_min);
@@ -272,7 +277,7 @@ void sys_timer_isr(){
   }
 
   if(process){
-    printf("Counted %d balls.\n\n", ball_x_min.used);                                                // 1) Ball count
+    printf("Counted %d balls.\n\n", ball_x_min.used);                                                // Ball count
 
     for(alt_u8 i=0; i<(ball_x_min.used); i++){
       diameter = ball_x_max.data[i] - ball_x_min.data[i];
@@ -283,21 +288,19 @@ void sys_timer_isr(){
       printf("Ball %d:\n", i+1);
       printf("    Distance: %03d\n", distance);                                                      // 2) Distance to each ball
       printf("    Angle: %03d\n", angle);                                                            // 3) Angle to each ball
-      printf("    Colour: ");                                                                        // 4) Colour of ball
+      printf("    Colour: ");
       for(alt_u8 j=0; j<5; j++){
         if(!( (filter_x_min[j] > ball_x_max.data[i]) || (filter_x_max[j] < ball_x_min.data[i]) )){
           colour = get_filter_id(j);
-          printf("%c ", colour);
+          printf("%c ", colour);                                                                     // 1) Colour of ball
         }
       }
-      appendArray(&ball_colours, colour);
       printf("\n\n");
     }
 
     process = 0;
     ball_x_min.used = 0;
     ball_x_max.used = 0;
-    ball_colours.used = 0;
   }
 
   IOWR_ALTERA_AVALON_TIMER_STATUS(TIMER_BASE, 0);
@@ -332,9 +335,8 @@ int main(){
     ctrl_uart = alt_up_rs232_open_dev("/dev/control_uart");
 		if(ctrl_uart){ printf("Started control uart...\n"); }
 
-    initArray(&ball_x_min, 4);
-    initArray(&ball_x_max, 4);
-    initArray(&ball_colours, 4);
+    initArray(&ball_x_min, 5);
+    initArray(&ball_x_max, 5);
 
 
 		OV8865SetExposure(exposure);

@@ -40,7 +40,7 @@ wire       sop, eop, in_valid, out_ready;
 //////////////////////////////////////////////////////////////////////// - Detect ball pixels, generate VGA output
 
 // Detect ball pixels
-wire   ball_detect, bright_detect, blue_detect, greenblue_detect, pink_detect, red_detect;
+wire   red_detect, pink_detect, greenblue_detect, blue_detect, bright_detect, ball_detect;
 wire   red_unique, pink_unique, yellow_unique, green_unique, blue_unique;
 
 assign bright_detect    = (red>=160)|(green>=192)|(blue>=128);
@@ -50,11 +50,11 @@ assign pink_detect      = (red>=192)&(green<128)&(blue<128);
 assign red_detect       = (red>=64)&(((red>>1)+(red>>3))>=green)&((red>>1)>=blue);
 assign ball_detect      = (bright_detect|blue_detect|greenblue_detect|pink_detect|red_detect)&(y>=288);
 
-assign    red_unique    = (red>=192)&(green< 128)&(blue< 128);
-assign   pink_unique    = (red>=192)&(green< 128)&(blue>=192);
-assign yellow_unique    = (red>=192)&(green>=192)&(blue< 128);
-assign  green_unique    = (red< 128)&(green>=192)&(blue>=192);
-assign   blue_unique    = (red< 128)&(green< 128)&(blue> 192);
+assign    red_unique    = (red>=128)&(green<  64)&(blue<  48)&(y>=288);
+assign   pink_unique    = (red>=192)&(green< 128)&(blue>=128)&(y>=288);
+assign yellow_unique    = (red>=192)&(green>=192)&(blue< 128)&(y>=288);
+assign  green_unique    = (red< 128)&(green>=240)&(blue>=224)&(y>=288);
+assign   blue_unique    = (red< 128)&(green< 128)&(blue> 192)&(y>=288);
 
 // Highlight detected areas
 wire [23:0] ball_high;
@@ -112,7 +112,7 @@ assign boundary_detect = (frame_count == MSG_INTERVAL-1) ?    red_unique :
 												 																	   ball_detect ;
 
 always@(posedge clk) begin
-	if (boundary_detect & (y>=288) & in_valid) begin	//Update bounds
+	if (boundary_detect & in_valid) begin	//Update bounds
 		if (x < x_min) x_min <= x;
 		if (x > x_max) x_max <= x;
 		if (y < y_min) y_min <= y;
@@ -132,7 +132,7 @@ always @(posedge clk) begin
 	if(sop & in_valid) begin
 		ball_in_col <= 0;
 	end
-	if(ball_detect & in_valid & (y>=288)) begin
+	if(ball_detect & in_valid) begin
 		ball_in_col[x] <= 1;
 	end
 end
