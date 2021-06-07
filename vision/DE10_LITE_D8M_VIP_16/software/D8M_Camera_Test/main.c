@@ -43,10 +43,16 @@
 #define MIPI_REG_MDLErrCnt		0x0090
 
 typedef struct{
+  alt_u8 *data;
+  size_t used;
+  size_t size;
+} array_u8;
+
+typedef struct{
   alt_u16 *data;
   size_t used;
   size_t size;
-} Array;
+} array_u16;
 
 /*
 Vision ---> Control
@@ -72,10 +78,12 @@ alt_u16 x_min, x_max, distance, diameter, mid_pos, angle, colour;
 alt_u16 filter_x_min[5], filter_x_max[5], filter_y_min[5], filter_y_max[5];
 alt_u8  balls_detected, filter_id;
 alt_u8  calibration=0, process=0;
-Array   ball_x_min, ball_x_max;
+
+array_u8  ball_colours, ball_distances, ball_angles, ball_sent;
+array_u16 ball_x_min, ball_x_max;
 
 alt_u8  prompt, parity;
-alt_u8  closest_distance=0xFF, moving=0, send_data=0;
+alt_u8  closest_distance=0xFF, moving=0, ticks=0;
 
 void mipi_clear_error(void){
   MipiBridgeRegWrite(MIPI_REG_CSIStatus,0x01FF); // clear error
@@ -141,14 +149,38 @@ bool MIPI_Init(void){
 }
 
 
-void initArray(Array *a, size_t init_size){
+void initArray_u8(array_u8 *a, size_t init_size){
+
+  a->data = malloc(init_size * sizeof(alt_u8));
+  a->used = 0;
+  a->size = init_size;
+}
+
+void appendArray_u8(array_u8 *a, alt_u8 element){
+
+  if (a->used == a->size){
+    a->data = realloc(a->data, a->size * sizeof(alt_u8));
+    a->size *= 2;
+  }
+  a->data[a->used] = element;
+  a->used++;
+}
+
+void freeArray_u8(array_u8 *a){
+  free(a->data);
+  a->data = NULL;
+  a->used = 0;
+  a->size = 0;
+}
+
+void initArray_u16(array_u16 *a, size_t init_size){
 
   a->data = malloc(init_size * sizeof(alt_u16));
   a->used = 0;
   a->size = init_size;
 }
 
-void appendArray(Array *a, alt_u16 element){
+void appendArray_u16(array_u16 *a, alt_u16 element){
 
   if (a->used == a->size){
     a->data = realloc(a->data, a->size * sizeof(alt_u16));
@@ -158,7 +190,7 @@ void appendArray(Array *a, alt_u16 element){
   a->used++;
 }
 
-void freeArray(Array *a){
+void freeArray_u16(array_u16 *a){
   free(a->data);
   a->data = NULL;
   a->used = 0;
@@ -276,14 +308,18 @@ void sys_timer_isr(){
         }
       }else if((x_max-x_min)>20){                              //The word is about ball data, append to arrays and increment ball count
         if((ball_x_min.used<8)&&(calibration == CALIBRATION_MAX)){
-          appendArray(&ball_x_min, x_min);
-          appendArray(&ball_x_max, x_max);
+          appendArray_u16(&ball_x_min, x_min);
+          appendArray_u16(&ball_x_max, x_max);
         }
         balls_detected = 1;
       }
   }
 
   if(process){
+    ball_colours.used = 0;
+    ball_distances.used = 0;
+    ball_angles.used = 0;
+
     printf("Counted %d balls.\n\n", ball_x_min.used);                                                // Ball count
 
     for(alt_u8 i=0; i<(ball_x_min.used); i++){
@@ -311,24 +347,19 @@ void sys_timer_isr(){
       }
       printf("\n\n");
 
-      if(send_data&&ctrl_uart){
-        if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)>6){
-          alt_up_rs232_write_data(ctrl_uart, 'b');
-          alt_up_rs232_write_data(ctrl_uart, colour);
-          alt_up_rs232_write_data(ctrl_uart, (distance/10)+48);
-          alt_up_rs232_write_data(ctrl_uart, (distance%10)+48);
-          alt_up_rs232_write_data(ctrl_uart, (angle/10)+48);
-          alt_up_rs232_write_data(ctrl_uart, (angle%10)+48);
-        }
-      }
+      appendArray_u8(&ball_colours, colour);
+      appendArray_u8(&ball_distances, distance);
+      appendArray_u8(&ball_angles, angle);
     }
 
-    if((closest_distance<25)&&ctrl_uart&&moving){
+    if((closest_distance<30)&&ctrl_uart&&moving&&(!ticks)){
       if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)){
         alt_up_rs232_write_data(ctrl_uart, 's');
+        ticks = 3;
       }
     }
 
+    if(ticks){ ticks--; }
     closest_distance = 0xFF;
     process = 0;
     ball_x_min.used = 0;
@@ -367,8 +398,12 @@ int main(){
     ctrl_uart = alt_up_rs232_open_dev("/dev/control_uart");
 		if(ctrl_uart){ printf("Started control uart...\n"); }
 
-    initArray(&ball_x_min, 5);
-    initArray(&ball_x_max, 5);
+    initArray_u16(&ball_x_min, 5);
+    initArray_u16(&ball_x_max, 5);
+    initArray_u8(&ball_colours, 5);
+    initArray_u8(&ball_distances, 5);
+    initArray_u8(&ball_angles, 5);
+    initArray_u8(&ball_sent, 5);
 
 
 		OV8865SetExposure(exposure);
@@ -392,5 +427,12 @@ int main(){
         }
       }
 		}
+
+    freeArray_u16(&ball_x_min);
+    freeArray_u16(&ball_x_max);
+    freeArray_u8(&ball_colours);
+    freeArray_u8(&ball_distances);
+    freeArray_u8(&ball_angles);
+    freeArray_u8(&ball_sent);
 		return 0;
 }

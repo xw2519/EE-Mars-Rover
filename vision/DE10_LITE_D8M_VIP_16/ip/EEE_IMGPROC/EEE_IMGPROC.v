@@ -49,13 +49,13 @@ assign   pink_detect = (red>=192)&(green<128)&(blue<128);
 assign  green_detect = (green>=32)&(((green>>1)+(green>>3))>=red)&(green>=(blue>>1));
 assign   blue_detect = (blue>=48)&(blue>=red)&(blue>=green)&(blue<144);
 assign bright_detect = (red>=160)|(green>=192)|(blue>=128);
-assign   ball_detect = (bright_detect|blue_detect|green_detect|pink_detect|red_detect)&(y>=288);
+assign   ball_detect = (bright_detect|blue_detect|green_detect|pink_detect|red_detect)&(y>=272);
 
-assign    red_unique = (red>=128)&(green<  96)&(blue<  64)&(y>=288);
-assign   pink_unique = (red>=192)&(green< 128)&(blue>=128)&(y>=288);
-assign yellow_unique = (red>=192)&(green>=224)&(blue< 128)&(y>=288);
-assign  green_unique = (red< 128)&(green>=240)&(blue>=224)&(y>=288);
-assign   blue_unique = (red<  96)&(green<  96)&(blue> 128)&(y>=288);
+assign    red_unique = (red>=128)&(green<  96)&(blue<  64)&(y>=272);
+assign   pink_unique = (red>=192)&(green< 128)&(blue>=128)&(y>=272);
+assign yellow_unique = (red>=192)&(green>=224)&(blue< 128)&(y>=272);
+assign  green_unique = (red< 128)&(green>=240)&(blue>=224)&(y>=272);
+assign   blue_unique = (red<  96)&(green<  96)&(blue> 128)&(y>=272);
 
 // Highlight detected areas
 wire [23:0] ball_high;
