@@ -178,6 +178,8 @@ alt_u8 filter_index(alt_u8 filter_id){
       return 3;}
     case 'B': {
       return 4;}
+    default:{
+      return 0;}
   }
 }
 
@@ -193,6 +195,8 @@ alt_u8 get_filter_id(alt_u8 index){
       return 'G';}
     case 4: {
       return 'B';}
+    default:{
+      return 'U';}
   }
 }
 
