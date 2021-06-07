@@ -53,9 +53,9 @@ module Qsys_control_uart (
  *                           Parameter Declarations                          *
  *****************************************************************************/
 
-parameter CW							= 9;		// Baud counter width
-parameter BAUD_TICK_COUNT			= 434;
-parameter HALF_BAUD_TICK_COUNT	= 217;
+parameter CW							= 18;		// Baud counter width
+parameter BAUD_TICK_COUNT			= 166666;
+parameter HALF_BAUD_TICK_COUNT	= 83333;
 
 parameter TDW							= 10;		// Total data width
 parameter DW							= 8;		// Data width

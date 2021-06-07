@@ -51,7 +51,7 @@ assign   blue_detect = (blue>=48)&(blue>=red)&(blue>=green)&(blue<144);
 assign bright_detect = (red>=160)|(green>=192)|(blue>=128);
 assign   ball_detect = (bright_detect|blue_detect|green_detect|pink_detect|red_detect)&(y>=288);
 
-assign    red_unique = (red>=128)&(green<  64)&(blue<  64)&(y>=288);
+assign    red_unique = (red>=128)&(green<  96)&(blue<  64)&(y>=288);
 assign   pink_unique = (red>=192)&(green< 128)&(blue>=128)&(y>=288);
 assign yellow_unique = (red>=192)&(green>=224)&(blue< 128)&(y>=288);
 assign  green_unique = (red< 128)&(green>=240)&(blue>=224)&(y>=288);

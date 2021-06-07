@@ -677,7 +677,7 @@
   <parameter name="AUTO_CLK_CLOCK_RATE" value="50000000" />
   <parameter name="AUTO_DEVICE_FAMILY" value="MAX 10" />
   <parameter name="avalon_bus_type" value="Memory Mapped" />
-  <parameter name="baud" value="115200" />
+  <parameter name="baud" value="300" />
   <parameter name="clk_rate" value="50000000" />
   <parameter name="data_bits" value="8" />
   <parameter name="parity" value="None" />
