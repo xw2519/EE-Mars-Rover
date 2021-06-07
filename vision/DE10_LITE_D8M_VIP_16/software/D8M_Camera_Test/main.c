@@ -18,7 +18,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-//EEE_IMGPROC defines
 
 //offsets
 #define EEE_IMGPROC_STATUS 0
@@ -26,9 +25,9 @@
 #define EEE_IMGPROC_ID     2
 #define EEE_IMGPROC_BBCOL  3
 
-#define GAIN_STEP       0x40
-#define EXPOSURE_STEP  0x100
-#define CALIBRATION_MAX    8
+#define GAIN_STEP         0x40
+#define EXPOSURE_STEP    0x100
+#define CALIBRATION_MAX      8
 
 #define MIPI_REG_PHYClkCtl		0x0056
 #define MIPI_REG_PHYData0Ctl	0x0058
@@ -49,29 +48,32 @@ typedef struct{
   size_t size;
 } Array;
 
-// s - stop, send direction {sign, 2 digit decimal}
-// p - pause, send ball data
-// a - acknowledgement
-// c - continue
-// d - ball data following
-// r,p,y,g,b - ball colours
-// data transmission - {'b', colour, 2 digit perpendicular distance, 2 digit other distance}
-// \n - end transmission
+/*
+Vision ---> Control
+s - Emergency Stop                    {'s', <sign>, <2-digit decimal>}
+p - Pause to gather data
+c - Continue after gathering data
+b - Sending ball data                 {'b', colour, 2 digit perpendicular distance, 2 digit other distance}
+\n - End Transmission
+Control ---> Vision
+m - Movement command received
+s - Stop command received
+*/
 
 alt_up_rs232_dev* ctrl_uart;
 
-alt_u16 gain          =   0x7FF;
-alt_u32 exposure      =  0x2000;
-alt_u16 current_focus =     300;
+alt_u16 gain          =  0x7FF;
+alt_u32 exposure      = 0x2000;
+alt_u16 current_focus =    300;
 
 alt_u16 x_min, x_max, distance, diameter, mid_pos, angle, colour;
 alt_u16 filter_x_min[5], filter_x_max[5], filter_y_min[5], filter_y_max[5];
 alt_u8  balls_detected, filter_id;
-alt_u8  calibration = 0, process = 0;;
+alt_u8  calibration=0, process=0;
 Array   ball_x_min, ball_x_max;
 
 alt_u8  prompt, parity;
-
+alt_u8  closest_distance=0xFF, moving=0;
 
 void mipi_clear_error(void){
   MipiBridgeRegWrite(MIPI_REG_CSIStatus,0x01FF); // clear error
@@ -197,8 +199,8 @@ void timer_init(void* isr){
 
     IOWR_ALTERA_AVALON_TIMER_CONTROL(TIMER_BASE, 0x0003);
     IOWR_ALTERA_AVALON_TIMER_STATUS(TIMER_BASE, 0);
-    IOWR_ALTERA_AVALON_TIMER_PERIODL(TIMER_BASE, 0x0000);
-    IOWR_ALTERA_AVALON_TIMER_PERIODH(TIMER_BASE, 0x000F);
+    IOWR_ALTERA_AVALON_TIMER_PERIODL(TIMER_BASE, 0x0900);
+    IOWR_ALTERA_AVALON_TIMER_PERIODH(TIMER_BASE, 0x0000);
     alt_irq_register(TIMER_IRQ, 0, isr);
     IOWR_ALTERA_AVALON_TIMER_CONTROL(TIMER_BASE, 0x0007);
 }
@@ -209,10 +211,9 @@ void sys_timer_isr(){
   if((IORD(KEY_BASE,0)&0x03) == 0x01){
     current_focus = Focus_Window(320,240);
 
-    printf("button pressed ");
     if(ctrl_uart){
       if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)){
-        alt_up_rs232_write_data(ctrl_uart, 'h');
+        alt_up_rs232_write_data(ctrl_uart, 'm');
       }
     }
 
@@ -225,7 +226,7 @@ void sys_timer_isr(){
     OV8865SetGain(gain);
     OV8865SetExposure(exposure);
 
-    printf("\nGain = %x ", gain);
+    printf("\nGain = %x\n", gain);
     printf("Exposure = %x\n", exposure);
   }
 
@@ -285,19 +286,28 @@ void sys_timer_isr(){
       mid_pos  = (ball_x_min.data[i]>>1) + (ball_x_max.data[i]>>1);
       if(mid_pos>320){ angle = ((((mid_pos-320)<<7)/distance)>>6) + ((((mid_pos-320)<<7)/distance)>>7); }
       else           { angle = ((((320-mid_pos)<<7)/distance)>>6) + ((((320-mid_pos)<<7)/distance)>>7); }
+
+      if(distance < closest_distance){ closest_distance = distance; }
       printf("Ball %d:\n", i+1);
       printf("    Distance: %03d\n", distance);                                                      // 2) Distance to each ball
       printf("    Angle: %03d\n", angle);                                                            // 3) Angle to each ball
       printf("    Colour: ");
-      for(alt_u8 j=0; j<5; j++){
+      for(alt_u8 j=4; j>=0; j--){
         if(!( (filter_x_min[j] > ball_x_max.data[i]) || (filter_x_max[j] < ball_x_min.data[i]) )){
           colour = get_filter_id(j);
-          printf("%c ", colour);                                                                     // 1) Colour of ball
+          printf("%c ", colour);                                                                  // 1) Colour of ball
         }
       }
       printf("\n\n");
     }
 
+    if((closest_distance<20)&&ctrl_uart&&moving){
+      if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)){
+        alt_up_rs232_write_data(ctrl_uart, 's');
+      }
+    }
+
+    closest_distance = 0xFF;
     process = 0;
     ball_x_min.used = 0;
     ball_x_max.used = 0;
@@ -353,8 +363,10 @@ int main(){
 
           alt_up_rs232_read_data(ctrl_uart, &prompt, &parity);
           alt_up_rs232_disable_read_interrupt(ctrl_uart);
-          printf("UART received: %c\n", prompt);
+          if     (prompt=='m'){ moving = 1; }
+          else if(prompt=='s'){ moving = 0; }
 
+          printf("UART received: %c\n", prompt);
         }
       }
 		}

@@ -27,11 +27,11 @@ module EEE_IMGPROC(
 
 ////////////////////////////////////////////////////////////////////////
 
-parameter IMAGE_W = 11'd640;
-parameter IMAGE_H = 11'd480;
+parameter IMAGE_W         = 11'd640;
+parameter IMAGE_H         = 11'd480;
 parameter MESSAGE_BUF_MAX = 256;
-parameter MSG_INTERVAL = 20;
-parameter BB_COL_DEFAULT = 24'h00ff00;
+parameter MSG_INTERVAL    = 20;
+parameter BB_COL_DEFAULT  = 24'h00ff00;
 
 wire [7:0] red, green, blue;
 wire [7:0] red_out, green_out, blue_out;
@@ -40,21 +40,22 @@ wire       sop, eop, in_valid, out_ready;
 //////////////////////////////////////////////////////////////////////// - Detect ball pixels, generate VGA output
 
 // Detect ball pixels
-wire   red_detect, pink_detect, greenblue_detect, blue_detect, bright_detect, ball_detect;
+wire   red_detect, pink_detect, green_detect, blue_detect, bright_detect, ball_detect;
 wire   red_unique, pink_unique, yellow_unique, green_unique, blue_unique;
 
-assign bright_detect    = (red>=160)|(green>=192)|(blue>=128);
-assign blue_detect      = (blue>=48)&(blue>=red)&(blue>=green)&(blue<144);
-assign greenblue_detect = (green>=32)&(((green>>1)+(green>>3))>=red)&(green>=(blue>>1));
-assign pink_detect      = (red>=192)&(green<128)&(blue<128);
-assign red_detect       = (red>=64)&(((red>>1)+(red>>3))>=green)&((red>>1)>=blue);
-assign ball_detect      = (bright_detect|blue_detect|greenblue_detect|pink_detect|red_detect)&(y>=288);
 
-assign    red_unique    = (red>=128)&(green<  64)&(blue<  48)&(y>=288);
-assign   pink_unique    = (red>=192)&(green< 128)&(blue>=128)&(y>=288);
-assign yellow_unique    = (red>=192)&(green>=192)&(blue< 128)&(y>=288);
-assign  green_unique    = (red< 128)&(green>=240)&(blue>=224)&(y>=288);
-assign   blue_unique    = (red< 128)&(green< 128)&(blue> 192)&(y>=288);
+assign    red_detect = (red>=64)&(((red>>1)+(red>>3))>=green)&((red>>1)>=blue);
+assign   pink_detect = (red>=192)&(green<128)&(blue<128);
+assign  green_detect = (green>=32)&(((green>>1)+(green>>3))>=red)&(green>=(blue>>1));
+assign   blue_detect = (blue>=48)&(blue>=red)&(blue>=green)&(blue<144);
+assign bright_detect = (red>=160)|(green>=192)|(blue>=128);
+assign   ball_detect = (bright_detect|blue_detect|green_detect|pink_detect|red_detect)&(y>=288);
+
+assign    red_unique = (red>=128)&(green<  64)&(blue<  48)&(y>=288);
+assign   pink_unique = (red>=192)&(green< 128)&(blue>=128)&(y>=288);
+assign yellow_unique = (red>=192)&(green>=192)&(blue< 128)&(y>=288);
+assign  green_unique = (red< 128)&(green>=240)&(blue>=224)&(y>=288);
+assign   blue_unique = (red<  96)&(green<  96)&(blue> 128)&(y>=288);
 
 // Highlight detected areas
 wire [23:0] ball_high;
