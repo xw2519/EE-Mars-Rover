@@ -2,8 +2,8 @@
 <sch:Settings xmlns:sch="http://www.altera.com/embeddedsw/bsp/schema">
         <BspType>hal</BspType>
         <BspVersion>default</BspVersion>
-        <BspGeneratedTimeStamp>07-Jun-2021 05:11:34</BspGeneratedTimeStamp>
-        <BspGeneratedUnixTimeStamp>1623039094770</BspGeneratedUnixTimeStamp>
+        <BspGeneratedTimeStamp>07-Jun-2021 06:25:13</BspGeneratedTimeStamp>
+        <BspGeneratedUnixTimeStamp>1623043513743</BspGeneratedUnixTimeStamp>
         <BspGeneratedLocation>E:\DE10_LITE_D8M_VIP_16\software\D8M_Camera_Test_bsp</BspGeneratedLocation>
         <BspSettingsFile>settings.bsp</BspSettingsFile>
         <SopcDesignFile>..\..\Qsys.sopcinfo</SopcDesignFile>

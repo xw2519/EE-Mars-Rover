@@ -55,6 +55,8 @@ p - Pause to gather data
 c - Continue after gathering data
 b - Sending ball data                 {'b', colour, 2 digit perpendicular distance, 2 digit other distance}
 \n - End Transmission
+R,P,Y,G,B,U - Colours
+
 Control ---> Vision
 m - Movement command received
 s - Stop command received
@@ -73,7 +75,7 @@ alt_u8  calibration=0, process=0;
 Array   ball_x_min, ball_x_max;
 
 alt_u8  prompt, parity;
-alt_u8  closest_distance=0xFF, moving=0;
+alt_u8  closest_distance=0xFF, moving=0, send_data=0;
 
 void mipi_clear_error(void){
   MipiBridgeRegWrite(MIPI_REG_CSIStatus,0x01FF); // clear error
@@ -292,16 +294,32 @@ void sys_timer_isr(){
       printf("    Distance: %03d\n", distance);                                                      // 2) Distance to each ball
       printf("    Angle: %03d\n", angle);                                                            // 3) Angle to each ball
       printf("    Colour: ");
-      for(alt_u8 j=4; j>=0; j--){
+      for(alt_u8 j=4; j<255; j--){
         if(!( (filter_x_min[j] > ball_x_max.data[i]) || (filter_x_max[j] < ball_x_min.data[i]) )){
           colour = get_filter_id(j);
           printf("%c ", colour);                                                                  // 1) Colour of ball
+          break;
+        }
+        if(!j){
+          colour = 'U';
+          printf("%c ", colour);
         }
       }
       printf("\n\n");
+
+      if(send_data&&ctrl_uart){
+        if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)>6){
+          alt_up_rs232_write_data(ctrl_uart, 'b');
+          alt_up_rs232_write_data(ctrl_uart, colour);
+          alt_up_rs232_write_data(ctrl_uart, (distance/10)+48);
+          alt_up_rs232_write_data(ctrl_uart, (distance%10)+48);
+          alt_up_rs232_write_data(ctrl_uart, (angle/10)+48);
+          alt_up_rs232_write_data(ctrl_uart, (angle%10)+48);
+        }
+      }
     }
 
-    if((closest_distance<20)&&ctrl_uart&&moving){
+    if((closest_distance<25)&&ctrl_uart&&moving){
       if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)){
         alt_up_rs232_write_data(ctrl_uart, 's');
       }
