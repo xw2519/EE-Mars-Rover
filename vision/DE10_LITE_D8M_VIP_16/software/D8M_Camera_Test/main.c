@@ -82,8 +82,8 @@ alt_u8  calibration=0, process=0;
 array_u8  ball_colours, ball_distances, ball_angles, ball_sent;
 array_u16 ball_x_min, ball_x_max;
 
-alt_u8  prompt, parity;
-alt_u8  closest_distance=0xFF, moving=0, ticks=0;
+alt_u8  prompt, parity, ack=0;
+alt_u8  closest_distance=0xFF, moving=0, ticks=0, last_command='c', send_data, no_data_to_send;
 
 void mipi_clear_error(void){
   MipiBridgeRegWrite(MIPI_REG_CSIStatus,0x01FF); // clear error
@@ -315,6 +315,7 @@ void sys_timer_isr(){
       }
   }
 
+  // Process last batch of ball data
   if(process){
     ball_colours.used = 0;
     ball_distances.used = 0;
@@ -352,10 +353,23 @@ void sys_timer_isr(){
       appendArray_u8(&ball_angles, angle);
     }
 
-    if((closest_distance<30)&&ctrl_uart&&moving&&(!ticks)){
+    // Send messages to UART using processed data
+    if(ctrl_uart&&(closest_distance<30)&&moving&&(!ticks)){
       if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)){
         alt_up_rs232_write_data(ctrl_uart, 's');
+        last_command = 's';
         ticks = 3;
+      }
+    }
+
+    send_data = ctrl_uart&&(!moving)&&((last_command=='s')||(last_command=='p'));
+    no_data_to_send = 1;
+
+    if(ctrl_uart&&((last_command=='s')||(last_command=='p'))&&no_data_to_send){
+      if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)){
+        alt_up_rs232_write_data(ctrl_uart, 'c');
+        last_command = 'c';
+        ticks = 0;
       }
     }
 
@@ -422,6 +436,7 @@ int main(){
           alt_up_rs232_disable_read_interrupt(ctrl_uart);
           if     (prompt=='m'){ moving = 1; }
           else if(prompt=='s'){ moving = 0; }
+          else if(prompt=='a'){    ack = 1; }
 
           printf("UART received: %c\n", prompt);
         }
