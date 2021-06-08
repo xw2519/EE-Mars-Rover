@@ -424,7 +424,7 @@ void sys_timer_isr(){
               alt_up_rs232_write_data(ctrl_uart, ((ball_distances.data[i])%10)+48);
               alt_up_rs232_write_data(ctrl_uart, ((ball_angles.data[i])/10)+48);
               alt_up_rs232_write_data(ctrl_uart, ((ball_angles.data[i])%10)+48);
-              last_colour = ball_colours.data[0];
+              last_colour = ball_colours.data[i];
               ack = 3;
             }
           }
