@@ -83,7 +83,7 @@ array_u8  ball_colours, ball_distances, ball_angles, ball_sent;
 array_u16 ball_x_min, ball_x_max;
 
 alt_u8  prompt, parity, ack=0;
-alt_u8  closest_distance=0xFF, moving=0, ticks=0, last_command='c', send_data, no_data_to_send;
+alt_u8  closest_distance=0xFF, moving=1, stop_ticks=0, last_command='c', new_data, last_colour='U';
 
 void mipi_clear_error(void){
   MipiBridgeRegWrite(MIPI_REG_CSIStatus,0x01FF); // clear error
@@ -291,6 +291,17 @@ void sys_timer_isr(){
           }else{
             calibration++;
             printf("Calibration = %d\n", calibration);
+            if((calibration==CALIBRATION_MAX) && (exposure>EXPOSURE_STEP)){
+              if(gain>GAIN_STEP){
+                gain -= GAIN_STEP;
+                OV8865SetGain(gain);
+                printf("Gain = %x\n", gain);
+              }else{
+                exposure -= EXPOSURE_STEP;
+                OV8865SetExposure(exposure);
+                printf("Exposure = %x\n", exposure);
+              }
+            }
           }
         }
 
@@ -306,7 +317,7 @@ void sys_timer_isr(){
           filter_x_min[filter_index(filter_id)] = x_min;
           filter_x_max[filter_index(filter_id)] = x_max;
         }
-      }else if((x_max-x_min)>20){                              //The word is about ball data, append to arrays and increment ball count
+      }else if((x_max-x_min)>0x20){                              //The word is about ball data, append to arrays and increment ball count
         if((ball_x_min.used<8)&&(calibration == CALIBRATION_MAX)){
           appendArray_u16(&ball_x_min, x_min);
           appendArray_u16(&ball_x_max, x_max);
@@ -320,6 +331,7 @@ void sys_timer_isr(){
     ball_colours.used = 0;
     ball_distances.used = 0;
     ball_angles.used = 0;
+    new_data = 0;
 
     printf("Counted %d balls.\n\n", ball_x_min.used);                                                // Ball count
 
@@ -338,7 +350,7 @@ void sys_timer_isr(){
       for(alt_u8 j=4; j<255; j--){
         if(!( (filter_x_min[j] > ball_x_max.data[i]) || (filter_x_max[j] < ball_x_min.data[i]) )){
           colour = get_filter_id(j);
-          printf("%c ", colour);                                                                  // 1) Colour of ball
+          printf("%c ", colour);                                                                     // 1) Colour of ball
           break;
         }
         if(!j){
@@ -348,32 +360,78 @@ void sys_timer_isr(){
       }
       printf("\n\n");
 
+      for(alt_u8 j=0; j<(ball_sent.used); j++){
+        if(ball_sent.data[j]==colour){ break; }
+        if(j==(ball_sent.used-1)){ new_data++; }
+      }
+      if(ball_sent.used==0){ new_data++; }
+
       appendArray_u8(&ball_colours, colour);
       appendArray_u8(&ball_distances, distance);
       appendArray_u8(&ball_angles, angle);
     }
 
     // Send messages to UART using processed data
-    if(ctrl_uart&&(closest_distance<30)&&moving&&(!ticks)){
+    if(ctrl_uart&&(closest_distance<30)&&moving&&(!stop_ticks)){
       if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)){
         alt_up_rs232_write_data(ctrl_uart, 's');
         last_command = 's';
-        ticks = 3;
+        stop_ticks = 3;
       }
     }
 
-    send_data = ctrl_uart&&(!moving)&&((last_command=='s')||(last_command=='p'));
-    no_data_to_send = 1;
+    if(ctrl_uart&&new_data&&moving&&(!stop_ticks)){
+      if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)){
+        alt_up_rs232_write_data(ctrl_uart, 'p');
+        last_command = 'p';
+        stop_ticks = 3;
+      }
+    }
 
-    if(ctrl_uart&&((last_command=='s')||(last_command=='p'))&&no_data_to_send){
+    if(ctrl_uart&&(!moving)&&((last_command=='s')||(last_command=='p'))&&new_data&&(!ack)){
+
+      if(ball_sent.used==0){
+        if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)>6){
+          alt_up_rs232_write_data(ctrl_uart, 'b');
+          alt_up_rs232_write_data(ctrl_uart, ball_colours.data[0]);
+          alt_up_rs232_write_data(ctrl_uart, ((ball_distances.data[0])/10)+48);
+          alt_up_rs232_write_data(ctrl_uart, ((ball_distances.data[0])%10)+48);
+          alt_up_rs232_write_data(ctrl_uart, ((ball_angles.data[0])/10)+48);
+          alt_up_rs232_write_data(ctrl_uart, ((ball_angles.data[0])%10)+48);
+          last_colour = ball_colours.data[0];
+          ack = 3;
+        }
+      }
+
+      for(alt_u8 i=0; (i<(ball_colours.used))&&(!ack); i++){
+        for(alt_u8 j=0; j<(ball_sent.used); j++){
+          if(ball_sent.data[j]==ball_colours.data[i]){ break; }
+          if(j==(ball_sent.used-1)){
+            if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)>6){
+              alt_up_rs232_write_data(ctrl_uart, 'b');
+              alt_up_rs232_write_data(ctrl_uart, ball_colours.data[i]);
+              alt_up_rs232_write_data(ctrl_uart, ((ball_distances.data[i])/10)+48);
+              alt_up_rs232_write_data(ctrl_uart, ((ball_distances.data[i])%10)+48);
+              alt_up_rs232_write_data(ctrl_uart, ((ball_angles.data[i])/10)+48);
+              alt_up_rs232_write_data(ctrl_uart, ((ball_angles.data[i])%10)+48);
+              last_colour = ball_colours.data[0];
+              ack = 3;
+            }
+          }
+        }
+      }
+    }
+
+    if(ctrl_uart&&((last_command=='s')||(last_command=='p'))&&(!moving)&&(!new_data)){
       if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)){
         alt_up_rs232_write_data(ctrl_uart, 'c');
         last_command = 'c';
-        ticks = 0;
+        stop_ticks = 0;
       }
     }
 
-    if(ticks){ ticks--; }
+    if(stop_ticks){ stop_ticks--; }
+    if(ack){ ack--; }
     closest_distance = 0xFF;
     process = 0;
     ball_x_min.used = 0;
@@ -436,7 +494,17 @@ int main(){
           alt_up_rs232_disable_read_interrupt(ctrl_uart);
           if     (prompt=='m'){ moving = 1; }
           else if(prompt=='s'){ moving = 0; }
-          else if(prompt=='a'){    ack = 1; }
+          else if(prompt=='a'){
+            appendArray_u8(&ball_sent, last_colour);
+            ack = 0;
+          }
+
+          /*else if(prompt=='c'){ moving = 1; }
+          else if(prompt=='p'){ moving = 0; }
+          else if(prompt=='b'){
+            appendArray_u8(&ball_sent, last_colour);
+            ack = 0;
+          }*/
 
           printf("UART received: %c\n", prompt);
         }

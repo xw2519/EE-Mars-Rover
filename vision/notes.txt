@@ -56,6 +56,18 @@ most processing handled in software.
 - Can accurately determine distance to balls under many lighting conditions due to filters.
 
 
+The image processor uses RGB pixel values, this was chosen over conversion to HSV because HSV
+filters had poor performance when lighting conditions were changed.
+
+The image processor uses filters to determine whether a given pixel could belong to a ball,
+there are two sets of filters. The first set of filters works to prevent false negatives, however,
+this set of filters provides no data about the colour of the balls seen. The second set of
+filters was designed to prevent false positives. This set contains five filters, one for each
+colour of ball, and provides information about colours.
+
+This information is accessible to the nios2 processor over a FIFO queue.
+
+
 Notes                          ///////////////////////////////////////////////////////////////////////////////////
 
 - Added uart over IO0 and IO1 to communicate with control subsystem.
