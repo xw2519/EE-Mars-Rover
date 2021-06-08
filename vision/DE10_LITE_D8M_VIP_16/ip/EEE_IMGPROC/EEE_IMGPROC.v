@@ -49,13 +49,13 @@ assign   pink_detect = (red>=192)&(green<128)&(blue<128);
 assign  green_detect = (green>=32)&(((green>>1)+(green>>3))>=red)&(green>=(blue>>1));
 assign   blue_detect = (blue>=48)&(blue>=red)&(blue>=green)&(blue<144);
 assign bright_detect = (red>=160)|(green>=192)|(blue>=128);
-assign   ball_detect = (bright_detect|blue_detect|green_detect|pink_detect|red_detect)&(y>=272);
+assign   ball_detect = (bright_detect|blue_detect|green_detect|pink_detect|red_detect)&(y>=256);
 
-assign    red_unique = (red>=128)&(green<  96)&(blue<  64)&(y>=272);
-assign   pink_unique = (red>=192)&(green< 128)&(blue>=128)&(y>=272);
-assign yellow_unique = (red>=192)&(green>=224)&(blue< 128)&(y>=272);
-assign  green_unique = (red< 128)&(green>=240)&(blue>=224)&(y>=272);
-assign   blue_unique = (red<  96)&(green<  96)&(blue> 128)&(y>=272);
+assign    red_unique = (red>=128)&(green<  96)&(blue<  64)&(y>=256);
+assign   pink_unique = (red>=192)&(green< 128)&(blue>=128)&(y>=256);
+assign yellow_unique = (red>=192)&(green>=224)&(blue< 128)&(y>=256);
+assign  green_unique = (red< 128)&(green>=224)&(blue>=224)&(y>=256);
+assign   blue_unique = (red<  96)&(green<  96)&(blue> 128)&(y>=256);
 
 // Highlight detected areas
 wire [23:0] ball_high;
@@ -168,6 +168,7 @@ end
 `define YELLOW_ID "Y"
 `define  GREEN_ID "G"
 `define   BLUE_ID "B"
+`define DETECT_ID "D"
 
 reg [1:0]  msg_state;
 reg [7:0]  msg_id;
@@ -206,6 +207,10 @@ always@(posedge clk) begin
 				end
 				MSG_INTERVAL-5: begin
 					msg_id <= `BLUE_ID;
+					msg_state <= 2'b01;
+				end
+				MSG_INTERVAL-6: begin
+					msg_id <= `DETECT_ID;
 					msg_state <= 2'b01;
 				end
 				default: begin

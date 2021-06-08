@@ -75,7 +75,7 @@ alt_u32 exposure      = 0x2000;
 alt_u16 current_focus =    300;
 
 alt_u16 x_min, x_max, distance, diameter, mid_pos, angle, colour;
-alt_u16 filter_x_min[5], filter_x_max[5], filter_y_min[5], filter_y_max[5];
+alt_u16 filter_x_min[5], filter_x_max[5], filter_y_min[5], filter_y_max[5], ball_bounds[4];
 alt_u8  balls_detected, filter_id;
 alt_u8  calibration=0, process=0;
 
@@ -275,7 +275,7 @@ void sys_timer_isr(){
       x_max     =  word      & 0x7FF;
       filter_id = (word>>22) & 0x0FF;
 
-      if((word&0xC0000000)&&(filter_id == 'B')){                //When last part of data from image processor arrives
+      if((word&0xC0000000)&&(filter_id == 'D')){                //When last part of data from image processor arrives
 
         if(calibration<CALIBRATION_MAX){                        //If calibrating, reduce gain if ball count is not zero
           if(balls_detected && (exposure>EXPOSURE_STEP)){
@@ -310,12 +310,22 @@ void sys_timer_isr(){
       }
 
       if(filter_id){                                          //The word is about filter data, append to arrays
-        if(word&0xC0000000){
-          filter_y_min[filter_index(filter_id)] = x_min;
-          filter_y_max[filter_index(filter_id)] = x_max;
+        if(filter_id=='D'){
+          if(word&0xC0000000){
+            ball_bounds[2] = x_min;
+            ball_bounds[3] = x_max;
+          }else{
+            ball_bounds[0] = x_min;
+            ball_bounds[1] = x_max;
+          }
         }else{
-          filter_x_min[filter_index(filter_id)] = x_min;
-          filter_x_max[filter_index(filter_id)] = x_max;
+          if(word&0xC0000000){
+            filter_y_min[filter_index(filter_id)] = x_min;
+            filter_y_max[filter_index(filter_id)] = x_max;
+          }else{
+            filter_x_min[filter_index(filter_id)] = x_min;
+            filter_x_max[filter_index(filter_id)] = x_max;
+          }
         }
       }else if((x_max-x_min)>0x20){                              //The word is about ball data, append to arrays and increment ball count
         if((ball_x_min.used<8)&&(calibration == CALIBRATION_MAX)){
@@ -372,7 +382,7 @@ void sys_timer_isr(){
     }
 
     // Send messages to UART using processed data
-    if(ctrl_uart&&(closest_distance<30)&&moving&&(!stop_ticks)){
+    if(ctrl_uart&&((closest_distance<30)||(ball_bounds[3]>=472))&&moving&&(!stop_ticks)){
       if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)){
         alt_up_rs232_write_data(ctrl_uart, 's');
         last_command = 's';
