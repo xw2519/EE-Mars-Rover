@@ -91,28 +91,77 @@ The approach is split into 5 stages which combines to form a robust project mana
 \begin{itemize}
     \item Command:
     \begin{itemize}
-        \item Establish and maintain bilateral communication with Control module 
-        \item Display rover sensor data 
+        \item Enable bilateral communication between user and Control module 
         \item Enable users to nagivate the rover 
         \item Plot a map of the locations of the obstacles encountered by the rover   
     \end{itemize}
 
     \item Control:
+    \begin{itemize}
+        \item Enable bilateral communication channels between Command, Drive, Energy and Vision modules
+    \end{itemize}
     
     \item Drive:
+    \begin{itemize}
+        \item Defines the operation of the two rover motors such as:
+        \begin{itemize}
+            \item Speed control 
+            \item Direction control 
+            \item Turning method 
+        \end{itemize}
+        \item Using the optical flow sensor, measure the distance travelled by the rover 
+    \end{itemize}
     
     \item Energy:
+    \begin{itemize}
+        \item Battery charge operation: Profile design, status estimation and melt/explosion prevention 
+        \item Battery voltage balancing and range estimation 
+        \item Implementing PV MMPT calculation algorithm 
+        \item Integrating and testing solar charging system  
+    \end{itemize}
     
     \item Vision:
+    \begin{itemize}
+        \item Using the on-board camera detect, avoid and record the location of obstacles encoutered by the rover  
+    \end{itemize} 
 \end{itemize}
 
 
+\vfill
 
+\pagebreak
 \subsection{Definition and Planning}
 
+Due to the generality of the project requirements, the project team had a significant amount of freedom in meeting the project requirements. The team had identified several design themes that guided the design and implementation choices made during the developement of the rover system:
+
+\begin{itemize}    
+    \item \textbf{Modularity}
+    
+    Having taken into account that the project team spanned four countries with different time-zones and the time constraint of the project, the team felt it was important to incorporate modular design in the development of each rover modules. 
+    
+    The approach meant each subsystem only had to ensure the pre-agreed connection interface was compatible with the required modules. This was very advantageous due to the following:
+    \begin{itemize}
+        \item Each module could independently develop sections of the rover system.
+        \item The testing strategy \footnote{Testing was managed by the Integration module} was more methodical and could occur early in stages, gradually leading up to a full rover system test.
+        \item No unnecessary meetings. By reducing the number of meetings the team had, it meant less time was wasted on arranging a time suitable for three time-zones and team meetings were more productive.  
+    \end{itemize}
+
+    \item \textbf{Scalability}:
+
+    \item \textbf{Open-source}
+    
+    Where possible, the team opted to use well-supported open-source development packages such as arduino libraries and the FastAPI framework. This complimented the modularity and scalability themes by ensuring the connecting interfaces are industry-standards and could be easily modified to expand its capabilites. 
+    
+    Being well-supported, there is ample documentation to support the development and the codebase is well-designed. This meant that the team could reduce the number of unknown bugs, decrease development time and ensure a high-quality codebase.     
+
+    \item \textbf{Lightweight}:
+    
+\end{itemize}
+
+\vfill
 
 
-
+\pagebreak
 \subsection{Implementation}
 
 
