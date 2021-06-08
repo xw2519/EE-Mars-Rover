@@ -1,0 +1,168 @@
+/* Navigation Interface */
+.button {
+    transition-duration: 0.4s;
+}
+
+.NavButtons {
+    text-align: center;
+    position: relative;
+    top: 5%
+}
+
+.Utility {
+    text-align: center;
+    position: relative;
+    left: 40%
+}
+
+.Start {
+    border-radius: 4px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+}
+
+.Boost {
+    border-radius: 4px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+}
+
+.Top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.Up {
+    display:inline-block;
+    border-radius: 8px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+    padding: 15px 15px;
+    border: 5px solid #272727;
+    background-color: #272727;
+    color: #D1E8E2;
+}
+
+.Up:hover {
+    display:inline-block;
+    border-radius: 8px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+    padding: 15px 15px;
+    border: 3px solid #D1E8E2;
+    background-color: #272727;
+    color: #D1E8E2;
+}
+
+.Middle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.Halt {
+    display:inline-block;
+    border-radius: 8px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+    padding: 15px 15px;
+    border: 5px solid #272727;
+    background-color: #272727;
+    color: #D1E8E2;
+}
+
+.Halt:hover {
+    display:inline-block;
+    border-radius: 8px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+    padding: 15px 15px;
+    border: 3px solid #D1E8E2;
+    background-color: #272727;
+    color: #D1E8E2;
+}
+
+.Right {
+    display:inline-block;
+    border-radius: 8px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+    padding: 15px 15px;
+    border: 5px solid #272727;
+    background-color: #272727;
+    color: #D1E8E2;
+}
+
+.Right:hover {
+    display:inline-block;
+    border-radius: 8px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+    padding: 15px 15px;
+    border: 3px solid #D1E8E2;
+    background-color: #272727;
+    color: #D1E8E2;
+}
+
+.Left {
+    display:inline-block;
+    border-radius: 8px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+    padding: 15px 15px;
+    border: 5px solid #272727;
+    background-color: #272727;
+    color: #D1E8E2;
+}
+
+.Left:hover {
+    display:inline-block;
+    border-radius: 8px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+    padding: 15px 15px;
+    border: 3px solid #D1E8E2;
+    background-color: #272727;
+    color: #D1E8E2;
+}
+
+.Bottom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.Down {
+    display:inline-block;
+    border-radius: 8px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+    padding: 15px 15px;
+    border: 5px solid #272727;
+    background-color: #272727;
+    color: #D1E8E2;
+}
+
+.Down:hover {
+    display:inline-block;
+    border-radius: 8px;
+    font-size: 16px;
+    height:60px;
+    width:60px;
+    padding: 15px 15px;
+    border: 3px solid #D1E8E2;
+    background-color: #272727;
+    color: #D1E8E2;
+}
