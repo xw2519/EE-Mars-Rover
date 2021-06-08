@@ -48,7 +48,7 @@ function LinkNodes(nodes: CustomNode[]) {
   return links
 }
 
-export default function Example({ width, height}: NetworkProps) {
+export default function Map({ width, height}: NetworkProps) {
 
   const circleRef = React.createRef<SVGCircleElement>();
 

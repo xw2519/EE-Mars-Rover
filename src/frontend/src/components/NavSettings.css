@@ -1,0 +1,38 @@
+
+
+.Nav_Settings {
+    position: relative;
+    margin-left: 20%;
+    margin-top: 4%;
+    width: 60%;
+}
+
+.Unit {
+    font-size: 20px;
+    text-align: left;
+}
+
+.Unit_title {
+    position: relative;
+    width: 50%;
+    margin-top: 0%;
+}
+
+.Unit_switch {
+    position: relative;
+    width: 20%;
+    margin-top: -10%;
+    margin-left: 80%;
+    background-color:#272727;
+    text-align: center;
+    color: #D1E8E2;
+}
+
+.Dist_value {
+    position: relative;
+    background-color:#272727;
+    text-align: center;
+    color: #D1E8E2;
+    font-size: large;
+    margin-top: 1%;
+}

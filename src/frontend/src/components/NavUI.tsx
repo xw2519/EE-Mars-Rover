@@ -6,19 +6,20 @@ import { Icon } from '@blueprintjs/core';
 // Add in angle and stuffies 
 interface NavUIProps {
     myLogger: any;
+    prop_dist_value: number
 }
 
 class NavUI extends React.Component<NavUIProps, {}> {
     NavUp = () => {
         console.log("UP");
-        ws_server.send("F0010");
-        this.props.myLogger.log('[Sending to rover]: FORWARD rover')
+        ws_server.send("F00" + this.props.prop_dist_value);
+        this.props.myLogger.log('[Sending to rover]: FORWARD rover by ' + this.props.prop_dist_value + ' cm')
     }
 
     NavDown = () => {
         console.log("DOWN");
-        ws_server.send("B0010");
-        this.props.myLogger.info('[Sending to rover]: REVERSE rover')
+        ws_server.send("B00" + this.props.prop_dist_value);
+        this.props.myLogger.info('[Sending to rover]: REVERSE rover ' + this.props.prop_dist_value + ' cm')
     }
 
     NavRight = () => {
