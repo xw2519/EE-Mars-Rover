@@ -81,7 +81,7 @@ const Dashboard = () => {
     
                 <div className="grid NavigationUI"> Navigation Panel <NavUI myLogger={myLogger} prop_dist_value={prop_dist_value}/> </div>
                 
-                <div className="grid CommandSettings"> UI Settings <NavSettings myLogger={myLogger} setDist={setDist}/> </div>
+                <div className="grid CommandSettings"> Navigation Settings <NavSettings myLogger={myLogger} setDist={setDist}/> </div>
             </div>
 
         </div>
