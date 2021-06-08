@@ -54,7 +54,7 @@ assign   ball_detect = (bright_detect|blue_detect|green_detect|pink_detect|red_d
 assign    red_unique = (red>=128)&(green<  96)&(blue<  64)&(y>=256);
 assign   pink_unique = (red>=192)&(green< 128)&(blue>=128)&(y>=256);
 assign yellow_unique = (red>=192)&(green>=224)&(blue< 128)&(y>=256);
-assign  green_unique = (red< 128)&(green>=224)&(blue>=192)&(y>=256);
+assign  green_unique = (red< 128)&(green>=192)&(blue>=160)&(y>=256);
 assign   blue_unique = (red<  96)&(green<  96)&(blue> 128)&(y>=256);
 
 // Highlight detected areas
