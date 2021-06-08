@@ -1,12 +1,7 @@
 from fastapi import FastAPI, Request, BackgroundTasks, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
-from typing import List
 import json
-import itertools as it
-
-import motor.motor_asyncio
-from bson import ObjectId
 
 app = FastAPI(title='Mars Command Server')
 
