@@ -67,7 +67,7 @@ div.greydiv { vertical-align:top ; text-align:center ; background:#eeeeee ; bord
   </table>
   <table class="blueBar">
    <tr>
-    <td class="l">2021.06.07.10:52:06</td>
+    <td class="l">2021.06.09.11:19:31</td>
     <td class="r">Datasheet</td>
    </tr>
   </table>
@@ -96,6 +96,9 @@ div.greydiv { vertical-align:top ; text-align:center ; background:#eeeeee ; bord
      <br/>&#160;&#160;
      <a href="#module_TERASIC_AUTO_FOCUS_0"><b>TERASIC_AUTO_FOCUS_0</b>
      </a> TERASIC_AUTO_FOCUS 1.0
+     <br/>&#160;&#160;
+     <a href="#module_accelerometer_spi"><b>accelerometer_spi</b>
+     </a> altera_up_avalon_accelerometer_spi 15.1
      <br/>&#160;&#160;
      <a href="#module_altpll_0"><b>altpll_0</b>
      </a> altpll 16.0
@@ -195,6 +198,23 @@ div.greydiv { vertical-align:top ; text-align:center ; background:#eeeeee ; bord
     <td class="empty"></td>
     <td class="empty"></td>
     <td class="addr"><span style="color:#989898">0x</span>00041040</td>
+    <td class="empty"></td>
+   </tr>
+   <tr>
+    <td class="slavemodule">&#160;
+     <a href="#module_accelerometer_spi"><b>accelerometer_spi</b>
+     </a>
+    </td>
+    <td class="empty"></td>
+    <td class="empty"></td>
+    <td class="empty"></td>
+    <td class="empty"></td>
+   </tr>
+   <tr>
+    <td class="slaveb">avalon_accelerometer_spi_mode_slave&#160;</td>
+    <td class="empty"></td>
+    <td class="empty"></td>
+    <td class="addr"><span style="color:#989898">0x</span>00000000</td>
     <td class="empty"></td>
    </tr>
    <tr>
@@ -735,6 +755,83 @@ div.greydiv { vertical-align:top ; text-align:center ; background:#eeeeee ; bord
        <tr>
         <td class="parametername">deviceFamily</td>
         <td class="parametervalue">UNKNOWN</td>
+       </tr>
+       <tr>
+        <td class="parametername">generateLegacySim</td>
+        <td class="parametervalue">false</td>
+       </tr>
+      </table>
+     </td>
+    </tr>
+   </table>&#160;&#160;
+   <table class="flowbox">
+    <tr>
+     <td class="parametersbox">
+      <h2>Software Assignments</h2>(none)</td>
+    </tr>
+   </table>
+  </div>
+  <a name="module_accelerometer_spi"> </a>
+  <div>
+   <hr/>
+   <h2>accelerometer_spi</h2>altera_up_avalon_accelerometer_spi v15.1
+   <br/>
+   <div class="greydiv">
+    <table class="connectionboxes">
+     <tr>
+      <td class="neighbor" rowspan="4">
+       <a href="#module_nios2_gen2">nios2_gen2</a>
+      </td>
+      <td class="from">data_master&#160;&#160;</td>
+      <td class="main" rowspan="9">accelerometer_spi</td>
+     </tr>
+     <tr>
+      <td class="to">&#160;&#160;avalon_accelerometer_spi_mode_slave</td>
+     </tr>
+     <tr>
+      <td class="from">irq&#160;&#160;</td>
+     </tr>
+     <tr>
+      <td class="to">&#160;&#160;interrupt</td>
+     </tr>
+     <tr style="height:6px">
+      <td></td>
+     </tr>
+     <tr>
+      <td class="neighbor" rowspan="4">
+       <a href="#module_clk_50">clk_50</a>
+      </td>
+      <td class="from">clk&#160;&#160;</td>
+     </tr>
+     <tr>
+      <td class="to">&#160;&#160;clk</td>
+     </tr>
+     <tr>
+      <td class="from">clk_reset&#160;&#160;</td>
+     </tr>
+     <tr>
+      <td class="to">&#160;&#160;reset</td>
+     </tr>
+    </table>
+   </div>
+   <br/>
+   <br/>
+   <table class="flowbox">
+    <tr>
+     <td class="parametersbox">
+      <h2>Parameters</h2>
+      <table>
+       <tr>
+        <td class="parametername">AUTO_DEVICE_FAMILY</td>
+        <td class="parametervalue">MAX10FPGA</td>
+       </tr>
+       <tr>
+        <td class="parametername">AUTO_CLK_CLOCK_RATE</td>
+        <td class="parametervalue">50000000</td>
+       </tr>
+       <tr>
+        <td class="parametername">deviceFamily</td>
+        <td class="parametervalue">MAX 10</td>
        </tr>
        <tr>
         <td class="parametername">generateLegacySim</td>
@@ -3236,7 +3333,7 @@ div.greydiv { vertical-align:top ; text-align:center ; background:#eeeeee ; bord
        <a href="#module_clk_50">clk_50</a>
       </td>
       <td class="from">clk&#160;&#160;</td>
-      <td class="main" rowspan="98">nios2_gen2</td>
+      <td class="main" rowspan="103">nios2_gen2</td>
      </tr>
      <tr>
       <td class="to">&#160;&#160;clk</td>
@@ -3246,6 +3343,32 @@ div.greydiv { vertical-align:top ; text-align:center ; background:#eeeeee ; bord
      </tr>
      <tr>
       <td class="to">&#160;&#160;reset</td>
+     </tr>
+     <tr>
+      <td></td>
+      <td></td>
+      <td class="from">data_master&#160;&#160;</td>
+      <td class="neighbor" rowspan="4">
+       <a href="#module_accelerometer_spi">accelerometer_spi</a>
+      </td>
+     </tr>
+     <tr>
+      <td></td>
+      <td></td>
+      <td class="to">&#160;&#160;avalon_accelerometer_spi_mode_slave</td>
+     </tr>
+     <tr>
+      <td></td>
+      <td></td>
+      <td class="from">irq&#160;&#160;</td>
+     </tr>
+     <tr>
+      <td></td>
+      <td></td>
+      <td class="to">&#160;&#160;interrupt</td>
+     </tr>
+     <tr style="height:6px">
+      <td></td>
      </tr>
      <tr>
       <td></td>
@@ -4433,7 +4556,7 @@ div.greydiv { vertical-align:top ; text-align:center ; background:#eeeeee ; bord
        </tr>
        <tr>
         <td class="parametername">dataSlaveMapParam</td>
-        <td class="parametervalue">&lt;address-map&gt;&lt;slave name='onchip_memory2_0.s1' start='0x20000' end='0x3F400' type='altera_avalon_onchip_memory2.s1' /&gt;&lt;slave name='nios2_gen2.debug_mem_slave' start='0x40800' end='0x41000' type='altera_nios2_gen2.debug_mem_slave' /&gt;&lt;slave name='EEE_IMGPROC_0.s1' start='0x41000' end='0x41020' type='EEE_IMGPROC.s1' /&gt;&lt;slave name='timer.s1' start='0x41020' end='0x41040' type='altera_avalon_timer.s1' /&gt;&lt;slave name='TERASIC_AUTO_FOCUS_0.mm_ctrl' start='0x41040' end='0x41060' type='TERASIC_AUTO_FOCUS.mm_ctrl' /&gt;&lt;slave name='i2c_opencores_camera.avalon_slave_0' start='0x41060' end='0x41080' type='i2c_opencores.avalon_slave_0' /&gt;&lt;slave name='i2c_opencores_mipi.avalon_slave_0' start='0x41080' end='0x410A0' type='i2c_opencores.avalon_slave_0' /&gt;&lt;slave name='mipi_pwdn_n.s1' start='0x410A0' end='0x410B0' type='altera_avalon_pio.s1' /&gt;&lt;slave name='mipi_reset_n.s1' start='0x410B0' end='0x410C0' type='altera_avalon_pio.s1' /&gt;&lt;slave name='key.s1' start='0x410C0' end='0x410D0' type='altera_avalon_pio.s1' /&gt;&lt;slave name='sw.s1' start='0x410D0' end='0x410E0' type='altera_avalon_pio.s1' /&gt;&lt;slave name='led.s1' start='0x410E0' end='0x410F0' type='altera_avalon_pio.s1' /&gt;&lt;slave name='altpll_0.pll_slave' start='0x410F0' end='0x41100' type='altpll.pll_slave' /&gt;&lt;slave name='control_uart.avalon_rs232_slave' start='0x41100' end='0x41108' type='altera_up_avalon_rs232.avalon_rs232_slave' /&gt;&lt;slave name='sysid_qsys.control_slave' start='0x41108' end='0x41110' type='altera_avalon_sysid_qsys.control_slave' /&gt;&lt;slave name='jtag_uart.avalon_jtag_slave' start='0x41110' end='0x41118' type='altera_avalon_jtag_uart.avalon_jtag_slave' /&gt;&lt;/address-map&gt;</td>
+        <td class="parametervalue">&lt;address-map&gt;&lt;slave name='accelerometer_spi.avalon_accelerometer_spi_mode_slave' start='0x0' end='0x2' type='altera_up_avalon_accelerometer_spi.avalon_accelerometer_spi_mode_slave' /&gt;&lt;slave name='onchip_memory2_0.s1' start='0x20000' end='0x3F400' type='altera_avalon_onchip_memory2.s1' /&gt;&lt;slave name='nios2_gen2.debug_mem_slave' start='0x40800' end='0x41000' type='altera_nios2_gen2.debug_mem_slave' /&gt;&lt;slave name='EEE_IMGPROC_0.s1' start='0x41000' end='0x41020' type='EEE_IMGPROC.s1' /&gt;&lt;slave name='timer.s1' start='0x41020' end='0x41040' type='altera_avalon_timer.s1' /&gt;&lt;slave name='TERASIC_AUTO_FOCUS_0.mm_ctrl' start='0x41040' end='0x41060' type='TERASIC_AUTO_FOCUS.mm_ctrl' /&gt;&lt;slave name='i2c_opencores_camera.avalon_slave_0' start='0x41060' end='0x41080' type='i2c_opencores.avalon_slave_0' /&gt;&lt;slave name='i2c_opencores_mipi.avalon_slave_0' start='0x41080' end='0x410A0' type='i2c_opencores.avalon_slave_0' /&gt;&lt;slave name='mipi_pwdn_n.s1' start='0x410A0' end='0x410B0' type='altera_avalon_pio.s1' /&gt;&lt;slave name='mipi_reset_n.s1' start='0x410B0' end='0x410C0' type='altera_avalon_pio.s1' /&gt;&lt;slave name='key.s1' start='0x410C0' end='0x410D0' type='altera_avalon_pio.s1' /&gt;&lt;slave name='sw.s1' start='0x410D0' end='0x410E0' type='altera_avalon_pio.s1' /&gt;&lt;slave name='led.s1' start='0x410E0' end='0x410F0' type='altera_avalon_pio.s1' /&gt;&lt;slave name='altpll_0.pll_slave' start='0x410F0' end='0x41100' type='altpll.pll_slave' /&gt;&lt;slave name='control_uart.avalon_rs232_slave' start='0x41100' end='0x41108' type='altera_up_avalon_rs232.avalon_rs232_slave' /&gt;&lt;slave name='sysid_qsys.control_slave' start='0x41108' end='0x41110' type='altera_avalon_sysid_qsys.control_slave' /&gt;&lt;slave name='jtag_uart.avalon_jtag_slave' start='0x41110' end='0x41118' type='altera_avalon_jtag_uart.avalon_jtag_slave' /&gt;&lt;/address-map&gt;</td>
        </tr>
        <tr>
         <td class="parametername">tightlyCoupledDataMaster0MapParam</td>
@@ -4485,7 +4608,7 @@ div.greydiv { vertical-align:top ; text-align:center ; background:#eeeeee ; bord
        </tr>
        <tr>
         <td class="parametername">internalIrqMaskSystemInfo</td>
-        <td class="parametervalue">31</td>
+        <td class="parametervalue">63</td>
        </tr>
        <tr>
         <td class="parametername">customInstSlavesSystemInfo</td>
@@ -5489,7 +5612,7 @@ div.greydiv { vertical-align:top ; text-align:center ; background:#eeeeee ; bord
        </tr>
        <tr>
         <td class="parametername">timestamp</td>
-        <td class="parametervalue">1623059525</td>
+        <td class="parametervalue">1623233971</td>
        </tr>
        <tr>
         <td class="parametername">deviceFamily</td>
@@ -5514,7 +5637,7 @@ div.greydiv { vertical-align:top ; text-align:center ; background:#eeeeee ; bord
        </tr>
        <tr>
         <td class="parametername">TIMESTAMP</td>
-        <td class="parametervalue">1623059525</td>
+        <td class="parametervalue">1623233971</td>
        </tr>
       </table>
      </td>
@@ -5718,7 +5841,7 @@ div.greydiv { vertical-align:top ; text-align:center ; background:#eeeeee ; bord
   <table class="blueBar">
    <tr>
     <td class="l">generation took 0.01 seconds</td>
-    <td class="r">rendering took 0.10 seconds</td>
+    <td class="r">rendering took 0.07 seconds</td>
    </tr>
   </table>
  </body>

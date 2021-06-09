@@ -4,7 +4,7 @@
  * Machine generated for CPU 'nios2_gen2' in SOPC Builder design 'Qsys'
  * SOPC Builder design path: ../../Qsys.sopcinfo
  *
- * Generated: Tue Jun 08 10:50:23 BST 2021
+ * Generated: Wed Jun 09 12:39:57 BST 2021
  */
 
 /*
@@ -147,6 +147,7 @@
 #define __ALTERA_AVALON_SYSID_QSYS
 #define __ALTERA_AVALON_TIMER
 #define __ALTERA_NIOS2_GEN2
+#define __ALTERA_UP_AVALON_ACCELEROMETER_SPI
 #define __ALTERA_UP_AVALON_RS232
 #define __ALTPLL
 #define __EEE_IMGPROC
@@ -216,6 +217,20 @@
 #define TERASIC_AUTO_FOCUS_0_NAME "/dev/TERASIC_AUTO_FOCUS_0"
 #define TERASIC_AUTO_FOCUS_0_SPAN 32
 #define TERASIC_AUTO_FOCUS_0_TYPE "TERASIC_AUTO_FOCUS"
+
+
+/*
+ * accelerometer_spi configuration
+ *
+ */
+
+#define ACCELEROMETER_SPI_BASE 0x0
+#define ACCELEROMETER_SPI_IRQ 5
+#define ACCELEROMETER_SPI_IRQ_INTERRUPT_CONTROLLER_ID 0
+#define ACCELEROMETER_SPI_NAME "/dev/accelerometer_spi"
+#define ACCELEROMETER_SPI_SPAN 2
+#define ACCELEROMETER_SPI_TYPE "altera_up_avalon_accelerometer_spi"
+#define ALT_MODULE_CLASS_accelerometer_spi altera_up_avalon_accelerometer_spi
 
 
 /*
@@ -479,7 +494,7 @@
 #define SYSID_QSYS_IRQ_INTERRUPT_CONTROLLER_ID -1
 #define SYSID_QSYS_NAME "/dev/sysid_qsys"
 #define SYSID_QSYS_SPAN 8
-#define SYSID_QSYS_TIMESTAMP 1623145429
+#define SYSID_QSYS_TIMESTAMP 1623234083
 #define SYSID_QSYS_TYPE "altera_avalon_sysid_qsys"
 
 

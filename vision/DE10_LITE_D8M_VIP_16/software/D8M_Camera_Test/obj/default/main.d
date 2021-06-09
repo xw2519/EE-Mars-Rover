@@ -10,6 +10,8 @@ obj/default/main.o: main.c ../D8M_Camera_Test_bsp/system.h \
  ../D8M_Camera_Test_bsp//HAL/inc/priv/alt_dev_llist.h \
  ../D8M_Camera_Test_bsp//HAL/inc/sys/alt_warning.h \
  ../D8M_Camera_Test_bsp//drivers/inc/altera_avalon_pio_regs.h \
+ ../D8M_Camera_Test_bsp//drivers/inc/altera_up_avalon_accelerometer_spi.h \
+ ../D8M_Camera_Test_bsp//drivers/inc/altera_up_avalon_accelerometer_spi_regs.h \
  ../D8M_Camera_Test_bsp//drivers/inc/altera_up_avalon_rs232.h \
  ../D8M_Camera_Test_bsp//HAL/inc/sys/alt_irq.h \
  ../D8M_Camera_Test_bsp//HAL/inc/nios2.h \
@@ -49,6 +51,10 @@ obj/default/main.o: main.c ../D8M_Camera_Test_bsp/system.h \
 ../D8M_Camera_Test_bsp//HAL/inc/sys/alt_warning.h:
 
 ../D8M_Camera_Test_bsp//drivers/inc/altera_avalon_pio_regs.h:
+
+../D8M_Camera_Test_bsp//drivers/inc/altera_up_avalon_accelerometer_spi.h:
+
+../D8M_Camera_Test_bsp//drivers/inc/altera_up_avalon_accelerometer_spi_regs.h:
 
 ../D8M_Camera_Test_bsp//drivers/inc/altera_up_avalon_rs232.h:
 

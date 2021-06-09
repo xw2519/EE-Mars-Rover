@@ -2,6 +2,7 @@
 #include "altera_avalon_timer_regs.h"
 #include "altera_avalon_timer.h"
 #include "altera_avalon_pio_regs.h"
+#include "altera_up_avalon_accelerometer_spi.h"
 #include "altera_up_avalon_rs232.h"
 #include "sys/alt_irq.h"
 #include <stdlib.h>
@@ -18,6 +19,12 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+
+//debug defines
+#define VIEW_BALL_COUNT
+#define VIEW_BALL_DATA
+#define VIEW_UART_MSGS
+#define VIEW_AUTO_GAIN
 
 //offsets
 #define EEE_IMGPROC_STATUS 0
@@ -56,10 +63,11 @@ typedef struct{
 
 /*
 Vision ---> Control
-s - Emergency Stop                    {'s', <sign>, <2-digit decimal>}
+s - Emergency Stop
 p - Pause to gather data
 c - Continue after gathering data
-b - Sending ball data                 {'b', colour, 2 digit perpendicular distance, 2 digit other distance}
+b - Sending ball data                 {'b', colour, 2 digit perpendicular distance, sign, 2 digit other distance} (+ right, - left)
+                         - If stopping reason unknown, {bX00+00}
 \n - End Transmission
 R,P,Y,G,B,U - Colours
 
@@ -68,22 +76,25 @@ m - Movement command received
 s - Stop command received
 */
 
-alt_up_rs232_dev* ctrl_uart;
+alt_up_rs232_dev             *ctrl_uart;
+alt_up_accelerometer_spi_dev   *acc_dev;
 
-alt_u16 gain          =  0x7FF;
-alt_u32 exposure      = 0x2000;
-alt_u16 current_focus =    300;
+alt_u16 gain     =  0x7FF;
+alt_u32 exposure = 0x2000;
 
-alt_u16 x_min, x_max, distance, diameter, mid_pos, angle, colour;
-alt_u16 filter_x_min[5], filter_x_max[5], filter_y_min[5], filter_y_max[5], ball_bounds[4];
-alt_u8  balls_detected, filter_id;
-alt_u8  calibration=0, process=0;
-
-array_u8  ball_colours, ball_distances, ball_angles, ball_sent;
+int       word;
+alt_u16   x_min, x_max;
+alt_u16   filter_x_min[5], filter_x_max[5], filter_y_min[5], filter_y_max[5], ball_bounds[4];
 array_u16 ball_x_min, ball_x_max;
 
-alt_u8  prompt, parity, ack=0;
-alt_u8  closest_distance=0xFF, moving=1, stop_ticks=0, last_command='c', new_data, last_colour='U';
+alt_u16   distance, diameter, mid_pos, angle, colour, touching_edge;
+array_u8  ball_colours, ball_distances, ball_angles, ball_sent;
+
+alt_u8    balls_detected, filter_id;
+alt_u8    calibration=0, process=0;
+
+alt_u8    prompt, parity, ack=0, moving=1;
+alt_u8    closest_distance=0xFF, closest_index, stop_reasoned, stop_ticks=0, last_command='c', new_data, last_colour='U';
 
 void mipi_clear_error(void){
   MipiBridgeRegWrite(MIPI_REG_CSIStatus,0x01FF); // clear error
@@ -232,6 +243,27 @@ alt_u8 get_filter_id(alt_u8 index){
   }
 }
 
+void send_ball_data(alt_u8 colour, alt_u8 distance, alt_u8 angle){
+  if(ctrl_uart){
+    if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)>7){
+      alt_up_rs232_write_data(ctrl_uart, 'b');
+      alt_up_rs232_write_data(ctrl_uart, colour);
+      alt_up_rs232_write_data(ctrl_uart, (distance/10)+48);
+      alt_up_rs232_write_data(ctrl_uart, (distance%10)+48);
+      if(angle<64){
+        alt_up_rs232_write_data(ctrl_uart, '+');
+      }else{
+        angle = -angle;
+        alt_up_rs232_write_data(ctrl_uart, '-');
+      }
+      alt_up_rs232_write_data(ctrl_uart, (angle/10)+48);
+      alt_up_rs232_write_data(ctrl_uart, (angle%10)+48);
+      last_colour = colour;
+      ack = 3;
+    }
+  }
+}
+
 
 void timer_init(void* isr){
 
@@ -247,7 +279,7 @@ void sys_timer_isr(){
 
   // touch KEY0 to trigger Auto focus, KEY1 to trigger gain adjustment
   if((IORD(KEY_BASE,0)&0x03) == 0x01){
-    current_focus = Focus_Window(320,240);
+    Focus_Window(320,240);
 
     if(ctrl_uart){
       if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)){
@@ -264,52 +296,46 @@ void sys_timer_isr(){
     OV8865SetGain(gain);
     OV8865SetExposure(exposure);
 
-    printf("\nGain = %x\n", gain);
-    printf("Exposure = %x\n", exposure);
+    #ifdef VIEW_AUTO_GAIN
+      printf("\nGain = %x\n", gain);
+      printf("Exposure = %x\n", exposure);
+    #endif
   }
 
-  //Read messages from the image processor and process them
-  while ((IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_STATUS)>>8) & 0xff) { 	//Find out if there are words to read
-      int word  = IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_MSG); 			//Get next word from message buffer
+  while ((IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_STATUS)>>8) & 0xff) { //Check if there is incoming data from image processor
+      word      = IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_MSG); 			//Get next word from message buffer
       x_min     = (word>>11) & 0x7FF;
       x_max     =  word      & 0x7FF;
       filter_id = (word>>22) & 0x0FF;
 
-      if((word&0xC0000000)&&(filter_id == 'D')){                //When last part of data from image processor arrives
+      if((word&0xC0000000)&&(filter_id == 'D')){                //If last part of data from image processor arrives
 
-        if(calibration<CALIBRATION_MAX){                        //If calibrating, reduce gain if ball count is not zero
-          if(balls_detected && (exposure>EXPOSURE_STEP)){
+        if(calibration<CALIBRATION_MAX){                        //Check if calibrated
+
+          if(!balls_detected){ calibration++; }
+
+          if((balls_detected||(calibration==CALIBRATION_MAX)) && (exposure>EXPOSURE_STEP)){
             if(gain>GAIN_STEP){
               gain -= GAIN_STEP;
               OV8865SetGain(gain);
-              printf("Gain = %x\n", gain);
             }else{
               exposure -= EXPOSURE_STEP;
               OV8865SetExposure(exposure);
-              printf("Exposure = %x\n", exposure);
-            }
-          }else{
-            calibration++;
-            printf("Calibration = %d\n", calibration);
-            if((calibration==CALIBRATION_MAX) && (exposure>EXPOSURE_STEP)){
-              if(gain>GAIN_STEP){
-                gain -= GAIN_STEP;
-                OV8865SetGain(gain);
-                printf("Gain = %x\n", gain);
-              }else{
-                exposure -= EXPOSURE_STEP;
-                OV8865SetExposure(exposure);
-                printf("Exposure = %x\n", exposure);
-              }
             }
           }
+
+          #ifdef VIEW_AUTO_GAIN
+            printf("G = %03x   ", gain);
+            printf("E = %04x   ", exposure);
+            printf("C = %02d\n", calibration);
+          #endif
         }
 
         if(calibration >= CALIBRATION_MAX){ process = 1; }     //Start processing the data if calibrated
         else{ balls_detected = 0; }
       }
 
-      if(filter_id){                                          //The word is about filter data, append to arrays
+      if(filter_id){                                                 //If the word contains filter data, append to arrays
         if(filter_id=='D'){
           if(word&0xC0000000){
             ball_bounds[2] = x_min;
@@ -327,70 +353,85 @@ void sys_timer_isr(){
             filter_x_max[filter_index(filter_id)] = x_max;
           }
         }
-      }else if((x_max-x_min)>0x20){                              //The word is about ball data, append to arrays and increment ball count
-        if((ball_x_min.used<8)&&(calibration == CALIBRATION_MAX)){
+
+      }else if(((x_max-x_min)>=0x20)&&(ball_x_min.used<8)&&(calibration==CALIBRATION_MAX)){   //Else, the word contains ball data, append to arrays
           appendArray_u16(&ball_x_min, x_min);
           appendArray_u16(&ball_x_max, x_max);
-        }
-        balls_detected = 1;
+      }
+
+      balls_detected |= (!filter_id)&&((x_max-x_min)>20);
+      for(alt_u8 i=0; i<5; i++){
+        if(!(filter_x_min[i]>= 472)){ balls_detected |= 1; }
       }
   }
 
-  // Process last batch of ball data
-  if(process){
+  if(process){                                                         //Process a batch of ball data
     ball_colours.used = 0;
     ball_distances.used = 0;
     ball_angles.used = 0;
     new_data = 0;
 
-    printf("Counted %d balls.\n\n", ball_x_min.used);                                                // Ball count
+    #ifdef VIEW_BALL_COUNT
+      printf("Counted %d balls.\n\n", ball_x_min.used);                                                        // Ball count
+    #endif
 
     for(alt_u8 i=0; i<(ball_x_min.used); i++){
       diameter = ball_x_max.data[i] - ball_x_min.data[i];
-      distance = 2560/diameter;
+      distance = 2560/diameter;                                                                                // 2) Distance to each ball
       mid_pos  = (ball_x_min.data[i]>>1) + (ball_x_max.data[i]>>1);
-      if(mid_pos>320){ angle = ((((mid_pos-320)<<7)/distance)>>6) + ((((mid_pos-320)<<7)/distance)>>7); }
-      else           { angle = ((((320-mid_pos)<<7)/distance)>>6) + ((((320-mid_pos)<<7)/distance)>>7); }
 
-      if(distance < closest_distance){ closest_distance = distance; }
-      printf("Ball %d:\n", i+1);
-      printf("    Distance: %03d\n", distance);                                                      // 2) Distance to each ball
-      printf("    Angle: %03d\n", angle);                                                            // 3) Angle to each ball
-      printf("    Colour: ");
+      if(mid_pos>320){ angle = ((((mid_pos-320)<<7)/distance)>>6) + ((((mid_pos-320)<<7)/distance)>>7); }      // 3) Angle to each ball
+      else           { angle = -((((320-mid_pos)<<7)/distance)>>6) - ((((320-mid_pos)<<7)/distance)>>7); }
+
       for(alt_u8 j=4; j<255; j--){
         if(!( (filter_x_min[j] > ball_x_max.data[i]) || (filter_x_max[j] < ball_x_min.data[i]) )){
-          colour = get_filter_id(j);
-          printf("%c ", colour);                                                                     // 1) Colour of ball
+          colour = get_filter_id(j);                                                                           // 1) Colour of ball
           break;
         }
-        if(!j){
-          colour = 'U';
-          printf("%c ", colour);
+        if(!j){ colour = 'U'; }
+      }
+
+      touching_edge = ((ball_x_min.data[i]<=8)||(ball_x_max.data[i]>=632)||(ball_bounds[3]>=472));
+
+      if(distance < closest_distance){
+        closest_distance = distance;
+        if(!touching_edge){ closest_index = i; }
+        else              { closest_index = 0xFF; }
+      }
+
+      if(!touching_edge){
+
+        if(ball_sent.used==0){ new_data++; }
+        for(alt_u8 j=0; j<(ball_sent.used); j++){
+          if(ball_sent.data[j]==colour){ break; }
+          if(j==(ball_sent.used-1)){ new_data++; }
         }
-      }
-      printf("\n\n");
 
-      for(alt_u8 j=0; j<(ball_sent.used); j++){
-        if(ball_sent.data[j]==colour){ break; }
-        if(j==(ball_sent.used-1)){ new_data++; }
+        appendArray_u8(&ball_colours, colour);
+        appendArray_u8(&ball_distances, distance);
+        appendArray_u8(&ball_angles, angle);
       }
-      if(ball_sent.used==0){ new_data++; }
 
-      appendArray_u8(&ball_colours, colour);
-      appendArray_u8(&ball_distances, distance);
-      appendArray_u8(&ball_angles, angle);
+      #ifdef VIEW_BALL_DATA
+        printf("Ball %d:\n", i+1);
+        printf("    Distance: %03d\n", distance);
+        if(angle<64){ printf("    Angle: +%03d\n", angle); }
+        else        { printf("    Angle: -%03d\n", 65536-angle); }
+        printf("    Colour: %c\n\n", colour);
+      #endif
     }
 
     // Send messages to UART using processed data
-    if(ctrl_uart&&((closest_distance<30)||(ball_bounds[3]>=472))&&moving&&(!stop_ticks)){
+    if(ctrl_uart&&moving&&(!stop_ticks)&&((closest_distance<30)||(ball_bounds[3]>=472))){
       if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)){
         alt_up_rs232_write_data(ctrl_uart, 's');
+        stop_reasoned = 0;
         last_command = 's';
         stop_ticks = 3;
       }
     }
 
-    if(ctrl_uart&&new_data&&moving&&(!stop_ticks)){
+    if(ctrl_uart&&moving&&(!stop_ticks)&&new_data){
       if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)){
         alt_up_rs232_write_data(ctrl_uart, 'p');
         last_command = 'p';
@@ -398,41 +439,23 @@ void sys_timer_isr(){
       }
     }
 
-    if(ctrl_uart&&(!moving)&&((last_command=='s')||(last_command=='p'))&&new_data&&(!ack)){
+    if(ctrl_uart&&(!moving)&&(last_command=='s')&&(!ack)&&(!stop_reasoned)){
+      if((closest_index==0xFF)||(ball_distances.data[closest_index]>30)){ send_ball_data('X', 0, 0); }
+      else{ send_ball_data(ball_colours.data[closest_index], ball_distances.data[closest_index], ball_angles.data[closest_index]); }
+    }
 
-      if(ball_sent.used==0){
-        if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)>6){
-          alt_up_rs232_write_data(ctrl_uart, 'b');
-          alt_up_rs232_write_data(ctrl_uart, ball_colours.data[0]);
-          alt_up_rs232_write_data(ctrl_uart, ((ball_distances.data[0])/10)+48);
-          alt_up_rs232_write_data(ctrl_uart, ((ball_distances.data[0])%10)+48);
-          alt_up_rs232_write_data(ctrl_uart, ((ball_angles.data[0])/10)+48);
-          alt_up_rs232_write_data(ctrl_uart, ((ball_angles.data[0])%10)+48);
-          last_colour = ball_colours.data[0];
-          ack = 3;
-        }
-      }
+    if(ctrl_uart&&(!moving)&&new_data&&((last_command=='s')||(last_command=='p'))&&(!ack)){
 
+      if(ball_sent.used==0){ send_ball_data(ball_colours.data[0], ball_distances.data[0], ball_angles.data[0]); }
       for(alt_u8 i=0; (i<(ball_colours.used))&&(!ack); i++){
         for(alt_u8 j=0; j<(ball_sent.used); j++){
           if(ball_sent.data[j]==ball_colours.data[i]){ break; }
-          if(j==(ball_sent.used-1)){
-            if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)>6){
-              alt_up_rs232_write_data(ctrl_uart, 'b');
-              alt_up_rs232_write_data(ctrl_uart, ball_colours.data[i]);
-              alt_up_rs232_write_data(ctrl_uart, ((ball_distances.data[i])/10)+48);
-              alt_up_rs232_write_data(ctrl_uart, ((ball_distances.data[i])%10)+48);
-              alt_up_rs232_write_data(ctrl_uart, ((ball_angles.data[i])/10)+48);
-              alt_up_rs232_write_data(ctrl_uart, ((ball_angles.data[i])%10)+48);
-              last_colour = ball_colours.data[i];
-              ack = 3;
-            }
-          }
+          if(j==(ball_sent.used-1)){ send_ball_data(ball_colours.data[i], ball_distances.data[i], ball_angles.data[i]); }
         }
       }
     }
 
-    if(ctrl_uart&&((last_command=='s')||(last_command=='p'))&&(!moving)&&(!new_data)){
+    if(ctrl_uart&&(!moving)&&(!new_data)&&((last_command=='s')||(last_command=='p'))&&(!ack)){
       if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)){
         alt_up_rs232_write_data(ctrl_uart, 'c');
         last_command = 'c';
@@ -454,16 +477,16 @@ void sys_timer_isr(){
 int main(){
 
 		fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);
-
 	  printf("Vision subsystem running...\n");
+
 	  IOWR(MIPI_PWDN_N_BASE, 0x00, 0x00);
 	  IOWR(MIPI_RESET_N_BASE, 0x00, 0x00);
-
 	  usleep(2000);
+
 	  IOWR(MIPI_PWDN_N_BASE, 0x00, 0xFF);
 	  usleep(2000);
-	  IOWR(MIPI_RESET_N_BASE, 0x00, 0xFF);
 
+	  IOWR(MIPI_RESET_N_BASE, 0x00, 0xFF);
 	  printf("Image Processor ID: %x\n",IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_ID));
 	  usleep(2000);
 
@@ -479,6 +502,8 @@ int main(){
 
     ctrl_uart = alt_up_rs232_open_dev("/dev/control_uart");
 		if(ctrl_uart){ printf("Started control uart...\n"); }
+    acc_dev = alt_up_accelerometer_spi_open_dev("/dev/accelerometer_spi");
+    if(acc_dev){ printf("Started accelerometer SPI...\n"); }
 
     initArray_u16(&ball_x_min, 5);
     initArray_u16(&ball_x_max, 5);
@@ -487,10 +512,10 @@ int main(){
     initArray_u8(&ball_angles, 5);
     initArray_u8(&ball_sent, 5);
 
-
 		OV8865SetExposure(exposure);
 		OV8865SetGain(gain);
 		Focus_Init();
+    usleep(2000*1000);
 
     timer_init(sys_timer_isr);
 
@@ -507,6 +532,7 @@ int main(){
           else if(prompt=='a'){
             appendArray_u8(&ball_sent, last_colour);
             ack = 0;
+            stop_reasoned = 1;
           }
 
           /*else if(prompt=='c'){ moving = 1; }

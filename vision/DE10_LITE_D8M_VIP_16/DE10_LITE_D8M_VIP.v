@@ -179,7 +179,12 @@ Qsys u0 (
 		.eee_imgproc_0_conduit_mode_new_signal     (SW[0]),
 		
 		.control_uart_external_interface_RXD       (ARDUINO_IO[3]),
-		.control_uart_external_interface_TXD       (ARDUINO_IO[2])
+		.control_uart_external_interface_TXD       (ARDUINO_IO[2]),
+		
+		.accelerometer_spi_external_interface_I2C_SDAT      (GSENSOR_SDI),     //   accelerometer_spi_external_interface.I2C_SDAT
+		.accelerometer_spi_external_interface_I2C_SCLK      (GSENSOR_SCLK),    //  .I2C_SCLK
+		.accelerometer_spi_external_interface_G_SENSOR_CS_N (GSENSOR_CS_N),    //  .G_SENSOR_CS_N
+		.accelerometer_spi_external_interface_G_SENSOR_INT  (GSENSOR_INT[1])   //  .G_SENSOR_INT
 	);
 
 FpsMonitor uFps(

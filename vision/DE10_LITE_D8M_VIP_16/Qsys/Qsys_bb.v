@@ -43,7 +43,11 @@ module Qsys (
 	terasic_camera_0_conduit_end_D,
 	terasic_camera_0_conduit_end_FVAL,
 	terasic_camera_0_conduit_end_LVAL,
-	terasic_camera_0_conduit_end_PIXCLK);	
+	terasic_camera_0_conduit_end_PIXCLK,
+	accelerometer_spi_external_interface_I2C_SDAT,
+	accelerometer_spi_external_interface_I2C_SCLK,
+	accelerometer_spi_external_interface_G_SENSOR_CS_N,
+	accelerometer_spi_external_interface_G_SENSOR_INT);	
 
 	input		alt_vip_itc_0_clocked_video_vid_clk;
 	output	[23:0]	alt_vip_itc_0_clocked_video_vid_data;
@@ -89,4 +93,8 @@ module Qsys (
 	input		terasic_camera_0_conduit_end_FVAL;
 	input		terasic_camera_0_conduit_end_LVAL;
 	input		terasic_camera_0_conduit_end_PIXCLK;
+	inout		accelerometer_spi_external_interface_I2C_SDAT;
+	output		accelerometer_spi_external_interface_I2C_SCLK;
+	output		accelerometer_spi_external_interface_G_SENSOR_CS_N;
+	input		accelerometer_spi_external_interface_G_SENSOR_INT;
 endmodule

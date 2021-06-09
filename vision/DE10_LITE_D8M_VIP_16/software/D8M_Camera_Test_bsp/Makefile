@@ -287,6 +287,13 @@ altera_nios2_gen2_hal_driver_ASM_LIB_SRCS := \
 	$(altera_nios2_gen2_hal_driver_SRCS_ROOT)/src/alt_log_macro.S \
 	$(altera_nios2_gen2_hal_driver_SRCS_ROOT)/src/crt0.S
 
+# altera_up_avalon_accelerometer_spi_driver sources root 
+altera_up_avalon_accelerometer_spi_driver_SRCS_ROOT := drivers
+
+# altera_up_avalon_accelerometer_spi_driver sources 
+altera_up_avalon_accelerometer_spi_driver_C_LIB_SRCS := \
+	$(altera_up_avalon_accelerometer_spi_driver_SRCS_ROOT)/src/altera_up_avalon_accelerometer_spi.c
+
 # hal sources root 
 hal_SRCS_ROOT := HAL
 
@@ -360,6 +367,7 @@ COMPONENT_C_LIB_SRCS += \
 	$(altera_avalon_sysid_qsys_driver_C_LIB_SRCS) \
 	$(altera_avalon_timer_driver_C_LIB_SRCS) \
 	$(altera_nios2_gen2_hal_driver_C_LIB_SRCS) \
+	$(altera_up_avalon_accelerometer_spi_driver_C_LIB_SRCS) \
 	$(hal_C_LIB_SRCS) \
 	$(up_avalon_rs232_driver_C_LIB_SRCS)
 
