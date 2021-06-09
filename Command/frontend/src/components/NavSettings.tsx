@@ -1,7 +1,4 @@
-import { useState, useEffect } from "react";
-import Switch from "react-switch";
-import ws_server from './util/socketConfig';
-import { TextInputField, Button } from 'evergreen-ui'
+import { TextInputField } from 'evergreen-ui'
 
 const NavSettings = (NavSettings) => {
 

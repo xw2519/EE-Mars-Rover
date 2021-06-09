@@ -6,6 +6,7 @@ import Dashboard from "./components/Main_dashboard";
 import useToken from './components/util/useToken';
 
 function App() {
+
   const { token, setToken } = useToken();
 
   if(!token) {
@@ -23,6 +24,7 @@ function App() {
       </BrowserRouter>
     </div>
   )
+  
 }
 
 const rootElement = document.getElementById("root")

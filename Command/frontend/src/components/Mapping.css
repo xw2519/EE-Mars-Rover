@@ -4,3 +4,9 @@
     width: 100%;
     height: 100%;
 }
+
+svg .rotate {
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: rotate(45deg);
+  }

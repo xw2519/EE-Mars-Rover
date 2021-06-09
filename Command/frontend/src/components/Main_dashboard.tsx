@@ -18,8 +18,6 @@ import './NavSettings.css';
 
 const myLogger = new react_console_logger.Logger();
 
-var prop_dist = 10;
-
 const Dashboard = () => {
 
     const [dist_value, setDist] = useState(10);

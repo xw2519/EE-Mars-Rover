@@ -1,7 +1,6 @@
 import { Graph } from '@visx/network';
 import React, {useState} from 'react';
 import ws_server from './util/socketConfig'
-import { Tooltip } from "react-svg-tooltip";
 
 export type NetworkProps = {
   width: number;
@@ -53,31 +52,27 @@ export default function Map({ width, height}: NetworkProps) {
   const circleRef = React.createRef<SVGCircleElement>();
 
   const RoverNode = ( ) => (
-    <g transform={`translate(${-40 / 2},${-40 / 2})`}>
-      <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-current-location" width="40" height="30" viewBox="0 0 40 30" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" onClick={UpdateNodes}>
-        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-        <circle cx="12" cy="12" r="2" fill="currentColor"ref={circleRef}></circle>
-        <circle cx="12" cy="12" r="8" ></circle>
-        <line x1="12" y1="2" x2="12" y2="4"></line>
-        <line x1="12" y1="20" x2="12" y2="22"></line>
-        <line x1="20" y1="12" x2="22" y2="12"></line>
-        <line x1="2" y1="12" x2="4" y2="12"></line>
 
+      // Passes "angle" variable to determine the direction that the rover is facing
+
+      <svg width="40" height="40" fill="currentColor" className="bi-arrow-up-circle-fill" viewBox="0 0 24 24" transform='rotate(' + angle + '14 14)'>
+        <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
       </svg>
-    </g>
-    
+
   );
 
-  const LocationNode = ({ size = 40 }: { size?: number }) => (
-    <g transform={`translate(${-size / 2},${-size / 2})`}>
-      <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-map-pin" width="30" height="30" viewBox="0 0 30 30" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      
+  const LocationNode = () => (
+
+    <g transform={`translate(${-40 / 2}, ${-40 / 2})`}>
+      <svg className="icon-tabler-map-pin" width="30" height="30" viewBox="0 0 30 30" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
       </svg>
     </g>
+
   );
 
   const ObstacleNode = ( color ) => (
     <g transform={`translate(${-40 / 2},${-40 / 2})`}>
+
       <svg  xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-alert-octagon" width="30" height="30" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
       <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
       <path 
@@ -87,6 +82,7 @@ export default function Map({ width, height}: NetworkProps) {
       <line x1="12" y1="16" x2="12.01" y2="16"></line>
       </svg>
     </g>
+
   );
 
   const [nodes, set_nodes] = useState<CustomNode[]>([{x:0, y:0, custom:'Rover'}]);
