@@ -107,17 +107,45 @@ export default function Map({ width, height}: NetworkProps) {
     set_nodes(nodes => [...nodes, node])
   }
 
+  /*
+  function UpdateNodes(node: CustomNode) {
+
+    // Add current rover location
+    var node: CustomNode = {x: (20+nodes[(nodes.length - 1)].x), y: (-10+nodes[(nodes.length - 1)].y), custom: 'Rover'}
+
+    // Change icon on previous rover location 
+    for(let i = 0; i < (nodes.length); i++) {
+      if(nodes[i].custom === 'Rover') {
+        nodes[i].custom = 'Location'
+      }
+    }
+
+    // Update state
+    set_nodes(nodes => [...nodes, node])
+  }
+
   ws_server.onmessage = (e) => {  
     
     // Check if server JSON is intended for map
     var server_message = JSON.parse(e.data); 
 
     if(server_message.type === "Map") {
-      // Assign into CustomNode format and pass into "UpdateNodes function"
+      // Sort between Rover location or Obstacle 
+      if(server_message.map_type === "Obstacle") {
+        var node: CustomNode = {x: (server_message.x_distance+nodes[(nodes.length - 1)].x), y: (server_message.y_distance+nodes[(nodes.length - 1)].y), custom: 'Obstacle', color: server_message.color}
 
+        UpdateNodes(node)
+      }
+      else {
+        // Assign into CustomNode format and pass into "UpdateNodes function"
+        var node: CustomNode = {x: (server_message.x_distance+nodes[(nodes.length - 1)].x), y: (server_message.y_distance+nodes[(nodes.length - 1)].y), custom: 'Rover'}
+
+        UpdateNodes(node)
+      }
+      
     }
-
   }
+  */
 
   var links: CustomLink[] = [
     
