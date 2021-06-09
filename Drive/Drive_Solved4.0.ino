@@ -54,6 +54,7 @@
 
 long instructionStartTime = 0;
 bool instructionCompleted = 1;
+bool emergencyStop;
 
 float total_x = 0;
 
@@ -76,7 +77,6 @@ int b = 0;
 
 float distance_x = 0;
 float distance_y = 0;
-bool emergencyStop = 0;
 
 
 
@@ -354,16 +354,16 @@ void setup() {
 }
 
 /*******************************************************************************/
-void Send_Instruction_Completed(float distance, bool Completed, char instruction){
+void Send_Instruction_Completed(float distance, bool Completed){
       Stop();
       F = false;
       B = false;
       L = false;
       R = false;
       S = false;
-    String message = (String)instruction + (String)Completed + ',' + (String)distance;
+    String message = (String)Completed + ',' + (String)distance;
     Serial.println("#######################################################################################################################################################");
-    Serial1.print(message);
+    Serial.print(message);
     Serial.println("############################################################################################################################################################");
   }
 
@@ -436,8 +436,8 @@ void loop() {
 
   //Create some input instructions to operate the rover (Command)
     Serial.println("Enter the instruction: ");  
-    while(Serial1.available()!=0){
-     instr = Serial1.readString(); //Reading the Input string from Serial port.
+    while(Serial.available()!=0){
+     instr = Serial.readString(); //Reading the Input string from Serial port.
      Instr_Decode(instr);
     }
     
@@ -445,11 +445,11 @@ void loop() {
       Serial.println("Failed to execute instruction within 20 seconds or emergency stop");
       emergencyStop=0;
       if(F || B){
-        Send_Instruction_Completed(total_y,0, (F ? 'F':'B'));
+        Send_Instruction_Completed(total_y,0);
         }
 
       if(L || R){
-        Send_Instruction_Completed((total_x/28)*90,0,(L ? 'L':'R'));
+        Send_Instruction_Completed((total_x/28)*90,0);
         }
       
       Stop();
@@ -480,7 +480,7 @@ void loop() {
          if(millis()-instructionCompleteTime > 20000 && !firstTime && !instructionCompleted){
            Stop();
            instructionCompleted=1;
-           Send_Instruction_Completed(total_y,1,'F');
+           Send_Instruction_Completed(total_y,1);
            
          }
          Stop();
@@ -510,7 +510,7 @@ void loop() {
          if (firstTime) {instructionCompleteTime=millis();firstTime=0; Serial.println("########################### First Time #################################");} //firstTime the err lies in the given range
          if(millis()-instructionCompleteTime > 10000 && !firstTime && !instructionCompleted){
            instructionCompleted=1;
-           Send_Instruction_Completed(total_y,1,'B');
+           Send_Instruction_Completed(total_y,1);
          }
          Stop();
 
@@ -539,7 +539,7 @@ void loop() {
          if(millis()-instructionCompleteTime > 10000 && !firstTime && !instructionCompleted){
            instructionCompleted=1;
            Serial.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-           Send_Instruction_Completed((total_x/28)*90,1,'L');
+           Send_Instruction_Completed((total_x/28)*90,1);
          }
          Stop();
 
@@ -567,7 +567,7 @@ void loop() {
          if (firstTime) {instructionCompleteTime=millis();firstTime=0; Serial.println("########################### First Time #################################");} //firstTime the err lies in the given range
          if(millis()-instructionCompleteTime > 10000 && !firstTime && !instructionCompleted){
            instructionCompleted=1;
-           Send_Instruction_Completed((total_x/28)*90,1,'R'); //how far the rover moves
+           Send_Instruction_Completed((total_x/28)*90,1); //how far the rover moves
          }
          Stop();
 
@@ -680,22 +680,13 @@ byte frame[ADNS3080_PIXELS_X * ADNS3080_PIXELS_Y];
 //Instruction Decoding
 void Instr_Decode(String instruction){
 
-if(instruction[0] == 'P'){
-  while(!Serial1.available() || Serial1.peek()!='U'){
-    delay(50);
-  }
-  Serial1.read();
-  instructionStartTime=millis();
-}
-
-
- if(String(instruction[0]) == "X"){ //Emergency Stop
+ if(String(instruction[0]) == "X"){
   emergencyStop=1;
-    //F = false;
-    //B = false;
-    //L = false;
-    //R = false;
-    //S = false;
+    F = false;
+    B = false;
+    L = false;
+    R = false;
+    S = false;
     tmp_x = total_x;
     tmp_y = total_y;
  }
