@@ -90,10 +90,11 @@ void loop() {
     if(Serial.available()) { 
       Serial2.print(Serial.readString());
     }
-    if(client.available()) {
-        client.poll();
-    }
+    //if(client.available()) {
+        //client.poll();
+   //}
     if(Serial2.available()){
+      Serial.println("Received from Drive");
       dataFromDrive = Serial2.readString();
       distance=atof(dataFromDrive.substring(3).c_str());
       if(dataFromDrive[0]=='F' || dataFromDrive[0]=='B'){
@@ -103,7 +104,7 @@ void loop() {
       if(dataFromDrive[0]=='L' || dataFromDrive[0]=='R'){
         total_angle = (total_angle + distance)-(360*int(int((total_angle + distance))/360)); 
       }
-      if(dataFromDrive[1]=='0'){client.send("{type:\"Terminal\",message:\"Instruction not completed\"}");}
+      if(dataFromDrive[1]=='0'){Serial.println("{type:\"Terminal\",message:\"Instruction not completed\"}");}
       dataToCommand = "{type:\"Map\",x_distance:\"" + String(total_x) + "\",y_distance:\"" + String(total_y) + "\",angle:\""+String(total_angle)+"\"}";
       //client.send(dataToCommand);
       Serial.println(dataToCommand);

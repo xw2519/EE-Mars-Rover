@@ -449,7 +449,7 @@ void loop() {
         }
 
       if(L || R){
-        Send_Instruction_Completed((total_x/28)*90,0,(L ? 'L':'R'));
+        Send_Instruction_Completed((-total_x/28)*90,0,(L ? 'L':'R'));
         }
       
       Stop();
@@ -539,7 +539,7 @@ void loop() {
          if(millis()-instructionCompleteTime > 10000 && !firstTime && !instructionCompleted){
            instructionCompleted=1;
            Serial.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-           Send_Instruction_Completed((total_x/28)*90,1,'L');
+           Send_Instruction_Completed((-total_x/28)*90,1,'L');
          }
          Stop();
 
@@ -567,7 +567,7 @@ void loop() {
          if (firstTime) {instructionCompleteTime=millis();firstTime=0; Serial.println("########################### First Time #################################");} //firstTime the err lies in the given range
          if(millis()-instructionCompleteTime > 10000 && !firstTime && !instructionCompleted){
            instructionCompleted=1;
-           Send_Instruction_Completed((total_x/28)*90,1,'R'); //how far the rover moves
+           Send_Instruction_Completed((-total_x/28)*90,1,'R'); //how far the rover moves
          }
          Stop();
 
