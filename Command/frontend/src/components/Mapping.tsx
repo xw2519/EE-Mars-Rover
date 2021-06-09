@@ -51,7 +51,7 @@ function LinkNodes(nodes: CustomNode[]) {
 export default function Map({ width, height}: NetworkProps) {
 
   function RoverNode ( angle ) {
-
+    // Plotting rover node icon
     var rotation = 'rotate( ' + angle.angle + ' 14 14 )'
 
     console.log(rotation)
@@ -66,7 +66,7 @@ export default function Map({ width, height}: NetworkProps) {
   }
 
   function LocationNode () {
-
+    // Empty node to enable rover pathway plotting
     return (
       <g transform={`translate(${-40 / 2}, ${-40 / 2})`}>
         <svg className="icon-tabler-map-pin" width="30" height="30" viewBox="0 0 30 30" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -77,7 +77,7 @@ export default function Map({ width, height}: NetworkProps) {
   }
 
   function ObstacleNode ( color ) {
-
+    // Plot obstacle nodes 
     return (
       <g transform={`translate(${-40 / 2},${-40 / 2})`}>
         <svg className="icon-tabler-alert-octagon" width="30" height="30" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill={color} stroke-linecap="round" stroke-linejoin="round">
