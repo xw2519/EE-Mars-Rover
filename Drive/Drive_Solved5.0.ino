@@ -54,7 +54,7 @@
 
 long instructionStartTime = 0;
 bool instructionCompleted = 1;
-bool emergencyStop;
+bool emergencyStop = 0;
 
 float total_x = 0;
 
@@ -77,6 +77,7 @@ int b = 0;
 
 float distance_x = 0;
 float distance_y = 0;
+
 
 
 
@@ -262,31 +263,28 @@ int DIRR = 21;                    //defining right direction pin
 int pwmr = 5;                     //pin to control right wheel speed using pwm
 int pwml = 9;                     //pin to control left wheel speed using pwm
 
-//Define Commands & Dist.
+//Define Commands and Constants.
+String instr;
 bool F;
 bool B;
 bool L;
 bool R;
 bool S;
+unsigned long instructionCompleteTime=0;  //the instruction completed time
+bool firstTime=1; //first time error lies in the range given
   
-//const int MAX_INSTR = 500;
-float target_x;
-float target_y;
-float err_x;
-float err_y;
-float tmp_x = 0;
-float tmp_y = 0;
-float x_coord = 0;
-float y_coord = 0;
+float target_x; //target dist in x
+float target_y; //target dist in y
+float err_x; //error in x
+float err_y; //error in y
+float tmp_x = 0; //x-direc accumulation
+float tmp_y = 0; //y-direc accumulation
+
 float kpp = 1, kip = 1;   //position controller coefficient (Kpp / Kip = 10) 1,0.1
 float u0p, u1p, delta_up, e0p, e1p, e2p; // u->output; e->error; 0->this time; 1->last time; 2->last last time
-float cp;
-unsigned long instructionCompleteTime=0;
-bool firstTime=1;
-String instr;
-int orientation;
-/*******************************************************************************/
+float cp; //result from PI controller
 
+/*******************************************************************************/
 void setup() {
 
   // Motor Part //
@@ -354,19 +352,24 @@ void setup() {
 }
 
 /*******************************************************************************/
-void Send_Instruction_Completed(float distance, bool Completed){
-      Stop();
-      F = false;
-      B = false;
-      L = false;
-      R = false;
-      S = false;
-    String message = (String)Completed + ',' + (String)distance;
+//This function will send the distance/angle travelled by the rover and a instruction completed signal to indicate whether the instr executed successfully
+void Send_Instruction_Completed(float distance, bool Completed, char instruction){
+    //Stop the rover and reset the instructions
+    Stop();
+    total_x1 = 0;
+    total_y1 = 0;
+    F = false;
+    B = false;
+    L = false;
+    R = false;
+    S = false;
+    //Send message back to command
+    String message = (String)instruction + (String)Completed + ',' + (String)distance;
     Serial.println("#######################################################################################################################################################");
-    Serial.print(message);
+    Serial1.print(message);
     Serial.println("############################################################################################################################################################");
   }
-
+//This function will reset the variable used in PI controller function to 0 (need to be called every time when a new instr coming)
 void Reset_PI(){
   u0p = 0;
   u1p = 0;
@@ -381,7 +384,6 @@ void loop() {
 
 
   // Motor Part //
-
   unsigned long currentMillis = millis();
   if (loopTrigger) { // This loop is triggered, it wont run unless there is an interrupt
 
@@ -432,27 +434,26 @@ void loop() {
 
 
   //************************** Motor Testing **************************//
-  //this part of the code decides the direction of motor rotations depending on the time lapsed. currentMillis records the time lapsed once it is called.
-
   //Create some input instructions to operate the rover (Command)
     Serial.println("Enter the instruction: ");  
-    while(Serial.available()!=0){
-     instr = Serial.readString(); //Reading the Input string from Serial port.
+    while(Serial1.available()!=0){
+     instr = Serial1.readString(); //Reading the Input string from Serial port 1
      Instr_Decode(instr);
     }
     
+    //If the instr execution time is larger than 20sec and the instr still not finished || Emergency stop is called, error message will be returned
     if((millis()-instructionStartTime > 70000 && !instructionCompleted) || emergencyStop){
       Serial.println("Failed to execute instruction within 20 seconds or emergency stop");
       emergencyStop=0;
       if(F || B){
-        Send_Instruction_Completed(total_y,0);
+        Send_Instruction_Completed(total_y,0, (F ? 'F':'B'));
         }
 
       if(L || R){
-        Send_Instruction_Completed((total_x/28)*90,0);
+        Send_Instruction_Completed((-total_x/28)*90,0,(L ? 'L':'R'));
         }
       
-      Stop();
+      Stop(); //Stop the rover and reset all instr
       F = false;
       B = false;
       L = false;
@@ -464,11 +465,11 @@ void loop() {
    //Actions:
    if(F){
       Serial.println("I'm at F");
-      err_y = total_y - tmp_y;
+      err_y = total_y - tmp_y; //Calculate error
       cp = pi_d(err_y);
-      //Speed_Control(abs(cp)*0.01+0.4);
-      Speed_Control(1);
-      
+      Speed_Control(abs(cp)*0.01+0.4); //Using PI controller result to control speed
+
+      //Position Control
       if(err_y < -0.5){
         MovingForward();
         }
@@ -476,12 +477,17 @@ void loop() {
         MovingBackward();
         }
       if(err_y > -0.5 && err_y < 0.5){
-         if (firstTime) {instructionCompleteTime=millis();firstTime=0; Serial.println("########################### First Time #################################");} //firstTime the err lies in the given range
+        //firstTime the err lies in the given range
+         if (firstTime){
+            instructionCompleteTime=millis();
+            firstTime=0; 
+            Serial.println("########################### First Time #################################");
+         } 
+         //Check the motion after 10sec for position correction
          if(millis()-instructionCompleteTime > 20000 && !firstTime && !instructionCompleted){
            Stop();
            instructionCompleted=1;
-           Send_Instruction_Completed(total_y,1);
-           
+           Send_Instruction_Completed(total_y,1,'F');        
          }
          Stop();
         
@@ -510,7 +516,7 @@ void loop() {
          if (firstTime) {instructionCompleteTime=millis();firstTime=0; Serial.println("########################### First Time #################################");} //firstTime the err lies in the given range
          if(millis()-instructionCompleteTime > 10000 && !firstTime && !instructionCompleted){
            instructionCompleted=1;
-           Send_Instruction_Completed(total_y,1);
+           Send_Instruction_Completed(total_y,1,'B');
          }
          Stop();
 
@@ -523,10 +529,10 @@ void loop() {
      }
 
    if(L){
-      //Serial.println("I'm at L");
+      Serial.println("I'm at L");
       err_x = total_x - tmp_x;
       cp = pi_d(err_x);
-      Speed_Control(abs(cp)*0.01+0.39);
+      Speed_Control(abs(cp)*0.01+0.385);
       
       if(err_x < -0.2){
         Left90();
@@ -538,8 +544,7 @@ void loop() {
          if (firstTime) {instructionCompleteTime=millis();firstTime=0; Serial.println("########################### First Time #################################");} //firstTime the err lies in the given range
          if(millis()-instructionCompleteTime > 10000 && !firstTime && !instructionCompleted){
            instructionCompleted=1;
-           Serial.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-           Send_Instruction_Completed((total_x/28)*90,1);
+           Send_Instruction_Completed((-total_x/28)*90,1,'L');
          }
          Stop();
 
@@ -555,7 +560,7 @@ void loop() {
       //Serial.println("I'm at L");
       err_x = total_x - tmp_x;
       cp = pi_d(err_x);
-      Speed_Control(abs(cp)*0.01+0.39);
+      Speed_Control(abs(cp)*0.01+0.385);
       
       if(err_x < -0.2){
         Left90();
@@ -567,7 +572,7 @@ void loop() {
          if (firstTime) {instructionCompleteTime=millis();firstTime=0; Serial.println("########################### First Time #################################");} //firstTime the err lies in the given range
          if(millis()-instructionCompleteTime > 10000 && !firstTime && !instructionCompleted){
            instructionCompleted=1;
-           Send_Instruction_Completed((total_x/28)*90,1); //how far the rover moves
+           Send_Instruction_Completed((-total_x/28)*90,1,'R'); //how far the rover moves
          }
          Stop();
 
@@ -677,33 +682,38 @@ char asciiart(int k)
 
 byte frame[ADNS3080_PIXELS_X * ADNS3080_PIXELS_Y];
 
-//Instruction Decoding
+//Instruction Decoding Function
 void Instr_Decode(String instruction){
+  //Check the first digit of command string to determine action
+  if(instruction[0] == 'P'){ //pause
+    Stop();
+    while(!Serial1.available() || Serial1.peek()!='U'){ //unpause
+    delay(50); //50ms
+  }
+    Serial1.read(); //get rid of the U
+    instructionStartTime=millis();
+}
 
- if(String(instruction[0]) == "X"){
-  emergencyStop=1;
-    F = false;
-    B = false;
-    L = false;
-    R = false;
-    S = false;
+ if(String(instruction[0]) == "X"){ //Emergency Stop
+    emergencyStop=1;
+    //F = false;
+    //B = false;
+    //L = false;
+    //R = false;
+    //S = false;
     tmp_x = total_x;
     tmp_y = total_y;
  }
   
-  if(String(instruction[0]) == "F"){
+  if(String(instruction[0]) == "F"){ //Moving Forward
     F = true;
     target_x = 0;
-    target_y = 100*(String(instruction[3]).toInt()) + 10*(String(instruction[4]).toInt()) + (String(instruction[5]).toInt());
+    target_y = 100*(String(instruction[3]).toInt()) + 10*(String(instruction[4]).toInt()) + (String(instruction[5]).toInt()); //Convert to target distance
     B = false;
     L = false;
     R = false;
     S = false;
-    //Speed Control can apply on moving forward and backward
-    /*if(String(instruction[5] == "A")){
-      Speed_Control(0.01*(10*String(instruction[6]).toInt() + String(instruction[7]).toInt()));
-      }*/
-      
+    //Accumulate distance or angle
     tmp_x = total_x + target_x;
     tmp_y = total_y + target_y;
    }
@@ -712,29 +722,24 @@ void Instr_Decode(String instruction){
     F = false;
     B = true;
     target_x = 0;
-    target_y = -(100*(String(instruction[3]).toInt()) + 10*(String(instruction[4]).toInt()) + (String(instruction[5]).toInt()));
+    target_y = -(100*(String(instruction[3]).toInt()) + 10*(String(instruction[4]).toInt()) + (String(instruction[5]).toInt())); //Convert to target distance
     L = false;
     R = false;
     S = false;
-    
-    //Speed Control can apply on moving forward and backward
-   /* if(String(instruction[5] == "A")){
-      Speed_Control(0.01*(10*String(instruction[9]).toInt() + String(instruction[10]).toInt()));
-      }*/
-      
-     tmp_x = total_x + target_x;
-     tmp_y = total_y + target_y;
+    //Accumulate distance or angle
+    tmp_x = total_x + target_x;
+    tmp_y = total_y + target_y;
     }
     
   if(String(instruction[0]) == "L"){
     F = false;
     B = false;
     L = true;
-    target_x = Angle_Conversion(10*(String(instruction[1]).toInt()) + (String(instruction[2]).toInt()));
+    target_x = Angle_Conversion(10*(String(instruction[1]).toInt()) + (String(instruction[2]).toInt())); //Convert target angle to target dist
     target_y = 0;
     R = false;
     S = false;
-
+    //Accumulate distance or angle
     tmp_x = total_x + target_x;
     tmp_y = total_y + target_y;
     }
@@ -744,10 +749,10 @@ void Instr_Decode(String instruction){
     B = false;
     L = false;
     R = true;
-    target_x = -(Angle_Conversion(10*(String(instruction[1]).toInt()) + (String(instruction[2]).toInt())));
+    target_x = -(Angle_Conversion(10*(String(instruction[1]).toInt()) + (String(instruction[2]).toInt()))); //Convert target angle to target dist
     target_y = 0;
     S = false;
-
+    //Accumulate distance or angle
     tmp_x = total_x + target_x;
     tmp_y = total_y + target_y;
     }
@@ -805,29 +810,24 @@ void Instr_Decode(String instruction){
     }
 */
 
-    
-//  Serial.println("x coordinate = " + String(x_coord));
-//  Serial.println("y coordinate = " + String(y_coord)); 
-
-
- instructionStartTime = millis();
- instructionCompleted = 0;
- firstTime=1;
- Reset_PI();
- //Serial.println("Instr Complete Time(Decoding) = " + String(instructionCompleted));
-   }
+  instructionStartTime = millis(); //Start counting execution time
+  instructionCompleted = 0; //Reset completion signal
+  firstTime=1; //Reset first time error lying in between the range signal
+  Reset_PI(); //Reset PI controller constants
+  
+  }
 
 
 //Turning Method Conversion
 float Angle_Conversion(float target_angle){
-  return (target_angle/90)*28;  //3.14*15*0.5;
+  return (target_angle/90)*28;  //Converting from input angle to target dist. along x
   }
 
 //Five possible actions
   void MovingForward(){
     digitalWrite(pwmr, HIGH);       //setting right motor speed at maximum
     digitalWrite(pwml, HIGH);       //setting left motor speed at maximum   
-    DIRRstate = LOW;
+    DIRRstate = LOW; //Set motor state
     DIRLstate = HIGH;
     digitalWrite(DIRR, DIRRstate);
     digitalWrite(DIRL, DIRLstate);    
@@ -836,7 +836,7 @@ float Angle_Conversion(float target_angle){
    void MovingBackward(){
     digitalWrite(pwmr, HIGH);       //setting right motor speed at maximum
     digitalWrite(pwml, HIGH);       //setting left motor speed at maximum   
-    DIRRstate = HIGH;
+    DIRRstate = HIGH; //Set motor state
     DIRLstate = LOW;   
     digitalWrite(DIRR, DIRRstate);
     digitalWrite(DIRL, DIRLstate);
@@ -845,7 +845,7 @@ float Angle_Conversion(float target_angle){
    void Left90(){
     digitalWrite(pwmr, HIGH);       //setting right motor speed at maximum
     digitalWrite(pwml, HIGH);       //setting left motor speed at maximum   
-    DIRRstate = LOW;
+    DIRRstate = LOW; //Set motor state
     DIRLstate = LOW;
     digitalWrite(DIRR, DIRRstate);
     digitalWrite(DIRL, DIRLstate);   
@@ -854,7 +854,7 @@ float Angle_Conversion(float target_angle){
    void Right90(){
     digitalWrite(pwmr, HIGH);       //setting right motor speed at maximum
     digitalWrite(pwml, HIGH);       //setting left motor speed at maximum   
-    DIRRstate = HIGH;
+    DIRRstate = HIGH; //Set motor state
     DIRLstate = HIGH;  
     digitalWrite(DIRR, DIRRstate);
     digitalWrite(DIRL, DIRLstate); 
@@ -863,15 +863,14 @@ float Angle_Conversion(float target_angle){
    void Stop(){
     digitalWrite(pwmr, LOW);       //setting right motor speed at 0
     digitalWrite(pwml, LOW);       //setting left motor speed at 0 
-    Speed_Control(0);  
-    Serial.println("&&&&&&&&&&&&&&&&&& STOP &&&&&&&&&&&&&&&&&&&&&");
+    Speed_Control(0); 
     }
 
 
 
 //Function used for speed control
 void Speed_Control(float duty){
-  analogWrite(6, (int)(255-duty*255));
+  analogWrite(6, (int)(255-duty*255)); //Using duty cycle as an argument to control voltage then control speed
   }
   
 // Timer A CMP1 interrupt. Every 800us the program enters this interrupt.
