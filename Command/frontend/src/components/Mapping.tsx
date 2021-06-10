@@ -95,6 +95,7 @@ export default function Map({ width, height}: NetworkProps) {
 
   const [nodes, set_nodes] = useState<CustomNode[]>([{x:0, y:0, custom:'Rover'}]);
 
+  /*
   function UpdateNodes() {
 
     // Add current rover location
@@ -111,7 +112,8 @@ export default function Map({ width, height}: NetworkProps) {
     set_nodes(nodes => [...nodes, node])
   }
 
-  /*
+  */
+
   function UpdateNodes(node: CustomNode) {
 
     // Add current rover location
@@ -142,14 +144,13 @@ export default function Map({ width, height}: NetworkProps) {
       }
       else {
         // Assign into CustomNode format and pass into "UpdateNodes function"
-        var node: CustomNode = {x: (server_message.x_distance+nodes[(nodes.length - 1)].x), y: (server_message.y_distance+nodes[(nodes.length - 1)].y), custom: 'Rover'}
+        var node: CustomNode = {x: (server_message.x_distance+nodes[(nodes.length - 1)].x), y: (server_message.y_distance+nodes[(nodes.length - 1)].y), custom: 'Rover', angle: server_message.angle}
 
         UpdateNodes(node)
       }
       
     }
   }
-  */
 
   var links: CustomLink[] = [];
 
