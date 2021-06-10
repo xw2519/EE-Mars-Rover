@@ -19,8 +19,8 @@
 #include <ArduinoWebsockets.h>
 #include <WiFi.h>
 
-const char* ssid = "AsusMesh72"; //Enter SSID
-const char* password = "40572970"; //Enter Password
+const char* ssid = ""; //Enter SSID
+const char* password = ""; //Enter Password
 const char* websockets_server_host = "3.143.233.110"; //Enter server adress
 const uint16_t websockets_server_port = 8000; // Enter server port
 bool auto_mode = false;
