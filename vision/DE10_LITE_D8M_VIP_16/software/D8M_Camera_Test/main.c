@@ -70,7 +70,7 @@ s - Emergency Stop            - If stopping reason unknown, send {bX00+00} after
 p - Pause to gather data
 c - Continue after gathering data
 b - Ball data                 {'b', colour, 2 digit distance, sign, 2 digit other distance} (+right, -left) (R,P,Y,G,B,U - Colours)
-t - Tilt data                 {'t', sign, 2 digit inclination angle}
+t - Tilt data                 {'t', 3 digit y reading, 3 digit z reading} (Readings in 10-bit 2's complement)
 
 Control ---> Vision
 m - Movement command received
@@ -94,20 +94,18 @@ alt_u16   distance, diameter, mid_pos, angle, colour, touching_edge;
 array_u8  ball_colours, ball_distances, ball_angles, ball_sent;
 
 // Used to read, store and process accelerometer data
-alt_32    x_read, y_read, z_read;
-alt_u32   a, a2, a3, a5;
-alt_u8    incl;
+alt_32    x_read, y_read, z_read, x_drift, y_drift, z_drift;
 
 // Flags used to control flow of program
 alt_u8    balls_detected, filter_id;
-alt_u8    calibration=0, process=0;
+alt_u8    gain_calib=0, process=0, acc_calib=0;
 
 // Flags and data used for communication with control over UART
 alt_u8    prompt, parity, moving=1;
 alt_u8    closest_distance=0xFF, closest_index, stop_reasoned, last_command='c', new_data, last_colour='U';
 
 // Variables used to count time
-alt_u8    ack=0, stop_ticks=0;
+alt_u8    ack=0, stop_ticks=0, acc_ticks=0;
 alt_u16   mem_ticks=0;
 
 // MIPI
@@ -298,9 +296,9 @@ void sys_timer_isr(){
     Focus_Window(320,240);
   }
   if((IORD(KEY_BASE,0)&0x03) == 0x02){           // touch KEY0 to trigger gain adjustment
-    calibration = 0;
-    gain        = 0x7FF;
-    exposure    = 0x2000;
+    gain_calib = 0;
+    gain       = 0x7FF;
+    exposure   = 0x2000;
 
     OV8865SetGain(gain);
     OV8865SetExposure(exposure);
@@ -342,7 +340,7 @@ void sys_timer_isr(){
       }
 
     // Record ball data
-    }else if(((x_max-x_min)>=0x20)&&(ball_x_min.used<8)&&(calibration==CALIBRATION_MAX)){
+    }else if(((x_max-x_min)>=0x20)&&(ball_x_min.used<8)&&(gain_calib==CALIBRATION_MAX)){
       appendArray_u16(&ball_x_min, x_min);
       appendArray_u16(&ball_x_max, x_max);
     }
@@ -351,11 +349,11 @@ void sys_timer_isr(){
 
     if((word&0xC0000000)&&(filter_id == 'D')){
 
-      if(calibration<CALIBRATION_MAX){                        // Do calibration if not calibrated
+      if(gain_calib<CALIBRATION_MAX){                        // Do calibration if not calibrated
 
-        if(!balls_detected){ calibration++; }
+        if(!balls_detected){ gain_calib++; }
 
-        if((balls_detected||(calibration==CALIBRATION_MAX)) && (exposure>EXPOSURE_STEP)){
+        if((balls_detected||(gain_calib==CALIBRATION_MAX)) && (exposure>EXPOSURE_STEP)){
           if(gain>GAIN_STEP){
             gain -= GAIN_STEP;
             OV8865SetGain(gain);
@@ -368,11 +366,11 @@ void sys_timer_isr(){
         #ifdef VIEW_AUTO_GAIN
           printf("G = %03x   ", gain);
           printf("E = %04x   ", exposure);
-          printf("C = %02d\n", calibration);
+          printf("C = %02d\n", gain_calib);
         #endif
       }
 
-      if(calibration >= CALIBRATION_MAX){ process = 1; }      // Start processing the data if calibrated
+      if(gain_calib >= CALIBRATION_MAX){ process = 1; }      // Start processing the data if calibrated
       else{ balls_detected = 0; }
     }
 
@@ -449,23 +447,23 @@ void sys_timer_isr(){
     alt_up_accelerometer_spi_read_y_axis(acc_dev, &y_read);
     alt_up_accelerometer_spi_read_z_axis(acc_dev, &z_read);
 
-    y_read += 0x10;
+    if(acc_calib<CALIBRATION_MAX){
+      x_drift = x_read;
+      y_drift = x_read;
+      z_drift = x_read;
+      acc_calib++;
+    }
 
-    if(y_read<0){ a = (((-y_read)<<22)/z_read)>>16; }
-    else{ a = ((y_read<<22)/z_read)>>16; }
+    x_read -= x_drift;
+    y_read -= y_drift;
+    z_read -= z_drift;
 
-    a2 = a*a;
-    a3 = a*a2;
-    a5 = a2*a3;
-
-    a  <<= 24;
-    a3 <<= 12;
-
-    incl = (a - (a>>3) + (a3>>2) - (a5>>3))>>24;
+    x_read &= 0x3FF;
+    y_read &= 0x3FF;
+    z_read &= 0x3FF;
 
     #ifdef VIEW_ACC_READS
-      printf("X = %04x   Y = %04x   Z = %04x\n", x_read, y_read, z_read);
-      printf("Tilt: %02d\n", incl);
+      printf("X = %03x   Y = %03x   Z = %03x\n", x_read, y_read, z_read);
     #endif
 
     //----------------------------------------------------------------- Send messages to UART using processed data
@@ -517,19 +515,23 @@ void sys_timer_isr(){
     }
 
     // If UART is free otherwise, send tilt sensor data
-    if(ctrl_uart&&(!stop_ticks)&&(!ack)){
-      if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)>4){
+    if(ctrl_uart&&(!stop_ticks)&&(!ack)&&(!acc_ticks)&&(acc_calib>=CALIBRATION_MAX)){
+      if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)>7){
         alt_up_rs232_write_data(ctrl_uart, 't');
-        if(y_read<0){ alt_up_rs232_write_data(ctrl_uart, '-'); }
-        else{ alt_up_rs232_write_data(ctrl_uart, '+'); }
-        alt_up_rs232_write_data(ctrl_uart, (incl/10)+48);
-        alt_up_rs232_write_data(ctrl_uart, (incl%10)+48);
+        alt_up_rs232_write_data(ctrl_uart, (y_read/100)+48);
+        alt_up_rs232_write_data(ctrl_uart, ((y_read%100)/10)+48);
+        alt_up_rs232_write_data(ctrl_uart, (y_read%10)+48);
+        alt_up_rs232_write_data(ctrl_uart, (z_read/100)+48);
+        alt_up_rs232_write_data(ctrl_uart, ((z_read%100)/10)+48);
+        alt_up_rs232_write_data(ctrl_uart, (z_read%10)+48);
+        acc_ticks = 3;
       }
     }
 
     //----------------------------------------------------------------- Update ime variables
 
     if(stop_ticks){ stop_ticks--; }
+    if(acc_ticks){ acc_ticks--; }
     if(ack){ ack--; }
     mem_ticks++;
     if(mem_ticks>=32){                                  // Erase memory every ~10 seconds
