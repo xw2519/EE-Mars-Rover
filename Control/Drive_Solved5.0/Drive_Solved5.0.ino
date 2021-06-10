@@ -356,6 +356,8 @@ void setup() {
 /*******************************************************************************/
 void Send_Instruction_Completed(float distance, bool Completed, char instruction){
       Stop();
+      total_x1 = 0;
+      total_y1 = 0;
       F = false;
       B = false;
       L = false;
@@ -466,8 +468,8 @@ void loop() {
       Serial.println("I'm at F");
       err_y = total_y - tmp_y;
       cp = pi_d(err_y);
-      //Speed_Control(abs(cp)*0.01+0.4);
-      Speed_Control(1);
+      Speed_Control(abs(cp)*0.01+0.4);
+      //Speed_Control(1);
       
       if(err_y < -0.5){
         MovingForward();
@@ -526,7 +528,7 @@ void loop() {
       //Serial.println("I'm at L");
       err_x = total_x - tmp_x;
       cp = pi_d(err_x);
-      Speed_Control(abs(cp)*0.01+0.39);
+      Speed_Control(abs(cp)*0.01+0.385);
       
       if(err_x < -0.2){
         Left90();
@@ -555,7 +557,7 @@ void loop() {
       //Serial.println("I'm at L");
       err_x = total_x - tmp_x;
       cp = pi_d(err_x);
-      Speed_Control(abs(cp)*0.01+0.39);
+      Speed_Control(abs(cp)*0.01+0.385);
       
       if(err_x < -0.2){
         Left90();

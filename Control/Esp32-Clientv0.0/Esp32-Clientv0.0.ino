@@ -97,12 +97,13 @@ void loop() {
       Serial.println("Received from Drive");
       dataFromDrive = Serial2.readString();
       distance=atof(dataFromDrive.substring(3).c_str());
+      Serial.println(distance);
       if(dataFromDrive[0]=='F' || dataFromDrive[0]=='B'){
-        total_y += ((dataFromDrive[0]=='F')? 1:-1)*(distance * cos(3.14159265*total_angle/180.0));
-        total_x += ((dataFromDrive[0]=='F')? 1:-1)*(distance * sin(3.14159265*total_angle/180.0)); 
+        total_y += (distance * cos(3.14159265*total_angle/180.0));
+        total_x += (distance * sin(3.14159265*total_angle/180.0)); 
       }
       if(dataFromDrive[0]=='L' || dataFromDrive[0]=='R'){
-        total_angle = (total_angle + distance)-(360*int(int((total_angle + distance))/360)); 
+        total_angle = (total_angle + distance) -(360*int(int((total_angle + distance))/360)); 
       }
       if(dataFromDrive[1]=='0'){Serial.println("{type:\"Terminal\",message:\"Instruction not completed\"}");}
       dataToCommand = "{type:\"Map\",x_distance:\"" + String(total_x) + "\",y_distance:\"" + String(total_y) + "\",angle:\""+String(total_angle)+"\"}";
