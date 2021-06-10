@@ -139,3 +139,12 @@ filters triggered and find the colour of balls.
 - Change pink and blue filters to reduce false positives.
 - Ensure yellow ball does not trigger any filters, or make a yellow filter.
 - Make additional filters that uniquely identify balls?
+
+- Made new set of filters to reduce false positive rate.
+
+- Ball tracking uses colour to decide whether balls are new.
+Balls of unidentified colour are problematic.
+- Flush ball memory every 10 seconds?
+- Add ability to send data of several U.C. balls in a single frame?
+
+- Added accelerometer, need to process data to find angle of rover.

@@ -29,18 +29,21 @@ module EEE_IMGPROC(
 
 parameter IMAGE_W         = 11'd640;
 parameter IMAGE_H         = 11'd480;
-parameter MESSAGE_BUF_MAX = 256;
-parameter MSG_INTERVAL    = 20;
-parameter BB_COL_DEFAULT  = 24'h00ff00;
+parameter MESSAGE_BUF_MAX = 256;                  // Size of message FIFO
+parameter MSG_INTERVAL    = 20;                   // Interval between sending data to FIFO, in frames
+parameter BB_COL_DEFAULT  = 24'h00ff00;           // Bounding box colour
 
-wire [7:0] red, green, blue;
-wire [7:0] red_out, green_out, blue_out;
-wire       sop, eop, in_valid, out_ready;
+wire [7:0] red, green, blue;                      // Input RGB values of pixels
+wire [7:0] red_out, green_out, blue_out;          // Output to VGA
+wire       sop, eop, in_valid, out_ready;         // Streaming and packet info
+reg        packet_video;
 
-//////////////////////////////////////////////////////////////////////// - Detect ball pixels, generate VGA output
+//////////////////////////////////////////////////////////////////////// - Detect ball pixels and colours using filters
 
-// Detect ball pixels
+// Ball filters, decide if a given pixel could be part of a ball, low chance of false negatives
 wire   red_detect, pink_detect, green_detect, blue_detect, bright_detect, ball_detect;
+
+// Colour filters, detect the 5 colours, low chance of false positives
 wire   red_unique, pink_unique, yellow_unique, green_unique, blue_unique;
 
 
@@ -57,8 +60,12 @@ assign yellow_unique = (red>=192)&(green>=224)&(blue< 128)&(y>=256);
 assign  green_unique = (red< 128)&(green>=192)&(blue>=160)&(y>=256);
 assign   blue_unique = (red<  96)&(green<  96)&(blue> 128)&(y>=256);
 
-// Highlight detected areas
-wire [23:0] ball_high;
+//////////////////////////////////////////////////////////////////////// - Generate VGA output
+
+wire        bb_active;         // High if current pixel is part of bounding box
+wire [23:0] new_image;         // Debug view, shows bounding box and filter data
+wire [23:0] ball_high;         // Shows which filters are triggered
+
 assign ball_high = yellow_unique ? {8'hdd, 8'hdd, 8'h00} :
 									   pink_unique ? {8'hdd, 8'h00, 8'hdd} :
 									   blue_unique ? {8'h00, 8'h00, 8'hdd} :
@@ -67,22 +74,17 @@ assign ball_high = yellow_unique ? {8'hdd, 8'hdd, 8'h00} :
 									   ball_detect ? {8'hdd, 8'hdd, 8'hdd} :
  									                 {8'h00, 8'h00, 8'h00} ;
 
-// Show bounding box
-wire        bb_active;
-wire [23:0] new_image;
-
 assign bb_active = (x==left)|(x==right)|(y==top)|(y==bottom);
 assign new_image = bb_active ? bb_col : ball_high;
 
-// Switch output pixels depending on mode
-// Don't modify the start-of-packet word or data in non-video packets
+// Switch output between debug view and video from the camera, depending on mode(SW0)
 assign {red_out, green_out, blue_out} = (mode & ~sop & packet_video) ? new_image : {red,green,blue};
 
-//////////////////////////////////////////////////////////////////////// - Generate image coordinates
+//////////////////////////////////////////////////////////////////////// - Generate image coordinates(x,y)
+
+reg [10:0] x, y;
 
 //Count valid pixels to get the image coordinates. Reset and detect packet type on Start of Packet.
-reg [10:0] x, y;
-reg packet_video;
 always@(posedge clk) begin
 	if (sop) begin
 		x <= 11'h0;
@@ -100,9 +102,8 @@ always@(posedge clk) begin
 	end
 end
 
-//////////////////////////////////////////////////////////////////////// - Processing to find balls
+//////////////////////////////////////////////////////////////////////// - Process ball filter data and send messages
 
-//Find first and last pixels that triger a filter
 reg [10:0] x_min, y_min, x_max, y_max;
 wire boundary_detect;
 assign boundary_detect = (frame_count == MSG_INTERVAL-1) ?    red_unique :
@@ -112,14 +113,15 @@ assign boundary_detect = (frame_count == MSG_INTERVAL-1) ?    red_unique :
 												 (frame_count == MSG_INTERVAL-5) ?   blue_unique :
 												 																	   ball_detect ;
 
+// Find the bounding box a given filter
 always@(posedge clk) begin
-	if (boundary_detect & in_valid) begin	//Update bounds
+	if (boundary_detect & in_valid) begin	         // Update bounds
 		if (x < x_min) x_min <= x;
 		if (x > x_max) x_max <= x;
 		if (y < y_min) y_min <= y;
 		y_max <= y;
 	end
-	if (sop & in_valid) begin	//Reset bounds on start of packet
+	if (sop & in_valid) begin	                    // Reset bounds on start of packet
 		x_min <= IMAGE_W-11'h1;
 		x_max <= 0;
 		y_min <= IMAGE_H-11'h1;
@@ -127,27 +129,29 @@ always@(posedge clk) begin
 	end
 end
 
-//Group columns to find balls
-reg [IMAGE_W-1:0] ball_in_col;
+// Group columns to find balls
+reg [IMAGE_W-1:0] column_detect;
+
 always @(posedge clk) begin
 	if(sop & in_valid) begin
-		ball_in_col <= 0;
+		column_detect <= 0;
 	end
 	if(ball_detect & in_valid) begin
-		ball_in_col[x] <= 1;
+		column_detect[x] <= 1;
 	end
 end
 
-//During last line of pixels, send data as messages
+// When receiving last line of pixels, generate messages for CPU from ball data
 reg in_ball, send_msg;
 reg [10:0] ball_min, ball_max;
+
 always@(posedge clk) begin
 	if (in_valid&(y == IMAGE_H-1)&packet_video) begin
-		in_ball <= ball_in_col[x];
-		if((in_ball==0) & (ball_in_col[x]==1)) begin
+		in_ball <= column_detect[x];
+		if((in_ball==0) & (column_detect[x]==1)) begin
 			ball_min <= x;
 		end
-		if((in_ball==1) & (ball_in_col[x]==0)) begin
+		if((in_ball==1) & (column_detect[x]==0)) begin
 			ball_max <= x;
 			send_msg <= 1;
 		end
@@ -160,9 +164,8 @@ always@(posedge clk) begin
 	end
 end
 
-//////////////////////////////////////////////////////////////////////// - Process colours
+//////////////////////////////////////////////////////////////////////// - Process bounding box and send colour data
 
-//Process bounding box at the end of the frame.
 `define    RED_ID "R"
 `define   PINK_ID "P"
 `define YELLOW_ID "Y"
@@ -176,19 +179,20 @@ reg [10:0] left, right, top, bottom;
 reg [7:0]  frame_count;
 
 always@(posedge clk) begin
-	if (eop & in_valid & packet_video) begin  //Ignore non-video packets
-		//Latch edges for display overlay on next frame
+	if (eop & in_valid & packet_video) begin  // At the end of each video packet
+
+		// Latch edges for bounding box on next frame
 		left <= x_min;
 		right <= x_max;
 		top <= y_min;
 		bottom <= y_max;
 
-		//Start message writer FSM once every MSG_INTERVAL frames, if there is room in the FIFO
 		frame_count <= frame_count - 1;
 		if (frame_count == 0) frame_count <= MSG_INTERVAL-1;
 
+		// Send data from colour filters once every MSG_INTERVAL frames, if there is room in the FIFO
 		if(msg_buf_size < MESSAGE_BUF_MAX-2) begin
-			case(frame_count)
+			case(frame_count)            // Send data from different filters depending on frame_count
 				MSG_INTERVAL-1: begin
 					msg_id <= `RED_ID;
 					msg_state <= 2'b01;
@@ -220,26 +224,26 @@ always@(posedge clk) begin
 			endcase
 		end
 	end
-	if (msg_state != 2'b00) msg_state <= msg_state + 2'b01;
+	if (msg_state != 2'b00) msg_state <= msg_state + 2'b01;     // Update state of message writer FSM
 end
 
-//////////////////////////////////////////////////////////////////////// - Send messages
+//////////////////////////////////////////////////////////////////////// - Write messages to FIFO
 
-//Generate output messages for CPU
-reg [31:0] msg_buf_in;
+reg  [31:0] msg_buf_in;
 wire [31:0] msg_buf_out;
-reg msg_buf_wr;
-wire msg_buf_rd, msg_buf_flush;
-wire [7:0] msg_buf_size;
-wire msg_buf_empty;
+reg         msg_buf_wr;
+wire        msg_buf_rd;
+wire        msg_buf_flush;
+wire  [7:0] msg_buf_size;
+wire        msg_buf_empty;
 
-always@(*) begin	//Write words to FIFO as state machine advances
+always@(*) begin	                                    // Write words to FIFO as state machine advances
 	case(msg_state)
-		2'b00: begin
+		2'b00: begin                                      // Send data from ball filters in this state
 			msg_buf_in = {10'h0, ball_min, ball_max};
 			msg_buf_wr = send_msg  & (frame_count==0) & (msg_buf_size < MESSAGE_BUF_MAX - 1);
 		end
-		2'b01: begin
+		2'b01: begin                                      // Send data from colour filters, first 2 bits indicate x/y data
 			msg_buf_in = {2'h0, msg_id, x_min, x_max};
 			msg_buf_wr = 1'b1;
 		end
@@ -254,7 +258,7 @@ always@(*) begin	//Write words to FIFO as state machine advances
 	endcase
 end
 
-////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////// - FIFO and register connections
 
 //Output message FIFO
 MSG_FIFO	MSG_FIFO_inst (
