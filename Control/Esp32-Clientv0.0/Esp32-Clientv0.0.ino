@@ -106,7 +106,7 @@ void loop() {
         total_angle = (total_angle + distance) -(360*int(int((total_angle + distance))/360)); 
       }
       if(dataFromDrive[1]=='0'){client.send("{type:\"Terminal\",message:\"Instruction not completed\"}");}
-      dataToCommand = "{type:\"Map\",x_distance:\"" + String(total_x) + "\",y_distance:\"" + String(total_y) + "\",angle:\""+String(total_angle)+"\"}";
+      dataToCommand = "{type:\"Map\",x_distance:\"" + String(total_x) + "\",y_distance:\"" + String(total_y) + "\",angle:\""+String(total_angle)+"\",map_type:\"Rover\"}";
       client.send(dataToCommand);
       //Serial.println(dataToCommand);
       }
