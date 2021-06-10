@@ -45,8 +45,8 @@ Ball balls[10];
 WebsocketsClient client;
 
 void sendBallToCommand(char colour,float x,float y){
-  //client.send("Ball!");
-  Serial.println("Ball");
+  client.send("Ball!");
+  //Serial.println("Ball");
 }
 void setup() {
     Serial.begin(115200);
@@ -69,7 +69,7 @@ void setup() {
 
     Serial.println("Connected to Wifi, Connecting to server.");
     // try to connect to Websockets server
-    if(!client.connect(websockets_server_host, websockets_server_port, "/ws/rover")){Serial.print(".");delay(100);}
+    while(!client.connect(websockets_server_host, websockets_server_port, "/ws/rover")){Serial.print(".");delay(100);}
 //    if(connected) {
         Serial.println("Connected!");
        // client.send("Hello Server");
@@ -90,14 +90,14 @@ void loop() {
     if(Serial.available()) { 
       Serial2.print(Serial.readString());
     }
-    //if(client.available()) {
-        //client.poll();
-   //}
+    if(client.available()) {
+        client.poll();
+   }
     if(Serial2.available()){
-      Serial.println("Received from Drive");
+      //Serial.println("Received from Drive");
       dataFromDrive = Serial2.readString();
       distance=atof(dataFromDrive.substring(3).c_str());
-      Serial.println(distance);
+     // Serial.println(distance);
       if(dataFromDrive[0]=='F' || dataFromDrive[0]=='B'){
         total_y += (distance * cos(3.14159265*total_angle/180.0));
         total_x += (distance * sin(3.14159265*total_angle/180.0)); 
@@ -105,10 +105,10 @@ void loop() {
       if(dataFromDrive[0]=='L' || dataFromDrive[0]=='R'){
         total_angle = (total_angle + distance) -(360*int(int((total_angle + distance))/360)); 
       }
-      if(dataFromDrive[1]=='0'){Serial.println("{type:\"Terminal\",message:\"Instruction not completed\"}");}
+      if(dataFromDrive[1]=='0'){client.send("{type:\"Terminal\",message:\"Instruction not completed\"}");}
       dataToCommand = "{type:\"Map\",x_distance:\"" + String(total_x) + "\",y_distance:\"" + String(total_y) + "\",angle:\""+String(total_angle)+"\"}";
-      //client.send(dataToCommand);
-      Serial.println(dataToCommand);
+      client.send(dataToCommand);
+      //Serial.println(dataToCommand);
       }
 
     if(Serial1.available()){
