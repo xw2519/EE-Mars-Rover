@@ -1,15 +1,18 @@
-var value
+import {useState} from 'react';
 
 const NavSettings = (NavSettings) => {
 
-  const handleDistChange = (event) => {
+  const [value, setValue] = useState(10);
 
+  const handleDistChange = (event) => {
+    // Limiting the range of allowed input
     if(event >= 100) {
-      value = 99
+      setValue(99)
       NavSettings.setDist(99)
     }
     else {
       NavSettings.setDist(event)
+      setValue(event)
     }
     
   };
@@ -25,15 +28,17 @@ const NavSettings = (NavSettings) => {
       <div className="Unit_switch"> 
           <label>
             <input
-                type = "number"
-                placeholder="Unit"
-                defaultValue="10"
-                size={10}
-                max={99}
-                min={1}
-                maxLength={3}
-                className="Dist_value"
-                onChange={e => handleDistChange(e.target.value)}
+              id="Dist_value"
+              value={value}
+              className="Dist_value"
+              type = "number"
+              placeholder="Unit"
+              defaultValue="10"
+              size={10}
+              max={99}
+              min={1}
+              maxLength={2}
+              onChange={e => handleDistChange(e.target.value)}
 
             />
           </label>
