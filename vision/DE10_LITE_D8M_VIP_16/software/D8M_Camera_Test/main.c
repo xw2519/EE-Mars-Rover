@@ -22,9 +22,10 @@
 
 //debug defines
 #define VIEW_BALL_COUNT
-#define VIEW_BALL_DATA
+//#define VIEW_BALL_DATA
 #define VIEW_UART_MSGS
 #define VIEW_AUTO_GAIN
+#define VIEW_ACC_READS
 
 //offsets for image processor memory mapped interface
 #define EEE_IMGPROC_STATUS 0
@@ -83,7 +84,7 @@ alt_u16 gain     =  0x7FF;             // Initial gain
 alt_u32 exposure = 0x2000;             // Initial exposure
 
 // Variables used for storing raw ball data from image processor
-int       word;
+alt_32    word;
 alt_u16   x_min, x_max;
 alt_u16   filter_x_min[5], filter_x_max[5], filter_y_min[5], filter_y_max[5], ball_bounds[4];
 array_u16 ball_x_min, ball_x_max;
@@ -91,6 +92,11 @@ array_u16 ball_x_min, ball_x_max;
 // Used for storing processed ball data
 alt_u16   distance, diameter, mid_pos, angle, colour, touching_edge;
 array_u8  ball_colours, ball_distances, ball_angles, ball_sent;
+
+// Used to read, store and process accelerometer data
+alt_32    x_read, y_read, z_read;
+alt_u32   a, a2, a3, a5;
+alt_u8    incl;
 
 // Flags used to control flow of program
 alt_u8    balls_detected, filter_id;
@@ -437,6 +443,31 @@ void sys_timer_isr(){
       #endif
     }
 
+    //----------------------------------------------------------------- Read and process accelerometer data
+
+    alt_up_accelerometer_spi_read_x_axis(acc_dev, &x_read);
+    alt_up_accelerometer_spi_read_y_axis(acc_dev, &y_read);
+    alt_up_accelerometer_spi_read_z_axis(acc_dev, &z_read);
+
+    y_read += 0x10;
+
+    if(y_read<0){ a = (((-y_read)<<22)/z_read)>>16; }
+    else{ a = ((y_read<<22)/z_read)>>16; }
+
+    a2 = a*a;
+    a3 = a*a2;
+    a5 = a2*a3;
+
+    a  <<= 24;
+    a3 <<= 12;
+
+    incl = (a - (a>>3) + (a3>>2) - (a5>>3))>>24;
+
+    #ifdef VIEW_ACC_READS
+      printf("X = %04x   Y = %04x   Z = %04x\n", x_read, y_read, z_read);
+      printf("Tilt: %02d\n", incl);
+    #endif
+
     //----------------------------------------------------------------- Send messages to UART using processed data
 
     // Stop the rover if a ball is very close
@@ -482,6 +513,17 @@ void sys_timer_isr(){
         alt_up_rs232_write_data(ctrl_uart, 'c');
         last_command = 'c';
         stop_ticks = 0;
+      }
+    }
+
+    // If UART is free otherwise, send tilt sensor data
+    if(ctrl_uart&&(!stop_ticks)&&(!ack)){
+      if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)>4){
+        alt_up_rs232_write_data(ctrl_uart, 't');
+        if(y_read<0){ alt_up_rs232_write_data(ctrl_uart, '-'); }
+        else{ alt_up_rs232_write_data(ctrl_uart, '+'); }
+        alt_up_rs232_write_data(ctrl_uart, (incl/10)+48);
+        alt_up_rs232_write_data(ctrl_uart, (incl%10)+48);
       }
     }
 
