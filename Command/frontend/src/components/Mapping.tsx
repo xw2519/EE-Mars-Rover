@@ -5,6 +5,7 @@ import ws_server from './util/socketConfig'
 export type NetworkProps = {
   width: number;
   height: number;
+  nodes: CustomNode[];
 };
 
 interface CustomNode {
@@ -28,27 +29,33 @@ function LinkNodes(nodes: CustomNode[]) {
   var node_link: CustomLink = {source: {x: 0, y: 0}, target: {x: 0, y: 0}}
   var links: CustomLink[] = [] 
 
-  for(let i = 0; i < (nodes.length-1); i++) {
+  console.log(nodes)
 
-    // Link all nodes
-    if(i !== (nodes.length-1)) {
+  if(nodes.length !== 1) {
+    console.log("triggered")
+    for(let i = 0; i < (nodes.length-1); i++) {
 
-      // Do not link obstacles
-      if(nodes[i+1].custom === "Obstacle") {
-        node_link = {source: nodes[i], target: nodes[(i)]}
+      // Link all nodes
+      if(i !== (nodes.length-1)) {
+  
+        // Do not link obstacles
+        if(nodes[i+1].custom === "Obstacle") {
+          node_link = {source: nodes[i], target: nodes[(i)]}
+        }
+        else {
+          node_link = {source: nodes[i], target: nodes[(i+1)]}
+        }      
       }
-      else {
-        node_link = {source: nodes[i], target: nodes[(i+1)]}
-      }      
+  
+      links.push(node_link)
     }
-
-    links.push(node_link)
+  
   }
 
   return links
 }
 
-export default function Map({ width, height}: NetworkProps) {
+export default function Map({ width, height, nodes}: NetworkProps) {
 
   function RoverNode ( angle ) {
 
@@ -56,10 +63,14 @@ export default function Map({ width, height}: NetworkProps) {
     var rotation = 'rotate( ' + angle.angle + ' 14 14 )'
 
     return (
-      // Passes "angle" variable to determine the direction that the rover is facing
-      <svg width="40" height="40" fill="currentColor" className="bi-arrow-up-circle-fill" viewBox="0 0 24 24" transform={rotation}>
-        <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
-      </svg>
+ 
+      <g transform={`translate(${-40 / 2}, ${-40 / 2})`}>
+
+        <svg width="38" height="38" fill="currentColor" className="bi-arrow-up-circle-fill" viewBox="0 0 24 24" transform={rotation}>
+          <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
+        </svg>
+      </g>
+
     )
 
   }
@@ -68,10 +79,10 @@ export default function Map({ width, height}: NetworkProps) {
 
     // Empty node to enable rover pathway plotting
     return (
-      <g transform={`translate(${-40 / 2}, ${-40 / 2})`}>
-        <svg className="icon-tabler-map-pin" width="30" height="30" viewBox="0 0 30 30" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+
+        <svg className="icon-tabler-map-pin" width="30" height="30" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
         </svg>
-      </g>
+
     )
 
   }
@@ -94,65 +105,6 @@ export default function Map({ width, height}: NetworkProps) {
 
   }
 
-  const [nodes, set_nodes] = useState<CustomNode[]>([{x:0, y:0, custom:'Rover'}]);
-
-  /*
-  function UpdateNodes() {
-
-    // Add current rover location
-    var node: CustomNode = {x: (20+nodes[(nodes.length - 1)].x), y: (-10+nodes[(nodes.length - 1)].y), custom: 'Rover'}
-
-    // Change icon on previous rover location 
-    for(let i = 0; i < (nodes.length); i++) {
-      if(nodes[i].custom === 'Rover') {
-        nodes[i].custom = 'Location'
-      }
-    }
-
-    // Update state
-    set_nodes(nodes => [...nodes, node])
-  }
-
-  */
-
-  function UpdateNodes(node: CustomNode) {
-
-    // Add current rover location
-    var node: CustomNode = {x: (20+nodes[(nodes.length - 1)].x), y: (-10+nodes[(nodes.length - 1)].y), custom: 'Rover'}
-
-    // Change icon on previous rover location 
-    for(let i = 0; i < (nodes.length); i++) {
-      if(nodes[i].custom === 'Rover') {
-        nodes[i].custom = 'Location'
-      }
-    }
-
-    // Update state
-    set_nodes(nodes => [...nodes, node])
-  }
-
-  ws_server.onmessage = (e) => {  
-    
-    // Check if server JSON is intended for map
-    var server_message = JSON.parse(e.data); 
-
-    if(server_message.type === "Map") {
-      // Sort between Rover location or Obstacle 
-      if(server_message.map_type === "Obstacle") {
-        var node: CustomNode = {x: (server_message.x_distance+nodes[(nodes.length - 1)].x), y: (server_message.y_distance+nodes[(nodes.length - 1)].y), custom: 'Obstacle', color: server_message.color}
-
-        UpdateNodes(node)
-      }
-      else {
-        // Assign into CustomNode format and pass into "UpdateNodes function"
-        var node: CustomNode = {x: (server_message.x_distance+nodes[(nodes.length - 1)].x), y: (server_message.y_distance+nodes[(nodes.length - 1)].y), custom: 'Rover', angle: server_message.angle}
-
-        UpdateNodes(node)
-      }
-      
-    }
-  }
-
   var links: CustomLink[] = [];
 
   links = LinkNodes(nodes)
@@ -166,7 +118,7 @@ export default function Map({ width, height}: NetworkProps) {
   return width < 10 ? null : (
 
     <svg width={width} height={height}>
-      <rect width={width} height={height} rx={14} fill={background} />
+      <rect width={width} height={height} rx={2} fill={background} />
 
       <Graph<CustomLink, CustomNode>
         graph={graph}
@@ -176,7 +128,7 @@ export default function Map({ width, height}: NetworkProps) {
         nodeComponent={({ node: { custom, color, angle }  }) =>
           // RoverNode takes "angle" parameter to define direction of rover
           // ObstacleNode takes "color" parameter to define the color of the obstacle 
-          (custom === 'Rover') ? <RoverNode angle={180}/> : ((custom === 'Location') ? <LocationNode /> : <ObstacleNode color={color} />)
+          (custom === 'Rover') ? <RoverNode angle={angle}/> : ((custom === 'Location') ? <LocationNode /> : <ObstacleNode color={color} />)
         }
 
         linkComponent={({ link: { source, target } }) => (

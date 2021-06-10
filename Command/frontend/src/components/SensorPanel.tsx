@@ -8,13 +8,17 @@ class SensorReadings extends React.Component {
     /* Serve landing page */
     render() {
         
+        /*
         ws_server.onmessage = (e) => {  
             //Sensor panel readings
             var server_message = JSON.parse(e.data); 
+            console.log(server_message)
             document.getElementById("BatteryLeft")!.innerHTML = server_message.battery_remain;
             document.getElementById("DistanceLeft")!.innerHTML = server_message.dist_remain;
             document.getElementById("DistanceTravelled")!.innerHTML = server_message.dist_travel;
         }
+
+        */
 
         return (
             <div className="SensorPanel">            
