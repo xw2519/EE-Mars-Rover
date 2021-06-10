@@ -110,20 +110,6 @@ async def websocket_client(websocket: WebSocket):
         while True:
             # Receive messages from command client 
             received_data = await websocket.receive_text()
-            
-            # Testing
-            
-            terminal_check = {
-                "type" : "Map",
-                "x_distance" : "0.00",
-                "y_distance" : "15",
-                "map_type" : "Rover",
-                "angle": "-89.90"
-                }
-                
-            json_object = json.dumps(terminal_check)
-            
-            await session_instance.client_connection.send_to_client(json_object)
 
             if (received_data != ""):
                 print("[Server Info]: Sending to rover: " + received_data)                  

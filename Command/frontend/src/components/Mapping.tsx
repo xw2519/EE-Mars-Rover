@@ -29,8 +29,6 @@ function LinkNodes(nodes: CustomNode[]) {
   var node_link: CustomLink = {source: {x: 0, y: 0}, target: {x: 0, y: 0}}
   var links: CustomLink[] = [] 
 
-  console.log(nodes)
-
   if(nodes.length !== 1) {
     console.log("triggered")
     for(let i = 0; i < (nodes.length-1); i++) {
@@ -39,7 +37,7 @@ function LinkNodes(nodes: CustomNode[]) {
       if(i !== (nodes.length-1)) {
   
         // Do not link obstacles
-        if(nodes[i+1].custom === "Obstacle") {
+        if(nodes[i].custom === "Obstacle") {
           node_link = {source: nodes[i], target: nodes[(i)]}
         }
         else {
@@ -56,6 +54,8 @@ function LinkNodes(nodes: CustomNode[]) {
 }
 
 export default function Map({ width, height, nodes}: NetworkProps) {
+
+  console.log(nodes)
 
   function RoverNode ( angle ) {
 

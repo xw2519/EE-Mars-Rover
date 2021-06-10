@@ -83,7 +83,7 @@ const Dashboard = () => {
     const [distance_left, set_distance_left] = useState(0);
 
     var [nodes, set_nodes] = useState<CustomNode[]>([{x:0, y:0, custom:'Rover', angle:0}]);
-
+   
     useEffect(() => {
         const timeOutId = setTimeout(() => setPropDist(dist_value), 500);
         return () => clearTimeout(timeOutId);
@@ -92,45 +92,45 @@ const Dashboard = () => {
     function UpdateNodes() {
 
         if(tracker === 1) {
-            if(map_type === "Rover") {
-                var x = parseInt(x_coordinate.toString()) + parseInt(x_relative.toString()) 
-                var y = parseInt(y_coordinate.toString()) + parseInt(y_relative.toString())
 
-                var node: CustomNode = {x: (x), y: (y), custom: 'Rover', angle: angle}
+            var x = parseInt(x_coordinate.toString()) + parseInt(x_relative.toString()) 
+            var y = parseInt(y_coordinate.toString()) + parseInt(y_relative.toString())
 
-                set_x_relative(x)
-                set_y_relative(y)
+            var node: CustomNode = {x: (x), y: (y), custom: 'Rover', angle: angle}
 
-                set_nodes(
-                    nodes = [...nodes, node]
-                );
+            set_x_relative(x)
+            set_y_relative(y)
 
-                var links: CustomLink[] = [];
+            set_nodes(
+                nodes = [...nodes, node]
+            );
 
-                links = LinkNodes(nodes)
-
-            }
-            else if(map_type === "Obstacle") {
-                var node: CustomNode = {x: ((x_coordinate+x_relative)*0.4), y: ((y_coordinate+y_relative)*0.4), custom: 'Obstacle', color: color}
-            }
-            
             // Change icon on previous rover location 
             for(let i = 0; i < (nodes.length); i++) {
                 if(nodes[i].custom === 'Rover') {
                     nodes[i].custom = 'Location'
                 }
             }
-        
-            // Update state
-            set_nodes(nodes => [...nodes, node])
         
             tracker = 2
         }
         else {
             if(map_type === "Rover") {
-                var x = parseInt(x_coordinate.toString()) + parseInt(x_relative.toString()) 
-                var y = parseInt(y_coordinate.toString()) + parseInt(y_relative.toString())
+                var x = 0
+                var y = 0
+                var x_coord = parseInt(x_coordinate.toString())
+                var y_coord = parseInt(y_coordinate.toString())
+                var x_rela = parseInt(x_relative.toString())
+                var y_rela = parseInt(y_relative.toString())
 
+                if(x_coord !== x_rela) {
+                    x = ((parseInt(x_coordinate.toString())) + parseInt(x_relative.toString()))
+                }
+                
+                if(y_coord !== y_rela) {
+                    y = ((parseInt(y_coordinate.toString())) + parseInt(y_relative.toString()))
+                }
+                
                 var node: CustomNode = {x: (x), y: (y), custom: 'Rover', angle: angle}
 
                 set_x_relative(x)
@@ -147,10 +147,10 @@ const Dashboard = () => {
                     nodes[i].custom = 'Location'
                 }
             }
-        
-            // Update state
-            set_nodes(nodes => [...nodes, node])
         }
+
+        // Update state
+        set_nodes(nodes => [...nodes, node])
     }
 
     ws_server.onmessage = (e) => {  
@@ -200,7 +200,7 @@ const Dashboard = () => {
         }
     
     }
-
+    
     /* Serve landing page */
     return (
         <>
