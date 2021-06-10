@@ -12,13 +12,27 @@ interface NavUIProps {
 class NavUI extends React.Component<NavUIProps, {}> {
     NavUp = () => {
         console.log("UP");
-        ws_server.send("F00" + this.props.prop_dist_value);
+
+        if(this.props.prop_dist_value < 10) {
+            ws_server.send("F0000" + this.props.prop_dist_value);
+        }
+        else {
+            ws_server.send("F000" + this.props.prop_dist_value);
+        }
+        
         this.props.myLogger.log('[Sending to rover]: FORWARD rover by ' + this.props.prop_dist_value + ' cm')
     }
 
     NavDown = () => {
         console.log("DOWN");
-        ws_server.send("B00" + this.props.prop_dist_value);
+
+        if(this.props.prop_dist_value < 10) {
+            ws_server.send("B0000" + this.props.prop_dist_value);
+        }
+        else {
+            ws_server.send("B000" + this.props.prop_dist_value);
+        }
+        
         this.props.myLogger.info('[Sending to rover]: REVERSE rover ' + this.props.prop_dist_value + ' cm')
     }
 

@@ -1,4 +1,4 @@
-import { TextInputField } from 'evergreen-ui'
+import {Helmet} from "react-helmet";
 
 const NavSettings = (NavSettings) => {
 
@@ -18,13 +18,17 @@ const NavSettings = (NavSettings) => {
 
         <div className="Unit_switch"> 
             <label>
-              <TextInputField
+              <input
+                  type = "number"
                   placeholder="Unit"
                   defaultValue="10"
-                  inputHeight={50}
-                  inputWidth={70}
+                  size={10}
+                  max={99}
+                  min={1}
+                  maxLength={3}
                   className="Dist_value"
                   onChange={e => handleDistChange(e.target.value)}
+
               />
             </label>
         </div>

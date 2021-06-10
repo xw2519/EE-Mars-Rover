@@ -32,7 +32,10 @@ Web client to server - JSON:
 received_data = ""
 received_data_rover = ""
 
-# Client based functions
+'''
+Connection management functions
+'''
+
 class ClientManager:
     '''
     Website connection functions
@@ -45,8 +48,11 @@ class ClientManager:
         self.connection = websocket_client
     
     async def send_to_client(self, data_client: str):
-        await self.connection.send_text(data_client)
-    
+        try:
+            await self.connection.send_text(data_client)
+        except:
+            print("[Server Error]: No command client is connected to the system") 
+        
 class RoverManager:
     '''
     Rover connection functions
@@ -59,9 +65,11 @@ class RoverManager:
         self.connection = websocket_client
     
     async def send_to_rover(self, data_rover: str):
-        await self.connection.send_text(data_rover)
+        try:
+            await self.connection.send_text(data_rover)
+        except:
+            print("[Server Error]: No rover is connected to the system") 
         
-# Session based functions
 class Session:
     '''
     Session (connection instance) functions
@@ -70,8 +78,7 @@ class Session:
         self.client_connection = ClientManager()
         self.rover_connection = RoverManager()
         
-        
-        
+
 '''
 Main server operations
 '''       
@@ -93,34 +100,34 @@ async def websocket_client(websocket: WebSocket):
     
     try:
         while True:
+            # Receive messages from command client 
             received_data = await websocket.receive_text()
-            
+
             if (received_data != ""):
+                print("[Server Info]: Sending to rover: " + received_data)  
                 await session_instance.rover_connection.send_to_rover(received_data)
             
-            print(received_data)
-            
     except WebSocketDisconnect:
-        print('[Server]: Command client websocket connection terminated')
+        print("[Server Error]: Command client websocket terminated")
 
 @app.websocket("/ws/rover")
 async def websocket_endpoint(websocket: WebSocket):
     '''
     Handle server <-> rover websocket connection
     '''
-    print('[Server]: Establishing websocket connection with rover')
+    print("[Server Error]: Establishing websocket connection with rover")
     await session_instance.rover_connection.connect(websocket)
     
     try:
         while True:
+            # Receive messages from the rover 
             received_data_rover = await websocket.receive_text()
             
             if (received_data_rover != ""):
+                print("[Server Info]: Sending to client: " + received_data_rover)  
                 await session_instance.client_connection.send_to_client(received_data_rover)
-            
-            print(received_data_rover)
-            
+
     except WebSocketDisconnect:
-        print('[Server]: Command client websocket connection terminated')
-        
+        print("[Server Error]: Rover websocket terminated")
+
     
