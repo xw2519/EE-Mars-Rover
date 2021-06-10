@@ -132,47 +132,64 @@ The approach is split into 5 stages which combines to form a robust project mana
 \pagebreak
 \subsection{Definition and Planning}
 
-Due to the generality of the project requirements, the project team had a significant amount of freedom in meeting the project requirements. The team had identified several design themes that guided the design and implementation choices made during the developement of the rover system:
+Due to lack of specific scope constraints aside from a deadline, the project team had a significant amount of freedom in designing and developing the rover system to meet the project requirements. The team had identified several design themes that guided the design and implementation choices made during the developement of the rover system:
 
 \begin{itemize}    
-    \item \textbf{Modularity}
+    \item \textbf{Modularity}:
     
     Having taken into account that the project team spanned four countries with different time-zones and the time constraint of the project, the team felt it was important to incorporate modular design in the development of each rover modules. 
     
-    The approach meant each subsystem only had to ensure the pre-agreed connection interface was compatible with the required modules. This was very advantageous due to the following:
+    The approach meant each subsystem only had to ensure the pre-agreed connection interfaces such as WebSocket was compatible with the required modules. This was very advantageous due to the following:
     \begin{itemize}
-        \item Each module could independently develop sections of the rover system.
+        \item Each module could independently develop sections of the rover system. This made the team much more dynamic and efficient.
         \item The testing strategy \footnote{Testing was managed by the Integration module} was more methodical and could occur early in stages, gradually leading up to a full rover system test.
         \item No unnecessary meetings. By reducing the number of meetings the team had, it meant less time was wasted on arranging a time suitable for three time-zones and team meetings were more productive.  
     \end{itemize}
 
     \item \textbf{Scalability}:
-
-    \item \textbf{Open-source}
     
-    Where possible, the team opted to use well-supported open-source development packages such as arduino libraries and the FastAPI framework. This complimented the modularity and scalability themes by ensuring the connecting interfaces are industry-standards and could be easily modified to expand its capabilites. 
+    During the first meeting, the team was not certain as to the exact features that are desirable in a rover system. Due to this reason, scalability was a critical consideration factor and gave the team a very flexible approach to the rover system. 
+    
+    An example would be the MongoDB database implemented by Command. MongoDB is a type of "NoSQL" database that is not as restrictive as traditional SQL databases which allowed the team to store new types of data without having to redesign the database model. 
+
+    \item \textbf{Open-source}: 
+    
+    Where possible, the team opted to use well-supported open-source development packages such as the FastAPI framework. This complimented modularity and scalability themes by ensuring the interfaces are industry-standard and could be easily modified to expand its capabilites. 
     
     Being well-supported, there is ample documentation to support the development and the codebase is well-designed. This meant that the team could reduce the number of unknown bugs, decrease development time and ensure a high-quality codebase.     
 
-    \item \textbf{Lightweight}:
+    \item \textbf{Minimalism}:
+    
+    Due to the open-ended nature of the project, the team was worried of a bloated codebase and every additional feature and software library was thoroughly researched and discussed to ensure a seamless and efficient integration into the existing system.     
+    
+    A clear example of this would be the single page grid-layout design of the Rover Command website which allowed intuitive interaction and features could be seamlessly added.  
     
 \end{itemize}
 
 \vfill
 
-
 \pagebreak
-\subsection{Implementation}
-
-
-
-
 \subsection{Performance and Control}
 
+\subsubsection{Gnatt chart}
+
+\begin{center}
+    [Gnatt chart image]
+\end{center}
 
 
 
-\subsection{Project conclusion}
+
+
+
+
+
+
+\subsubsection{Codebase clutter control}
+
+\textit{Due to the remote collaborative nature required, every member was encouraged to design and implement with a standardised minimalistic approach \footnote{Minimalistic coding guidelines: https://dev.to/paulasantamaria/6-ways-minimalism-can-help-you-write-clean-code-45kp} such as concise code documentation, avoiding too many dependencies and consistent code revisions. }
+ 
+
 
 
 
