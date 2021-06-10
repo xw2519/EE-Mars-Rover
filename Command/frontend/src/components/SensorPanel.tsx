@@ -17,8 +17,6 @@ class SensorReadings extends React.Component {
         }
 
         return (
-            <>
-
             <div className="SensorPanel">            
                 <div className = "Time"> 
                     <div className="TimeTitle"> Time: </div>
@@ -40,8 +38,6 @@ class SensorReadings extends React.Component {
                     <div className="DistanceTravelledValue"> <output name="DistanceTravelled" id="DistanceTravelled"> </output> [cm] </div>
                 </div>
             </div>
-
-            </>
         );
     }
 }

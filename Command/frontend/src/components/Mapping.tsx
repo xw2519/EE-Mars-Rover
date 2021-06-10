@@ -1,5 +1,5 @@
 import { Graph } from '@visx/network';
-import React, {useState} from 'react';
+import {useState} from 'react';
 import ws_server from './util/socketConfig'
 
 export type NetworkProps = {
@@ -51,10 +51,9 @@ function LinkNodes(nodes: CustomNode[]) {
 export default function Map({ width, height}: NetworkProps) {
 
   function RoverNode ( angle ) {
+
     // Plotting rover node icon
     var rotation = 'rotate( ' + angle.angle + ' 14 14 )'
-
-    console.log(rotation)
 
     return (
       // Passes "angle" variable to determine the direction that the rover is facing
@@ -66,6 +65,7 @@ export default function Map({ width, height}: NetworkProps) {
   }
 
   function LocationNode () {
+
     // Empty node to enable rover pathway plotting
     return (
       <g transform={`translate(${-40 / 2}, ${-40 / 2})`}>
@@ -77,6 +77,7 @@ export default function Map({ width, height}: NetworkProps) {
   }
 
   function ObstacleNode ( color ) {
+
     // Plot obstacle nodes 
     return (
       <g transform={`translate(${-40 / 2},${-40 / 2})`}>
