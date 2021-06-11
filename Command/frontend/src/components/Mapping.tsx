@@ -47,15 +47,12 @@ function LinkNodes(nodes: CustomNode[]) {
   
       links.push(node_link)
     }
-  
   }
 
   return links
 }
 
 export default function Map({ width, height, nodes}: NetworkProps) {
-
-  console.log(nodes)
 
   function RoverNode ( angle ) {
 
@@ -105,7 +102,9 @@ export default function Map({ width, height, nodes}: NetworkProps) {
 
   }
 
-  var links: CustomLink[] = [];
+  console.log("Mapping triggered")
+
+  var links: CustomLink[] = [{source: nodes[0], target: nodes[(0)]}];
 
   links = LinkNodes(nodes)
 
@@ -113,6 +112,9 @@ export default function Map({ width, height, nodes}: NetworkProps) {
     nodes,
     links,
   };
+
+  console.log("Links: ")
+  console.log(links)
 
   // Return SVG map
   return width < 10 ? null : (

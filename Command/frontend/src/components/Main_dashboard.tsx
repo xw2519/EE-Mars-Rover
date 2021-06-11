@@ -29,43 +29,6 @@ interface CustomNode {
     angle?: number
 }
 
-interface CustomLink {
-    source: CustomNode;
-    target: CustomNode;
-    dashed?: boolean;
-}
-
-function LinkNodes(nodes: CustomNode[]) {
-
-    var node_link: CustomLink = {source: {x: 0, y: 0}, target: {x: 0, y: 0}}
-    var links: CustomLink[] = [] 
-  
-    console.log(nodes)
-  
-    if(nodes.length !== 1) {
-      console.log("triggered")
-      for(let i = 0; i < (nodes.length-1); i++) {
-  
-        // Link all nodes
-        if(i !== (nodes.length-1)) {
-    
-          // Do not link obstacles
-          if(nodes[i+1].custom === "Obstacle") {
-            node_link = {source: nodes[i], target: nodes[(i)]}
-          }
-          else {
-            node_link = {source: nodes[i], target: nodes[(i+1)]}
-          }      
-        }
-    
-        links.push(node_link)
-      }
-    
-    }
-  
-    return links
-}
-
 const Dashboard = () => {
 
     var map_type = '';
@@ -78,6 +41,8 @@ const Dashboard = () => {
     var x_rover_previous: number = 0;
     var y_rover_previous: number = 0;
 
+    // var nodes: CustomNode[] = [{x:0, y:0, custom:'Rover', angle:0}];
+
     // Variables
     const [dist_value, setDist] = useState(10);
     const [prop_dist_value, setPropDist] = useState(10);
@@ -85,8 +50,8 @@ const Dashboard = () => {
     const [battery_left, set_battery_left] = useState(0);
     const [distance_travelled, set_distance_travelled] = useState(0);
     const [distance_left, set_distance_left] = useState(0);
-    
-    var [nodes, set_nodes] = useState<CustomNode[]>([{x:0, y:0, custom:'Rover', angle:0}]);
+
+    const [nodes, set_nodes] = useState<CustomNode[]>([{x:0, y:0, custom:'Rover', angle:0}]);
    
     useEffect(() => {
         const timeOutId = setTimeout(() => setPropDist(dist_value), 500);
@@ -94,17 +59,13 @@ const Dashboard = () => {
     }, [dist_value]);
 
     ws_server.onmessage = (e) => {  
-            
-        console.log(e.data)
-    
         // Check if server JSON is intended for terminal
         var server_message = JSON.parse(e.data); 
     
+        console.log("Receiving JSON: ")
         console.log(server_message)
     
-        if(server_message.type === "Terminal") {
-            myLogger.info(server_message.message)
-        }
+        if(server_message.type === "Terminal") { myLogger.info(server_message.message) }
 
         else if(server_message.type === "Map") {
 
@@ -129,78 +90,78 @@ const Dashboard = () => {
             set_distance_travelled(server_message.distance_travelled)
             set_distance_left(server_message.distance_left)
         }
-    
     }
     
     function UpdateNodes() {
 
-        if(tracker === 1) {
+        console.log("Updating nodes")
 
-        }
-        else {
-            if(map_type === "Rover") {
-                // Map plotting logic
-                var x_plot = 0
-                var y_plot = 0
+        if(map_type === "Rover") {
+            // Map plotting logic
+            var x_plot = 0
+            var y_plot = 0
 
-                x_rover_current= parseInt(x_rover_current.toString())
-                y_rover_current = parseInt(y_rover_current.toString())
+            x_rover_current= parseInt(x_rover_current.toString())
+            y_rover_current = parseInt(y_rover_current.toString())
 
-                // Determine direction
-                if(x_rover_current === x_rover_previous) {
-                    // x-axis not changing
-                    x_plot = x_plot_previous
+            // Determine direction
+            if(x_rover_current === x_rover_previous) {
+                // x-axis not changing
+                x_plot = x_plot_previous
 
-                    // y-axis not changing 
-                    if(y_rover_current === y_rover_previous) { y_plot = y_plot_previous }
-                    else {
-                        // y-axis changing 
-                        y_plot = (y_rover_current + y_plot_previous)
-                        y_plot_previous = y_plot
-                    }
-                }
+                // y-axis not changing 
+                if(y_rover_current === y_rover_previous) { y_plot = y_plot_previous }
                 else {
-                    // x-axis is changing 
-                    x_plot = (x_rover_current + x_plot_previous)
-
-                    // y-axis not changing 
-                    if(y_rover_current === y_rover_previous) { y_plot = y_plot_previous }
-                    else {
-                        // y-axis changing 
-                        y_plot = (y_rover_current + y_plot_previous)
-                        y_plot_previous = y_plot
-                    }
-                    x_plot_previous = x_plot
+                    // y-axis changing 
+                    y_plot = (y_rover_current + y_plot_previous)
+                    y_plot_previous = y_plot
                 }
-                
-                // Assign coordinate into node 
-                var node: CustomNode = {x: (x_plot), y: (y_plot), custom: 'Rover', angle: angle}
             }
             else {
-                // Map plotting logic
-                var x_plot = 0
-                var y_plot = 0
+                // x-axis is changing 
+                x_plot = (x_rover_current + x_plot_previous)
 
-                var x_obstacle_current = 0
-                var y_obstacle_current = 0
-
-                x_obstacle_current = parseInt(x_rover_current.toString())
-                y_obstacle_current = parseInt(y_rover_current.toString())
-
-                // Assign coordinates 
-                x_plot = x_obstacle_current + x_plot_previous
-                y_plot = y_obstacle_current + y_plot_previous
-                
-                // Assign coordinate into node 
-                var node: CustomNode = {x: (x_plot), y: (y_plot), custom: 'Obstacle', color: color}
+                // y-axis not changing 
+                if(y_rover_current === y_rover_previous) { y_plot = y_plot_previous }
+                else {
+                    // y-axis changing 
+                    y_plot = (y_rover_current + y_plot_previous)
+                    y_plot_previous = y_plot
+                }
+                x_plot_previous = x_plot
             }
             
-            // Update icon on previous rover location 
-            for(let i = 0; i < (nodes.length); i++) { if(nodes[i].custom === 'Rover') { nodes[i].custom = 'Location' } }
-        }
+            // Assign coordinate into node 
+            var node: CustomNode = {x: (x_plot), y: (y_plot), custom: 'Rover', angle: angle}
 
-        // Update state
-        set_nodes(nodes => [...nodes, node])
+            // Update node array 
+            set_nodes(nodes => [...nodes, node])
+        }
+        else {
+            // Map plotting logic
+            var x_plot = 0
+            var y_plot = 0
+
+            var x_obstacle_current = 0
+            var y_obstacle_current = 0
+
+            x_obstacle_current = parseInt(x_rover_current.toString())
+            y_obstacle_current = parseInt(y_rover_current.toString())
+
+            // Assign coordinates 
+            x_plot = x_obstacle_current + x_plot_previous
+            y_plot = y_obstacle_current + y_plot_previous
+            
+            // Assign coordinate into node 
+            var node: CustomNode = {x: (x_plot), y: (y_plot), custom: 'Obstacle', color: color}
+
+            // Update node array 
+            set_nodes(nodes => [...nodes, node])
+        }
+        
+        // Update icon on previous rover location 
+        for(let i = 0; i < (nodes.length); i++) { if(nodes[i].custom === 'Rover') { nodes[i].custom = 'Location' } }
+    
     }
     
     /* Serve landing page */
