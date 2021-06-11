@@ -150,6 +150,13 @@ const Dashboard = () => {
                 nodes.push(node)
                 return nodes;
             });
+
+            // Update icon on previous rover location 
+            for(let i = 0; i < (nodes.length-1); i++) { 
+                if(nodes[i].custom === 'Rover') { 
+                    nodes[i].custom = 'Location' 
+                } 
+            }
         }
         else {
             // Map plotting logic
@@ -174,12 +181,8 @@ const Dashboard = () => {
                 nodes.push(node)
                 return nodes;
             });
-
         }
         
-        // Update icon on previous rover location 
-        for(let i = 0; i < (nodes.length - 1); i++) { if(nodes[i].custom === 'Rover') { nodes[i].custom = 'Location' } }
-    
     }
     
     function LinkNodes(nodes: CustomNode[]) {
@@ -192,7 +195,8 @@ const Dashboard = () => {
             if(i !== (nodes.length)) {
                 
                 // Do not link obstacles
-                if(nodes[i].custom === "Obstacle") {
+                console.log(nodes[i+1].custom)
+                if(nodes[i+1].custom === "Obstacle") {
                     node_link = {source: nodes[i], target: nodes[(i)]}
                 }
                 else { 
