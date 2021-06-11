@@ -6,6 +6,7 @@ export type NetworkProps = {
   width: number;
   height: number;
   nodes: CustomNode[];
+  links: CustomLink[];
 };
 
 interface CustomNode {
@@ -24,35 +25,7 @@ interface CustomLink {
 
 export const background = '#1A1A1D';
 
-function LinkNodes(nodes: CustomNode[]) {
-
-  var node_link: CustomLink = {source: {x: 0, y: 0}, target: {x: 0, y: 0}}
-  var links: CustomLink[] = [] 
-
-  if(nodes.length !== 1) {
-    console.log("triggered")
-    for(let i = 0; i < (nodes.length-1); i++) {
-
-      // Link all nodes
-      if(i !== (nodes.length-1)) {
-  
-        // Do not link obstacles
-        if(nodes[i].custom === "Obstacle") {
-          node_link = {source: nodes[i], target: nodes[(i)]}
-        }
-        else {
-          node_link = {source: nodes[i], target: nodes[(i+1)]}
-        }      
-      }
-  
-      links.push(node_link)
-    }
-  }
-
-  return links
-}
-
-export default function Map({ width, height, nodes}: NetworkProps) {
+export default function Map({ width, height, nodes, links}: NetworkProps) {
 
   function RoverNode ( angle ) {
 
@@ -102,19 +75,13 @@ export default function Map({ width, height, nodes}: NetworkProps) {
 
   }
 
-  console.log("Mapping triggered")
-
-  var links: CustomLink[] = [{source: nodes[0], target: nodes[(0)]}];
-
-  links = LinkNodes(nodes)
+  console.log(nodes)
+  console.log(links)
 
   var graph = {
     nodes,
     links,
   };
-
-  console.log("Links: ")
-  console.log(links)
 
   // Return SVG map
   return width < 10 ? null : (

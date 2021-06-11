@@ -107,9 +107,21 @@ async def websocket_client(websocket: WebSocket):
             terminal_check = {
                 "type" : "Map",
                 "x_distance" : "0.00",
-                "y_distance" : "15",
+                "y_distance" : "80",
                 "map_type" : "Rover",
-                "angle": "-89.90"
+                "angle": "89.90"
+                }
+                
+            json_object = json.dumps(terminal_check)
+            
+            await session_instance.client_connection.send_to_client(json_object)
+            
+            terminal_check = {
+                "type" : "Map",
+                "x_distance" : "100.00",
+                "y_distance" : "80",
+                "map_type" : "Rover",
+                "angle": "89.90"
                 }
                 
             json_object = json.dumps(terminal_check)

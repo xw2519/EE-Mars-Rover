@@ -19,14 +19,18 @@ import './NavSettings.css';
 
 const myLogger = new react_console_logger.Logger();
 
-var tracker: number = 1;
-
 interface CustomNode {
     x: number;
     y: number;
     custom?: string;
     color?: string;
     angle?: number
+}
+
+interface CustomLink {
+    source: CustomNode;
+    target: CustomNode;
+    dashed?: boolean;
 }
 
 const Dashboard = () => {
@@ -52,6 +56,7 @@ const Dashboard = () => {
     const [distance_left, set_distance_left] = useState(0);
 
     const [nodes, set_nodes] = useState<CustomNode[]>([{x:0, y:0, custom:'Rover', angle:0}]);
+    const [links, set_links] = useState<CustomLink[]>([{source: {x: 0, y: 0}, target: {x: 0, y: 0}}]);
    
     useEffect(() => {
         const timeOutId = setTimeout(() => setPropDist(dist_value), 500);
@@ -76,13 +81,14 @@ const Dashboard = () => {
                 map_type = "Rover"
                 angle = server_message.angle
                 UpdateNodes()
+                LinkNodes(nodes)
             }
             else {
                 map_type = "Obstacle"
                 color = server_message.color
                 UpdateNodes()
+                LinkNodes(nodes)
             }
-
         }
 
         else if(server_message.type === "Energy") {
@@ -91,10 +97,15 @@ const Dashboard = () => {
             set_distance_left(server_message.distance_left)
         }
     }
+
+    function useForceUpdate(){
+        const [value, setValue] = useState(0); // integer state
+        return () => setValue(value => value + 1); // update the state to force render
+    }
+
+    const forceUpdate = useForceUpdate();
     
     function UpdateNodes() {
-
-        console.log("Updating nodes")
 
         if(map_type === "Rover") {
             // Map plotting logic
@@ -135,7 +146,10 @@ const Dashboard = () => {
             var node: CustomNode = {x: (x_plot), y: (y_plot), custom: 'Rover', angle: angle}
 
             // Update node array 
-            set_nodes(nodes => [...nodes, node])
+            set_nodes((nodes) => {
+                nodes.push(node)
+                return nodes;
+            });
         }
         else {
             // Map plotting logic
@@ -156,12 +170,42 @@ const Dashboard = () => {
             var node: CustomNode = {x: (x_plot), y: (y_plot), custom: 'Obstacle', color: color}
 
             // Update node array 
-            set_nodes(nodes => [...nodes, node])
+            set_nodes((nodes) => {
+                nodes.push(node)
+                return nodes;
+            });
+
         }
         
         // Update icon on previous rover location 
-        for(let i = 0; i < (nodes.length); i++) { if(nodes[i].custom === 'Rover') { nodes[i].custom = 'Location' } }
+        for(let i = 0; i < (nodes.length - 1); i++) { if(nodes[i].custom === 'Rover') { nodes[i].custom = 'Location' } }
     
+    }
+    
+    function LinkNodes(nodes: CustomNode[]) {
+
+        var node_link: CustomLink = {source: {x: 0, y: 0}, target: {x: 0, y: 0}}
+    
+        for(let i = 0; i < (nodes.length-1); i++) {
+    
+            // Link all nodes
+            if(i !== (nodes.length)) {
+                
+                // Do not link obstacles
+                if(nodes[i].custom === "Obstacle") {
+                    node_link = {source: nodes[i], target: nodes[(i)]}
+                }
+                else { 
+                    node_link = {source: nodes[i], target: nodes[(i+1)]}
+                }      
+            }
+            set_links((links) => {
+                links.push(node_link)
+                return links;
+            });
+        } 
+
+        forceUpdate()
     }
     
     /* Serve landing page */
@@ -183,7 +227,7 @@ const Dashboard = () => {
                     <div className="grid SensorReading"> Sensor Panel <SensorReadings/> </div>
         
                     <div className="grid Map"> 
-                        <ParentSize>{({ width, height }) => <Map width={width} height={height} nodes={nodes}/>}</ParentSize>
+                        <ParentSize>{({ width, height }) => <Map width={width} height={height} nodes={nodes} links={links}/>}</ParentSize>
                     
                     </div>
 
