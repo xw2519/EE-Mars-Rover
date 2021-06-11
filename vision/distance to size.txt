@@ -1,0 +1,13 @@
+25 64 6c
+35 49 4e
+45 39 3d
+55 2e 31
+24 66 6c
+29 55 5a
+34 49 4e
+39 40 44
+44 38 3c
+49 33 36
+4 1c0 na
+distance/cm x/pixels y/pixels
+dec / hex / hex

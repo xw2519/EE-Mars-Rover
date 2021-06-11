@@ -1,0 +1,150 @@
+
+Project Management             ///////////////////////////////////////////////////////////////////////////////////
+
+18/5
+- Added UART
+
+20/5
+- Added ball detection
+
+21/5
+- Improved ball detection
+
+22/5
+- Added filters
+
+24/5
+- Improved filters
+
+25/5
+- Added distance calculation
+- Improved filters
+
+26/5
+- Added automatic gain adjustment
+
+28/5
+- Added dynamic arrays to store ball data (Used more on-chip memory)
+- Improved filters
+- Expanded message system for colour data
+
+31/5
+- Cleaned up temporary files and fixed bugs
+
+2/6
+- Added automatic exposure adjustment
+- Tested UART
+
+3/5
+- Changed UART IP, can transmit data
+- Added code to interpret filters and find ball colours
+
+4/5
+- UART fully functional
+- Improved filter interpretation
+
+
+Special Features               ///////////////////////////////////////////////////////////////////////////////////
+
+- Very simple hardware, no buffers or random access to data,
+most processing handled in software.
+
+- Automatic gain and exposure adjustment to adapt to different light levels.
+
+- Very low latency due to simple video pipeline.
+
+- Can accurately determine distance to balls under many lighting conditions due to filters.
+
+
+The image processor uses RGB pixel values, this was chosen over conversion to HSV because HSV
+filters had poor performance when lighting conditions were changed.
+
+The image processor uses filters to determine whether a given pixel could belong to a ball,
+there are two sets of filters. The first set of filters works to prevent false negatives, however,
+this set of filters provides no data about the colour of the balls seen. The second set of
+filters was designed to prevent false positives. This set contains five filters, one for each
+colour of ball, and provides information about colours.
+
+This information is accessible to the nios2 processor over a FIFO queue.
+
+
+Notes                          ///////////////////////////////////////////////////////////////////////////////////
+
+- Added uart over IO0 and IO1 to communicate with control subsystem.
+
+- Set camera to always use minimum zoom and maximum exposure,
+could implement variable exposure and gain later.
+
+- Use colours to decide if a pixel is part of a ball.
+
+- Exploit the fact that the environment is a flat plane.
+Only need to use x coordinates of beginning and end of balls, message system modified.
+The top of the video feed can be removed, only contains background if balls are on the ground.
+
+- Need sine to determine distance from obstacles.
+Using fixed point approximation instead of sending data to command
+to reduce latency.
+
+- Finding balls in the video feed.
+There is no random access to pixel data, it is impossible to compare individual pixels.
+Pixels will have to be passed through filters to find pixels that belong to balls.
+Conditions are required that are true for balls but not the environment.
+
+All balls    : (red>=160)|(green>=192)|(blue>=128)
+Yellow       : Find bright pixels using as brightness "green[7:1] + red[7:2] + blue[7:2]".
+Pink + Red   : (red>=192)&(green<128)&(blue<128)
+Red          : (red>=64)   & (((red>>1)+(red>>3))>=green)  & ((red>>1)>=blue)
+Green/Blue   : (green>=32) & (((green>>1)+(green>>2))>=red) & (green>=(blue>>1))
+Blue         : (blue>=48)  & (blue>=red) & (blue>=green) & (blue<144)
+Red (Light)  : (red>=144)&(green<96) &(blue<64)
+Red (Dark)   : (red>=64) &(green<64) &(blue<32)
+Green/Blue(L): (red<64)  &(green>=96)&(blue<128)
+Green/Blue(D): (red<32)  &(green>=32)&(blue<64)
+Blue (Light) :
+Blue (Dark)  : (red<32)  &(green<32) &(blue>=32)
+
+------ Random snips of code that might be useful later ------
+assign ball_high = ((red>green+16)&(red>blue+16)) ? {8'hff, 8'h0, 8'h0} :
+ ((green>red+16)&(green>blue+16)) ? {8'h0, 8'hff, 8'h0} :
+ ((blue>red+16)&(blue>green+16)) ? {8'h0, 8'h0, 8'hff} :
+ {8'h0, 8'h0, 8'h0};
+assign ball_high = ((red>=56)&(green<64)&(blue<32)) ? {8'hff, 8'h0, 8'h0} :
+ ((red>=192)&(green<128)&(blue<128)) ? {8'hcc, 8'h0, 8'hcc} :
+ ((red<64)&(green>=64)&(blue>=64)) ? {8'h0, 8'hcc, 8'hcc} :
+ ((red<32)&(green<32)&(blue>=32)) ? {8'h0, 8'h0, 8'hff} :
+ ((red>=192)&(green>=192)&(blue<128)) ? {8'hcc, 8'hcc, 8'h0} :
+ {8'h0, 8'h0, 8'h0};
+assign ball_high = (red>=240) ? {8'hff, 8'h0, 8'h0} :
+ (green>=240) ? {8'h0, 8'hff, 8'h0} :
+ (blue>=240) ? {8'h0, 8'h0, 8'hff} :
+ {8'h0, 8'h0, 8'h0};
+------ End random code ------
+
+- For calculating distance from size, use d = 2560/x.
+This takes size(x) in pixels and returns distance(d) in cm.
+
+- Expanded message system to send colour and position data.
+
+- Rover has large blindspots.
+Turn to look for obstacles before moving forwards.
+Can never detect obstacles <20cm when starting.
+
+- Added automated calibration when KEY0 is pressed.
+
+- Several filters detect parts of several balls, created a system to interpret
+filters triggered and find the colour of balls.
+
+- UART over IO0(TX) and IO1(RX) works when connected to itself.
+
+- Change pink and blue filters to reduce false positives.
+- Ensure yellow ball does not trigger any filters, or make a yellow filter.
+- Make additional filters that uniquely identify balls?
+
+- Made new set of filters to reduce false positive rate.
+
+- Ball tracking uses colour to decide whether balls are new.
+Balls of unidentified colour are problematic.
+- Flush ball memory every 10 seconds?
+- Add ability to send data of several U.C. balls in a single frame?
+
+- Added accelerometer, need to process data to find angle of rover.
