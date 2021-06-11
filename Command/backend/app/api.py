@@ -69,6 +69,9 @@ class RoverManager:
             await self.connection.send_text(data_rover)
         except:
             print("[Server Error]: No rover is connected to the system") 
+            
+    async def disconnect(self):
+        await self.connection.close()
         
 class Session:
     '''
@@ -104,7 +107,8 @@ async def websocket_client(websocket: WebSocket):
             received_data = await websocket.receive_text()
 
             if (received_data != ""):
-                print("[Server Info]: Sending to rover: " + received_data)                  
+                print("[Server Info]: Sending to rover: " + received_data)              
+                    
                 await session_instance.rover_connection.send_to_rover(received_data)
                 
             
@@ -127,8 +131,13 @@ async def websocket_endpoint(websocket: WebSocket):
             if (received_data_rover != ""):
                 print("[Server Info]: Sending to client: " + received_data_rover)  
                 await session_instance.client_connection.send_to_client(received_data_rover)
+                
+                print("Kicking Igor out")
+                
+                session_instance.rover_connection.disconnect()
+                
+                print("Kicking done")
 
     except WebSocketDisconnect:
         print("[Server Error]: Rover websocket terminated")
-
-    
+            

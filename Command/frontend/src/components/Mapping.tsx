@@ -61,11 +61,11 @@ export default function Map({ width, height, nodes, links}: NetworkProps) {
 
     var fill:string = '';
     
-    if(color.color == "red") { fill = "#FF0000" }
-    if(color.color == "green") { fill = "#008000" }
-    if(color.color == "blue") { fill = "#0000FF" }
-    if(color.color == "yellow") { fill = "#FFFF00" }
-    if(color.color == "pink") { fill = "#FFB6C1" }
+    if(color.color == "R") { fill = "#FF0000" }
+    if(color.color == "G") { fill = "#008000" }
+    if(color.color == "B") { fill = "#0000FF" }
+    if(color.color == "Y") { fill = "#FFFF00" }
+    if(color.color == "P") { fill = "#FFB6C1" }
 
     // Plot obstacle nodes 
     return (
@@ -80,7 +80,7 @@ export default function Map({ width, height, nodes, links}: NetworkProps) {
         </svg>
       </g>
     )
-
+    
   }
 
   console.log(nodes)
