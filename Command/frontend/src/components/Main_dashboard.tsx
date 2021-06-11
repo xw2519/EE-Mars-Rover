@@ -19,7 +19,7 @@ import './NavSettings.css';
 
 const myLogger = new react_console_logger.Logger();
 
-var tracker: number = 1
+var tracker: number = 1;
 
 interface CustomNode {
     x: number;
@@ -68,90 +68,30 @@ function LinkNodes(nodes: CustomNode[]) {
 
 const Dashboard = () => {
 
+    var map_type = '';
+    var angle: number = 0;
+    var color: string = '';
+    var x_rover_current: number = 0;
+    var y_rover_current: number = 0;
+    var x_plot_previous: number = 0;
+    var y_plot_previous: number = 0;
+    var x_rover_previous: number = 0;
+    var y_rover_previous: number = 0;
+
     // Variables
     const [dist_value, setDist] = useState(10);
     const [prop_dist_value, setPropDist] = useState(10);
-    const [map_type, set_map_type] = useState('');
-    var [x_coordinate, set_x_coordinate] = useState(0);
-    var [y_coordinate, set_y_coordinate] = useState(0);
-    const [x_relative, set_x_relative] = useState<number>(0);
-    const [y_relative, set_y_relative] = useState<number>(0);
-    const [angle, set_angle] = useState(0);
-    const [color, set_color] = useState('');
+
     const [battery_left, set_battery_left] = useState(0);
     const [distance_travelled, set_distance_travelled] = useState(0);
     const [distance_left, set_distance_left] = useState(0);
-
+    
     var [nodes, set_nodes] = useState<CustomNode[]>([{x:0, y:0, custom:'Rover', angle:0}]);
    
     useEffect(() => {
         const timeOutId = setTimeout(() => setPropDist(dist_value), 500);
         return () => clearTimeout(timeOutId);
     }, [dist_value]);
-
-    function UpdateNodes() {
-
-        if(tracker === 1) {
-
-            var x = parseInt(x_coordinate.toString()) + parseInt(x_relative.toString()) 
-            var y = parseInt(y_coordinate.toString()) + parseInt(y_relative.toString())
-
-            var node: CustomNode = {x: (x), y: (y), custom: 'Rover', angle: angle}
-
-            set_x_relative(x)
-            set_y_relative(y)
-
-            set_nodes(
-                nodes = [...nodes, node]
-            );
-
-            // Change icon on previous rover location 
-            for(let i = 0; i < (nodes.length); i++) {
-                if(nodes[i].custom === 'Rover') {
-                    nodes[i].custom = 'Location'
-                }
-            }
-        
-            tracker = 2
-        }
-        else {
-            if(map_type === "Rover") {
-                var x = 0
-                var y = 0
-                var x_coord = parseInt(x_coordinate.toString())
-                var y_coord = parseInt(y_coordinate.toString())
-                var x_rela = parseInt(x_relative.toString())
-                var y_rela = parseInt(y_relative.toString())
-
-                if(x_coord !== x_rela) {
-                    x = ((parseInt(x_coordinate.toString())) + parseInt(x_relative.toString()))
-                }
-                
-                if(y_coord !== y_rela) {
-                    y = ((parseInt(y_coordinate.toString())) + parseInt(y_relative.toString()))
-                }
-                
-                var node: CustomNode = {x: (x), y: (y), custom: 'Rover', angle: angle}
-
-                set_x_relative(x)
-                set_y_relative(y)
-
-            }
-            else if(map_type === "Obstacle") {
-                var node: CustomNode = {x: ((x_coordinate+x_relative)*0.4), y: ((y_coordinate+y_relative)*0.4), custom: 'Obstacle', color: color}
-            }
-            
-            // Change icon on previous rover location 
-            for(let i = 0; i < (nodes.length); i++) {
-                if(nodes[i].custom === 'Rover') {
-                    nodes[i].custom = 'Location'
-                }
-            }
-        }
-
-        // Update state
-        set_nodes(nodes => [...nodes, node])
-    }
 
     ws_server.onmessage = (e) => {  
             
@@ -168,26 +108,17 @@ const Dashboard = () => {
 
         else if(server_message.type === "Map") {
 
-            set_x_coordinate(
-                x_coordinate = server_message.x_distance
-            );
-
-            set_y_coordinate(
-                y_coordinate = server_message.y_distance
-            );
+            x_rover_current = server_message.x_distance
+            y_rover_current = server_message.y_distance
 
             if(server_message.map_type == "Rover") {
-                set_map_type("Rover")
-                set_angle(server_message.angle)
-
+                map_type = "Rover"
+                angle = server_message.angle
                 UpdateNodes()
-
             }
             else {
-                console.log("Obstacle")
-                set_map_type("Obstacle")
-                set_color(server_message.color)
-
+                map_type = "Obstacle"
+                color = server_message.color
                 UpdateNodes()
             }
 
@@ -199,6 +130,77 @@ const Dashboard = () => {
             set_distance_left(server_message.distance_left)
         }
     
+    }
+    
+    function UpdateNodes() {
+
+        if(tracker === 1) {
+
+        }
+        else {
+            if(map_type === "Rover") {
+                // Map plotting logic
+                var x_plot = 0
+                var y_plot = 0
+
+                x_rover_current= parseInt(x_rover_current.toString())
+                y_rover_current = parseInt(y_rover_current.toString())
+
+                // Determine direction
+                if(x_rover_current === x_rover_previous) {
+                    // x-axis not changing
+                    x_plot = x_plot_previous
+
+                    // y-axis not changing 
+                    if(y_rover_current === y_rover_previous) { y_plot = y_plot_previous }
+                    else {
+                        // y-axis changing 
+                        y_plot = (y_rover_current + y_plot_previous)
+                        y_plot_previous = y_plot
+                    }
+                }
+                else {
+                    // x-axis is changing 
+                    x_plot = (x_rover_current + x_plot_previous)
+
+                    // y-axis not changing 
+                    if(y_rover_current === y_rover_previous) { y_plot = y_plot_previous }
+                    else {
+                        // y-axis changing 
+                        y_plot = (y_rover_current + y_plot_previous)
+                        y_plot_previous = y_plot
+                    }
+                    x_plot_previous = x_plot
+                }
+                
+                // Assign coordinate into node 
+                var node: CustomNode = {x: (x_plot), y: (y_plot), custom: 'Rover', angle: angle}
+            }
+            else {
+                // Map plotting logic
+                var x_plot = 0
+                var y_plot = 0
+
+                var x_obstacle_current = 0
+                var y_obstacle_current = 0
+
+                x_obstacle_current = parseInt(x_rover_current.toString())
+                y_obstacle_current = parseInt(y_rover_current.toString())
+
+                // Assign coordinates 
+                x_plot = x_obstacle_current + x_plot_previous
+                y_plot = y_obstacle_current + y_plot_previous
+                
+                // Assign coordinate into node 
+                var node: CustomNode = {x: (x_plot), y: (y_plot), custom: 'Obstacle', color: color}
+            }
+            
+            // Update icon on previous rover location 
+            for(let i = 0; i < (nodes.length); i++) { if(nodes[i].custom === 'Rover') { nodes[i].custom = 'Location' } }
+        }
+
+        // Update state
+        set_nodes(nodes => [...nodes, node])
     }
     
     /* Serve landing page */
