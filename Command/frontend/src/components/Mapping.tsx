@@ -59,11 +59,19 @@ export default function Map({ width, height, nodes, links}: NetworkProps) {
 
   function ObstacleNode ( color ) {
 
+    var fill:string = '';
+    
+    if(color.color == "red") { fill = "#FF0000" }
+    if(color.color == "green") { fill = "#008000" }
+    if(color.color == "blue") { fill = "#0000FF" }
+    if(color.color == "yellow") { fill = "#FFFF00" }
+    if(color.color == "pink") { fill = "#FFB6C1" }
+
     // Plot obstacle nodes 
     return (
       <g transform={`translate(${-40 / 2},${-40 / 2})`}>
-        <svg className="icon-tabler-alert-octagon" width="30" height="30" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill={color} stroke-linecap="round" stroke-linejoin="round">
-        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <svg className="icon-tabler-alert-octagon" width="30" height="30" viewBox="0 0 24 24" stroke-width="2" stroke={fill} fill="#1A1A1D" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill={color}></path>
         <path 
           d="M8.7 3h6.6c.3 0 .5 .1 .7 .3l4.7 4.7c.2 .2 .3 .4 .3 .7v6.6c0 .3 -.1 .5 -.3 .7l-4.7 4.7c-.2 .2 -.4 .3 -.7 .3h-6.6c-.3 0 -.5 -.1 -.7 -.3l-4.7 -4.7c-.2 -.2 -.3 -.4 -.3 -.7v-6.6c0 -.3 .1 -.5 .3 -.7l4.7 -4.7c.2 -.2 .4 -.3 .7 -.3z">
         </path>
