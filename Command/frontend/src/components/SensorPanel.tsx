@@ -1,24 +1,27 @@
-import React from 'react';
-import ws_server from './util/socketConfig'
+// Sensor panel component displaying sensor readings 
 
+import React from 'react';
 import DateTime from './util/time'
 
-class SensorReadings extends React.Component {
+interface SensorReadingProps {
+    distance_travelled: number
+}
+
+function update(ID, value) {
+    var element = document.getElementById(ID);
+    if(typeof element !== 'undefined' && element !== null) {
+        element.innerHTML = value;
+    }
+}
+
+class SensorReadings extends React.Component<SensorReadingProps, {}> {
     
     /* Serve landing page */
     render() {
-        
-        /*
-        ws_server.onmessage = (e) => {  
-            //Sensor panel readings
-            var server_message = JSON.parse(e.data); 
-            console.log(server_message)
-            document.getElementById("BatteryLeft")!.innerHTML = server_message.battery_remain;
-            document.getElementById("DistanceLeft")!.innerHTML = server_message.dist_remain;
-            document.getElementById("DistanceTravelled")!.innerHTML = server_message.dist_travel;
-        }
 
-        */
+        console.log("Distance " + this.props.distance_travelled.toString())
+
+        update("DistanceTravelled", this.props.distance_travelled.toString())
 
         return (
             <div className="SensorPanel">            

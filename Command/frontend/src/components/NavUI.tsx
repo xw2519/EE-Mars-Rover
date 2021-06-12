@@ -1,3 +1,5 @@
+// User navigation command interface
+
 import React from 'react';
 import ws_server from './util/socketConfig';
 

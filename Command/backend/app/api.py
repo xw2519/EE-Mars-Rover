@@ -1,13 +1,32 @@
+'''
+api.py
+
+Handles the WebSocket connection interfaces of the Command website and rover.
+
+WARNING: Database components are disabled (commented out) due to MongoDB database server not configured. Rest of the FastAPI server will work as normal.
+'''
+
+from app.database import *
 from fastapi import FastAPI, Request, BackgroundTasks, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 import json
+from datetime import datetime
 
 app = FastAPI(title='Mars Command Server')
+
+'''
+Initate MongoDB database collection using the current time as the collection name
+now = datetime.now()
+
+current_time = now.strftime("%H:%M:%S")
+Session_collection = create_database_collection("Session ", current_time)
+'''
 
 origins = [
     "http://localhost:3000"
 ]
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -18,15 +37,30 @@ app.add_middleware(
 )
 
 '''
-Server to web client - JSON:
-    - Battery remaining 
-    - Distance remaining 
-    - Distance travelled 
-    - Map coordinates
+Communication interfaces:
 
-Web client to server - JSON:
-    - Functions 
-    - Logging entry
+    Rover to Server - JSON:
+        Map (Rover):
+        - x_distance 
+        - y_distance 
+        - angle
+        
+        Map (Obstacle):
+        - x_distance 
+        - y_distance 
+        - color  
+        
+        Terminal logging:
+        - Message 
+        
+        Sensor data:
+        - Battery remaining
+        - Distance remaining 
+        - Distance travelled 
+
+    Server to Rover - Serial:
+        - Navigation commands 
+        - Automation toggle
 '''
 
 received_data = ""
@@ -48,10 +82,10 @@ class ClientManager:
         self.connection = websocket_client
     
     async def send_to_client(self, data_client: str):
-        try:
-            await self.connection.send_text(data_client)
-        except:
-            print("[Server Error]: No command client is connected to the system") 
+        await self.connection.send_text(data_client)
+        
+    async def disconnect(self):
+        await self.connection.close()
         
 class RoverManager:
     '''
@@ -65,10 +99,7 @@ class RoverManager:
         self.connection = websocket_client
     
     async def send_to_rover(self, data_rover: str):
-        try:
-            await self.connection.send_text(data_rover)
-        except:
-            print("[Server Error]: No rover is connected to the system") 
+        await self.connection.send_text(data_rover)
             
     async def disconnect(self):
         await self.connection.close()
@@ -83,7 +114,7 @@ class Session:
         
 
 '''
-Main server operations
+Server routes
 '''       
         
 session_instance = Session()
@@ -105,51 +136,14 @@ async def websocket_client(websocket: WebSocket):
         while True:
             # Receive messages from command client 
             received_data = await websocket.receive_text()
-            
-             # Testing
-            terminal_check = {
-                "type" : "Map",
-                "x_distance" : "0.00",
-                "y_distance" : "-10",
-                "map_type" : "Rover",
-                "angle": "89.90"
-                }
-                
-            json_object = json.dumps(terminal_check)
-            
-            await session_instance.client_connection.send_to_client(json_object)
-            
-            terminal_check = {
-                "type" : "Map",
-                "x_distance" : "10.00",
-                "y_distance" : "-10",
-                "map_type" : "Rover",
-                "angle": "89.90"
-                }
-                
-            json_object = json.dumps(terminal_check)
-            
-            await session_instance.client_connection.send_to_client(json_object)
-            
-            terminal_check = {
-                "type" : "Map",
-                "x_distance" : "30.00",
-                "y_distance" : "-70",
-                "map_type" : "Obstacle",
-                "color": "R"
-                }
-                
-            json_object = json.dumps(terminal_check)
-            
-            await session_instance.client_connection.send_to_client(json_object)
-
+                  
             if (received_data != ""):
                 print("[Server Info]: Sending to rover: " + received_data)              
-                    
                 await session_instance.rover_connection.send_to_rover(received_data)
             
     except WebSocketDisconnect:
         print("[Server Error]: Command client websocket terminated")
+
 
 @app.websocket("/ws/rover")
 async def websocket_endpoint(websocket: WebSocket):
@@ -167,7 +161,19 @@ async def websocket_endpoint(websocket: WebSocket):
             if (received_data_rover != ""):
                 print("[Server Info]: Sending to client: " + received_data_rover)  
                 await session_instance.client_connection.send_to_client(received_data_rover)
-
+                
+                '''
+                Database component: Uploads details and coordinates of the rover and obstacles to MongoDB database server
+                
+                # Load JSON
+                data = json.loads(received_data_rover)         
+                
+                # Check if message is rover or obstacle data
+                if (data.type == "Map"):
+                    # Upload to the database
+                    insert_record(Session_collection, data)               
+                '''
+                
     except WebSocketDisconnect:
         print("[Server Error]: Rover websocket terminated")
             

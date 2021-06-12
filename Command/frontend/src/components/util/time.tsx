@@ -1,3 +1,5 @@
+// Generates the current time and animates it
+
 import { useState, useEffect } from 'react'
 
 export const DateTime = () => {

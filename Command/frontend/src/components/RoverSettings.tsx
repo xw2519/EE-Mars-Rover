@@ -1,3 +1,5 @@
+// Rover settings interface
+
 import { useState } from "react";
 import Switch from "react-switch";
 import ws_server from './util/socketConfig';

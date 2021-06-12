@@ -1,4 +1,4 @@
-import * as react_console_logger from 'react-console-logger';
+import react_console_logger from 'react-console-logger';
 import ParentSize from '@visx/responsive/lib/components/ParentSize';
 import {Helmet} from "react-helmet";
 import { useState, useEffect } from "react";
@@ -50,7 +50,7 @@ const Dashboard = () => {
     // Variables
     const [dist_value, setDist] = useState(10);
     const [prop_dist_value, setPropDist] = useState(10);
-
+    
     const [battery_left, set_battery_left] = useState(0);
     const [distance_travelled, set_distance_travelled] = useState(0);
     const [distance_left, set_distance_left] = useState(0);
@@ -77,7 +77,7 @@ const Dashboard = () => {
             x_rover_current = server_message.x_distance
             y_rover_current = server_message.y_distance
 
-            if(server_message.map_type == "Rover") {
+            if(server_message.map_type === "Rover") {
                 map_type = "Rover"
                 angle = server_message.angle
                 UpdateNodes()
@@ -113,8 +113,8 @@ const Dashboard = () => {
             var y_plot = 0
 
             // Multipled by constant to caliberate zoom
-            x_rover_current= parseInt(x_rover_current.toString())*3
-            y_rover_current = parseInt(y_rover_current.toString())*3
+            x_rover_current= parseInt(x_rover_current.toString())
+            y_rover_current = parseInt(y_rover_current.toString())
 
             // Determine direction
             if(x_rover_current === x_rover_previous) {
@@ -144,7 +144,10 @@ const Dashboard = () => {
             }
             
             // Assign coordinate into node 
-            var node: CustomNode = {x: (x_plot), y: (y_plot), custom: 'Rover', angle: angle}
+            var node: CustomNode = {x: (x_plot*3), y: (y_plot*3), custom: 'Rover', angle: angle}
+
+            // Update distance travelled
+            set_distance_travelled((Math.abs(x_plot) + Math.abs(y_plot)))
 
             // Update node array 
             set_nodes((nodes) => {
@@ -229,7 +232,7 @@ const Dashboard = () => {
 
                     </div>
                     
-                    <div className="grid SensorReading"> Sensor Panel <SensorReadings/> </div>
+                    <div className="grid SensorReading"> Sensor Panel <SensorReadings distance_travelled={distance_travelled}/> </div>
         
                     <div className="grid Map"> 
                         <ParentSize>{({ width, height }) => <Map width={width} height={height} nodes={nodes} links={links}/>}</ParentSize>

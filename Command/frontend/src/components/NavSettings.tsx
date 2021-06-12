@@ -1,3 +1,5 @@
+// User navigation settings interface
+
 import {useState} from 'react';
 
 const NavSettings = (NavSettings) => {

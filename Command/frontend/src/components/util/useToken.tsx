@@ -1,3 +1,5 @@
+// Gets and stores the security token issued by the server 
+
 import { useState } from 'react';
 
 export default function useToken() {

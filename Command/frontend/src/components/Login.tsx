@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+// Login page component
+
+import { useState } from 'react';
 import './Login.css';
 import PropTypes from 'prop-types';
 import { TextInputField, Button } from 'evergreen-ui'
