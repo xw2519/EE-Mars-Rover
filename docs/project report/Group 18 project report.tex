@@ -208,8 +208,19 @@ Due to lack of specific scope constraints aside from a deadline, the project tea
 
 \section{Structural design}
 
-The structural design of the rover system centers around the Control module which acts as the 
+The structural design of the rover system was centered around the capabilities of the Control module i.e. ESP32 board. The team took advantage of the ESP32's numerous connection interfaces to bridge all the different communication protocols used in the rover system. The ESP32 pre-processes all communications to the Command module minimise the amount of data transferred and end-to-end delay. 
 
+[Connection choices]
+\begin{itemize}
+    \item Websocket 
+    \item 3 UART    
+\end{itemize}
+
+[Module connection choices] 
+\begin{itemize}
+    \item Optical sensor processing on Control 
+    \item Batch sensor data communication in JSON
+\end{itemize}
 
 
 
@@ -227,26 +238,38 @@ The structural design of the rover system centers around the Control module whic
 \subsection{Command}
 
 
-
+\pagebreak
 \subsection{Control}
 
 
-
+\pagebreak
 \subsection{Vision}
 
 
 
-
+\pagebreak
 \subsection{Drive}
 
 
+\subsubsection{Movement}
+
+\subsubsection{Speed control}
+
+\subsubsection{Position control}
+
+\subsubsection{Optical sensor}
 
 
+
+
+
+
+\pagebreak
 \subsection{Energy}
 
 
 
-
+\pagebreak
 \subsection{Integration}
 
 
@@ -257,6 +280,11 @@ The structural design of the rover system centers around the Control module whic
 \section{Project Issues}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagebreak
+\section{Intellectual property}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
