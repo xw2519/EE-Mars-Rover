@@ -1,38 +1,19 @@
 \documentclass[11pt, a4paper]{article}
 
 \usepackage{graphicx}
-\usepackage{biblatex}
-\usepackage{parskip}
 \usepackage{listings}
-\usepackage{pdfpages}
-\usepackage{rotating}
-\usepackage{pdflscape}
 \usepackage{amsmath}
 \usepackage{geometry}
-\usepackage{subcaption} 
+\usepackage{setspace}
+\usepackage{biblatex}
 
-\lstset
-{
-    basicstyle=\ttfamily,
-    breaklines = true,
-    tabsize=2
-}
-
-\geometry
-{
-    a4paper,
-    total={170mm,257mm},
-    left=20mm,
-    top=20mm,
-    right=20mm,
-    bottom=20mm
-}
-
+% Page master configuration
+\lstset { basicstyle=\ttfamily, breaklines = true, tabsize=2 }
+\geometry { a4paper, total={170mm,257mm}, left=20mm, top=20mm, right=20mm, bottom=20mm }
 \graphicspath{{Images/}}
-
 \addbibresource{biblography.bib}
-
-\setlength{\parskip}{1em}
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0cm}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
@@ -72,7 +53,10 @@
 \end{titlepage}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\baselinestretch}{0.75}\normalsize
 \tableofcontents
+\renewcommand{\baselinestretch}{1.0}\normalsize
+
 \pagebreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -81,13 +65,14 @@
 
 The project team utilised the Project Management Institute's 5 Phases of Project Management \footnote{PMI: https://www.smartsheet.com/blog/demystifying-5-phases-project-management} as a guide to ensure all aspects of project planning and management are captured in the team's project management approach. 
 
-The approach is split into 5 stages which combines to form a robust project management system.
+Project management was split into 3 areas, each covering a important section of project management.
 
 \subsection{Conception and Initiation}
 
 \textbf{Project definition}: Design and build a rover system that has autonomous capabilities to detect, avoid and transmit the locations of the obstacles i.e. coloured balls to a server that users can interact with.
 
 \textbf{Project requirement}: The rover system is split into 5 modules, each with its own requirements:
+
 \begin{itemize}
     \item Command:
     \begin{itemize}
@@ -132,7 +117,7 @@ The approach is split into 5 stages which combines to form a robust project mana
 \pagebreak
 \subsection{Definition and Planning}
 
-Due to lack of specific scope constraints aside from a deadline, the project team had a significant amount of freedom in designing and developing the rover system to meet the project requirements. The team had identified several design themes that guided the design and implementation choices made during the developement of the rover system:
+The project team had a significant amount of freedom in designing and developing the rover system to meet the project requirements. The team had identified several design themes that guided the design and implementation choices made during the developement of the rover system:
 
 \begin{itemize}    
     \item \textbf{Modularity}:
@@ -160,9 +145,9 @@ Due to lack of specific scope constraints aside from a deadline, the project tea
 
     \item \textbf{Minimalism}:
     
-    Due to the open-ended nature of the project, the team was worried of a bloated codebase and every additional feature and software library was thoroughly researched and discussed to ensure a seamless and efficient integration into the existing system.     
+    Due to the open-ended nature of the project, the team did not want to limit the scope of their design but, at the same time, did not want to risk a bloated and inefficient rover system due to feature creep and badly integrated modules. 
     
-    A clear example of this would be the single page grid-layout design of the Rover Command website which allowed intuitive interaction and features could be seamlessly added.  
+    The team determined any design choice would need to prioritise efficiency and scalablity. All libraries are to be lightweight and only need to support the required features. 
     
 \end{itemize}
 
@@ -171,23 +156,25 @@ Due to lack of specific scope constraints aside from a deadline, the project tea
 \pagebreak
 \subsection{Performance and Control}
 
-\subsubsection{Gnatt chart}
-
 \subsubsection{Project timeline}
+
+\begin{center}
+    [Timeline chart image]
+\end{center}
+
+
+\subsubsection{Gnatt chart}
 
 \begin{center}
     [Gnatt chart image]
 \end{center}
 
 
+\subsubsection{Team communication}
 
-
-
-
-
-
-
-\subsubsection{Codebase clutter control}
+\begin{center}
+    [Communication heirarchy chart]
+\end{center}
 
 \textit{Due to the remote collaborative nature required, every member was encouraged to design and implement with a standardised minimalistic approach \footnote{Minimalistic coding guidelines: https://dev.to/paulasantamaria/6-ways-minimalism-can-help-you-write-clean-code-45kp} such as concise code documentation, avoiding too many dependencies and consistent code revisions. }
  
@@ -205,22 +192,49 @@ Due to lack of specific scope constraints aside from a deadline, the project tea
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \pagebreak
+\section{Rover system design}
 
-\section{Structural design}
+\subsection{Structural design}
 
-The structural design of the rover system was centered around the capabilities of the Control module i.e. ESP32 board. The team took advantage of the ESP32's numerous connection interfaces to bridge all the different communication protocols used in the rover system. The ESP32 pre-processes all communications to the Command module minimise the amount of data transferred and end-to-end delay. 
+\begin{center}
+    [Structural design diagram]
+\end{center}
 
-[Connection choices]
-\begin{itemize}
-    \item Websocket 
-    \item 3 UART    
-\end{itemize}
+The team established the structural design of the rover system during the first week of the project timeline. The structural design is formed in three stages: 
 
-[Module connection choices] 
-\begin{itemize}
-    \item Optical sensor processing on Control 
-    \item Batch sensor data communication in JSON
-\end{itemize}
+\begin{enumerate}
+
+    \item \textbf{Identifying the core module}: 
+    
+    The Control module was designated as the core module of the rover system due the ESP32 board's numerous communication interfaces and on-board data processing capabilities. With the remote nature of the project, this also meant the Control module will take the leadership role and act as the "heartbeat" of the team - ensuring each module development was in sync with the planned project timeline and each communication interface was compatible with Control.   
+
+    \item \textbf{Module connection}:
+    
+    With the role of Control established, the team could discuss how to structure the other modules that best took advantage of the ESP32's capabilities, ensured efficient operation in various environments and complimented the \textit{scalability} design theme. 
+
+    A major design problem was the location of processing the data from sensors like the optical sensor. The team chose to do as much processing locally on the ESP32 because the connection with Command module servers naturally has a certain degree of latency and Control was best equipped module on the rover to handle the processing. The Control module can also pre-process data to minimise the amount sent to Command and reduce the end-to-end latency of the system. [\textbf{latency data}]
+    
+    \item \textbf{Communication interface selection}: 
+    
+    In the second stage, the Control module worked with each module to research and select the most suitable communication interface. This was critical to establish the interfaces early on to allow the modules to start development as soon as possible and asynchronously as mentioned with \textit{modularity} design theme. 
+
+    The biggest concern was the type of connection between the Control module and Command server. The form of connection had to be energy efficient to compliment the \textit{minimalism} design theme and be able to scale easily depending on the data generated from the rover. The final design choice was to use the WebSocket protocol since it was native to the FastAPI framework used by Command and allowed real-time updates to the user. Compared to the HTTP protocol, the WebSocket protocol has a higher performance rating at 83 ms on WebSocket and 107 ms on HTTP for an average single request \cite{SocketvsHTTP}.  
+
+\end{enumerate}  
+
+\pagebreak
+\subsection{Functional design}
+
+The team defined the rover system into three functional layers that each handled a different aspect of the system. 
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagebreak
+\subsection{Intellectual property}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 
 
 
@@ -246,6 +260,9 @@ The structural design of the rover system was centered around the capabilities o
 \subsection{Vision}
 
 
+\subsubsection{Implementation problem}
+
+
 
 \pagebreak
 \subsection{Drive}
@@ -253,11 +270,13 @@ The structural design of the rover system was centered around the capabilities o
 
 \subsubsection{Movement}
 
-\subsubsection{Speed control}
+\subsubsection{Speed Control}
 
-\subsubsection{Position control}
+\subsubsection{Position Control}
 
-\subsubsection{Optical sensor}
+\subsubsection{Optical Sensor}
+
+\subsubsection{Implementation problem}
 
 
 
@@ -267,32 +286,35 @@ The structural design of the rover system was centered around the capabilities o
 \pagebreak
 \subsection{Energy}
 
+\subsubsection{Battery Charge Profile Design}
+
+\subsubsection{State of Charge}
+
+\subsubsection{Battery Balancing Algorithms}
+
+\subsubsection{PV MPPT Algorithms}
+
+\subsubsection{Circuit Design}
+
+\subsubsection{State of Health}
+
+\subsubsection{Energy to Control interface}
+
+\subsubsection{Implementation problem}
+
 
 
 \pagebreak
-\subsection{Integration}
+\section{Integration: Testing}
 
 
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\pagebreak
-\section{Project Issues}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\pagebreak
-\section{Intellectual property}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \pagebreak
-\section{References}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+\printbibliography[heading=bibnumbered, title={References}]
 
 
 
