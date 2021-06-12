@@ -29,14 +29,16 @@ export default function Map({ width, height, nodes, links}: NetworkProps) {
 
   function RoverNode ( angle ) {
 
+    console.log(angle.angle)
+
     // Plotting rover node icon
     var rotation = 'rotate( ' + angle.angle + ' 14 14 )'
 
     return (
  
-      <g transform={`translate(${-40 / 2}, ${-40 / 2})`}>
+      <g transform={`translate(${-30 / 2}, ${-33 / 2})`}>
 
-        <svg width="38" height="38" fill="currentColor" className="bi-arrow-up-circle-fill" viewBox="0 0 24 24" transform={rotation}>
+        <svg width="55" height="50" fill="currentColor" className="bi-arrow-up-circle-fill" viewBox="0 0 30 30" transform={rotation}>
           <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
         </svg>
       </g>
@@ -70,7 +72,7 @@ export default function Map({ width, height, nodes, links}: NetworkProps) {
     // Plot obstacle nodes 
     return (
       <g transform={`translate(${-40 / 2},${-40 / 2})`}>
-        <svg className="icon-tabler-alert-octagon" width="30" height="30" viewBox="0 0 24 24" stroke-width="2" stroke={fill} fill="#1A1A1D" stroke-linecap="round" stroke-linejoin="round">
+        <svg className="icon-tabler-alert-octagon" width="30" height="30" viewBox="0 0 35 35" stroke-width="2" stroke={fill} fill="#1A1A1D" stroke-linecap="round" stroke-linejoin="round">
         <path stroke="none" d="M0 0h24v24H0z" fill={color}></path>
         <path 
           d="M8.7 3h6.6c.3 0 .5 .1 .7 .3l4.7 4.7c.2 .2 .3 .4 .3 .7v6.6c0 .3 -.1 .5 -.3 .7l-4.7 4.7c-.2 .2 -.4 .3 -.7 .3h-6.6c-.3 0 -.5 -.1 -.7 -.3l-4.7 -4.7c-.2 -.2 -.3 -.4 -.3 -.7v-6.6c0 -.3 .1 -.5 .3 -.7l4.7 -4.7c.2 -.2 .4 -.3 .7 -.3z">

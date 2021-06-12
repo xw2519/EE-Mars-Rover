@@ -108,12 +108,13 @@ const Dashboard = () => {
     function UpdateNodes() {
 
         if(map_type === "Rover") {
-            // Map plotting logic
+            // Rover - Map plotting logic
             var x_plot = 0
             var y_plot = 0
 
-            x_rover_current= parseInt(x_rover_current.toString())
-            y_rover_current = parseInt(y_rover_current.toString())
+            // Multipled by constant to caliberate zoom
+            x_rover_current= parseInt(x_rover_current.toString())*3
+            y_rover_current = parseInt(y_rover_current.toString())*3
 
             // Determine direction
             if(x_rover_current === x_rover_previous) {
@@ -159,15 +160,15 @@ const Dashboard = () => {
             }
         }
         else {
-            // Map plotting logic
+            // Obstacle - Map plotting logic
             var x_plot = 0
             var y_plot = 0
 
             var x_obstacle_current = 0
             var y_obstacle_current = 0
 
-            x_obstacle_current = parseInt(x_rover_current.toString())
-            y_obstacle_current = parseInt(y_rover_current.toString())
+            x_obstacle_current = parseInt(x_rover_current.toString())*3
+            y_obstacle_current = parseInt(y_rover_current.toString())*3
 
             // Assign coordinates 
             x_plot = x_obstacle_current + x_plot_previous

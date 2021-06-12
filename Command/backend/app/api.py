@@ -105,12 +105,48 @@ async def websocket_client(websocket: WebSocket):
         while True:
             # Receive messages from command client 
             received_data = await websocket.receive_text()
+            
+             # Testing
+            terminal_check = {
+                "type" : "Map",
+                "x_distance" : "0.00",
+                "y_distance" : "-10",
+                "map_type" : "Rover",
+                "angle": "89.90"
+                }
+                
+            json_object = json.dumps(terminal_check)
+            
+            await session_instance.client_connection.send_to_client(json_object)
+            
+            terminal_check = {
+                "type" : "Map",
+                "x_distance" : "10.00",
+                "y_distance" : "-10",
+                "map_type" : "Rover",
+                "angle": "89.90"
+                }
+                
+            json_object = json.dumps(terminal_check)
+            
+            await session_instance.client_connection.send_to_client(json_object)
+            
+            terminal_check = {
+                "type" : "Map",
+                "x_distance" : "30.00",
+                "y_distance" : "-70",
+                "map_type" : "Obstacle",
+                "color": "R"
+                }
+                
+            json_object = json.dumps(terminal_check)
+            
+            await session_instance.client_connection.send_to_client(json_object)
 
             if (received_data != ""):
                 print("[Server Info]: Sending to rover: " + received_data)              
                     
                 await session_instance.rover_connection.send_to_rover(received_data)
-                
             
     except WebSocketDisconnect:
         print("[Server Error]: Command client websocket terminated")
@@ -131,12 +167,6 @@ async def websocket_endpoint(websocket: WebSocket):
             if (received_data_rover != ""):
                 print("[Server Info]: Sending to client: " + received_data_rover)  
                 await session_instance.client_connection.send_to_client(received_data_rover)
-                
-                print("Kicking Igor out")
-                
-                session_instance.rover_connection.disconnect()
-                
-                print("Kicking done")
 
     except WebSocketDisconnect:
         print("[Server Error]: Rover websocket terminated")
