@@ -3,8 +3,10 @@ import './Login.css';
 import PropTypes from 'prop-types';
 import { TextInputField, Button } from 'evergreen-ui'
 
+import {server_IP_address} from './util/socketConfig';
+
 async function loginUser(credentials) {
-    return fetch('http://localhost:8000/login', {
+    return fetch('http://' + server_IP_address + ':8000/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

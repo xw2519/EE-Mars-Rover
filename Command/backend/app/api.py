@@ -90,7 +90,7 @@ session_instance = Session()
 
 @app.post("/login")
 async def login_handler():
-    return {"token": "test123"}
+    return {"token": "test234"}
 
 
 @app.websocket("/ws/server")
