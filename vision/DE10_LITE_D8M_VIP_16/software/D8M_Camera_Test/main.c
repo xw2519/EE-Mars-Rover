@@ -21,8 +21,8 @@
 
 
 //debug defines
-#define VIEW_BALL_COUNT
-#define VIEW_BALL_DATA
+//#define VIEW_BALL_COUNT
+//#define VIEW_BALL_DATA
 #define VIEW_UART_MSGS
 #define VIEW_AUTO_GAIN
 //#define VIEW_ACC_READS
@@ -278,6 +278,10 @@ void send_ball_data(alt_u8 colour, alt_u8 distance, alt_u8 angle){
       alt_up_rs232_write_data(ctrl_uart, (angle%10)+48);
       last_colour = colour;
       ack = 3;
+
+      #ifdef VIEW_UART_MSGS
+        printf("UART sent: ball data\n");
+      #endif
     }
   }
 }
@@ -482,6 +486,10 @@ void sys_timer_isr(){
         last_command = 's';
         stop_ticks = 3;
       }
+
+      #ifdef VIEW_UART_MSGS
+        printf("UART sent: s\n");
+      #endif
     }
 
     // Pause the rover if new data has to be transmitted
@@ -491,6 +499,10 @@ void sys_timer_isr(){
         last_command = 'p';
         stop_ticks = 3;
       }
+
+      #ifdef VIEW_UART_MSGS
+        printf("UART sent: p\n");
+      #endif
     }
 
     // Transmit the reason for stopping the rover, send 'X00+00' if data not available
@@ -517,6 +529,10 @@ void sys_timer_isr(){
         alt_up_rs232_write_data(ctrl_uart, 'c');
         last_command = 'c';
         stop_ticks = 0;
+
+        #ifdef VIEW_UART_MSGS
+          printf("UART sent: c\n");
+        #endif
       }
     }
 

@@ -66,12 +66,11 @@ wire        bb_active;         // High if current pixel is part of bounding box
 wire [23:0] new_image;         // Debug view, shows bounding box and filter data
 wire [23:0] ball_high;         // Shows which filters are triggered
 
-assign ball_high = bright_detect ? {8'hdd, 8'hdd, 8'h00} :
-									   pink_detect ? {8'hdd, 8'h00, 8'hdd} :
+assign ball_high =   pink_detect ? {8'hdd, 8'h00, 8'hdd} :
 									   blue_detect ? {8'h00, 8'h00, 8'hdd} :
 									    red_detect ? {8'hdd, 8'h00, 8'h00} :
 									  green_detect ? {8'h00, 8'hdd, 8'h00} :
-									   ball_detect ? {8'hdd, 8'hdd, 8'hdd} :
+									 bright_detect ? {8'hdd, 8'hdd, 8'h00} :
  									                 {8'h00, 8'h00, 8'h00} ;
 /*
 assign ball_high = yellow_unique ? {8'hdd, 8'hdd, 8'h00} :
