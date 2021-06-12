@@ -22,10 +22,10 @@
 
 //debug defines
 #define VIEW_BALL_COUNT
-//#define VIEW_BALL_DATA
+#define VIEW_BALL_DATA
 #define VIEW_UART_MSGS
 #define VIEW_AUTO_GAIN
-#define VIEW_ACC_READS
+//#define VIEW_ACC_READS
 
 //offsets for image processor memory mapped interface
 #define EEE_IMGPROC_STATUS 0
@@ -50,7 +50,7 @@
 #define MIPI_REG_FrmErrCnt		0x0080
 #define MIPI_REG_MDLErrCnt		0x0090
 
-//dynamic arrays, could easily scale system to detect more than 5 balls in future
+//dynamic arrays, could easily scale system to detect more than 5 balls if required
 typedef struct{
   alt_u8 *data;
   size_t used;
@@ -63,6 +63,11 @@ typedef struct{
 } array_u16;
 
 /*
+-------Comment notation--------
+////////// => Section
+//-------- => Subsection
+
+
 ------------Transmission over UART between vision and control subsystems---------------
 
 Vision ---> Control
@@ -101,7 +106,7 @@ alt_u8    balls_detected, filter_id;
 alt_u8    gain_calib=0, process=0, acc_calib=0;
 
 // Flags and data used for communication with control over UART
-alt_u8    prompt, parity, moving=1;
+alt_u8    prompt, parity, moving=0;
 alt_u8    closest_distance=0xFF, closest_index, stop_reasoned, last_command='c', new_data, last_colour='U';
 
 // Variables used to count time
@@ -375,6 +380,7 @@ void sys_timer_isr(){
     }
 
     balls_detected |= (!filter_id)&&((x_max-x_min)>20);
+    balls_detected |= ball_bounds[3]>=448;
     for(alt_u8 i=0; i<5; i++){
       if(!(filter_x_min[i]>= 472)){ balls_detected |= 1; }
     }
@@ -443,7 +449,7 @@ void sys_timer_isr(){
 
     //----------------------------------------------------------------- Read and process accelerometer data
 
-    alt_up_accelerometer_spi_read_x_axis(acc_dev, &x_read);
+    /*alt_up_accelerometer_spi_read_x_axis(acc_dev, &x_read);
     alt_up_accelerometer_spi_read_y_axis(acc_dev, &y_read);
     alt_up_accelerometer_spi_read_z_axis(acc_dev, &z_read);
 
@@ -464,7 +470,7 @@ void sys_timer_isr(){
 
     #ifdef VIEW_ACC_READS
       printf("X = %03x   Y = %03x   Z = %03x\n", x_read, y_read, z_read);
-    #endif
+    #endif*/
 
     //----------------------------------------------------------------- Send messages to UART using processed data
 
@@ -515,7 +521,7 @@ void sys_timer_isr(){
     }
 
     // If UART is free otherwise, send tilt sensor data
-    if(ctrl_uart&&(!stop_ticks)&&(!ack)&&(!acc_ticks)&&(acc_calib>=CALIBRATION_MAX)){
+    /*if(ctrl_uart&&(!stop_ticks)&&(!ack)&&(!acc_ticks)&&(acc_calib>=CALIBRATION_MAX)){
       if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)>7){
         alt_up_rs232_write_data(ctrl_uart, 't');
         alt_up_rs232_write_data(ctrl_uart, (y_read/100)+48);
@@ -526,7 +532,7 @@ void sys_timer_isr(){
         alt_up_rs232_write_data(ctrl_uart, (z_read%10)+48);
         acc_ticks = 3;
       }
-    }
+    }*/
 
     //----------------------------------------------------------------- Update ime variables
 

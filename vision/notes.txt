@@ -1,71 +1,67 @@
 
-Project Management             ///////////////////////////////////////////////////////////////////////////////////
 
-18/5
-- Added UART
+Report points               ///////////////////////////////////////////////////////////////////////////////////
 
-20/5
-- Added ball detection
+Functional requirements
 
-21/5
-- Improved ball detection
+- Avoids obstacles effectively.
 
-22/5
-- Added filters
+- Measures positions of balls.
 
-24/5
-- Improved filters
+- Transmits ball information to control subsystem.
 
-25/5
-- Added distance calculation
-- Improved filters
+Non-functional requirements
 
-26/5
-- Added automatic gain adjustment
+- Can collect position and colour of balls given that:
+  1. the distance is within 20cm - 80cm
+  2. the angle is less than 45 degrees
+  3. the ball does not touch the edges of the frame
 
-28/5
-- Added dynamic arrays to store ball data (Used more on-chip memory)
-- Improved filters
-- Expanded message system for colour data
+- In addition, balls can be detected (but data cannot be recorded) within:
+  1. distance greater than 14cm
+  2. angle smaller than 50 degrees
 
-31/5
-- Cleaned up temporary files and fixed bugs
+- Can identify colours of provided balls (red, pink, yellow, green, blue) under sunlight.
 
-2/6
-- Added automatic exposure adjustment
-- Tested UART
+- Can accurately determine distance to balls under sunlight and warmer lamp light.
 
-3/5
-- Changed UART IP, can transmit data
-- Added code to interpret filters and find ball colours
+- Automatic gain and exposure calibration to adapt to different light levels.
 
-4/5
-- UART fully functional
-- Improved filter interpretation
+*- Accelerometer data used to calculate inclination of rover.
+
+- Accelerometer and camera can be calibrated remotely.
+
+- Processes data 6 times per second.
+
+- UART uses acknowledgement to ensure:
+  1. all messages are transmitted successfully
+  2. important messages are transmitted correctly
+
+- Using dynamic arrays to allow system to easily scale to any number of balls.
 
 
-Special Features               ///////////////////////////////////////////////////////////////////////////////////
+Testing conditions
 
-- Very simple hardware, no buffers or random access to data,
-most processing handled in software.
+- Tested under sunlight(6500K?) and 3000K 5W LED lamp.
+  1. Varied brightness by varying distance to lamp or closing blinds partially.
+  2. Varied direction of lamp and sunlight by rotating camera and balls.
 
-- Automatic gain and exposure adjustment to adapt to different light levels.
-
-- Very low latency due to simple video pipeline.
-
-- Can accurately determine distance to balls under many lighting conditions due to filters.
+- Background was matte painted wall with wooden floor.
 
 
-The image processor uses RGB pixel values, this was chosen over conversion to HSV because HSV
-filters had poor performance when lighting conditions were changed.
 
-The image processor uses filters to determine whether a given pixel could belong to a ball,
-there are two sets of filters. The first set of filters works to prevent false negatives, however,
-this set of filters provides no data about the colour of the balls seen. The second set of
-filters was designed to prevent false positives. This set contains five filters, one for each
-colour of ball, and provides information about colours.
+The image processor receives a stream of RGB pixel values from the camera, this was chosen over
+conversion to HSV because the hue varied greatly when lighting conditions were changed
+which lead to poor ball detection and obstacle avoidance performance.
 
-This information is accessible to the nios2 processor over a FIFO queue.
+The image processor uses 'filters' to determine whether a given pixel could belong to a ball,
+there are two sets of these filters. The first set was designed to be unlikely to report
+false negatives across a wide range of lighting conditions, however, this set of filters
+provides no data about the colours of the balls detected. For colour detection, a second set
+of filters was designed, this set is very unlikely to report false positives. This set contains
+five filters, one for each ball colour.
+
+This information is accessible to the nios2 processor over a FIFO message buffer.
 
 
 Notes                          ///////////////////////////////////////////////////////////////////////////////////
@@ -148,3 +144,48 @@ Balls of unidentified colour are problematic.
 - Add ability to send data of several U.C. balls in a single frame?
 
 - Added accelerometer, need to process data to find angle of rover.
+
+
+Project Management             ///////////////////////////////////////////////////////////////////////////////////
+
+18/5
+- Added UART
+
+20/5
+- Added ball detection
+
+21/5
+- Improved ball detection
+
+22/5
+- Added filters
+
+24/5
+- Improved filters
+
+25/5
+- Added distance calculation
+- Improved filters
+
+26/5
+- Added automatic gain adjustment
+
+28/5
+- Added dynamic arrays to store ball data (Used more on-chip memory)
+- Improved filters
+- Expanded message system for colour data
+
+31/5
+- Cleaned up temporary files and fixed bugs
+
+2/6
+- Added automatic exposure adjustment
+- Tested UART
+
+3/5
+- Changed UART IP, can transmit data
+- Added code to interpret filters and find ball colours
+
+4/5
+- UART fully functional
+- Improved filter interpretation
