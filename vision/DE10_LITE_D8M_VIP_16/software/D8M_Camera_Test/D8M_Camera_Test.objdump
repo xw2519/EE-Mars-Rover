@@ -637,7 +637,7 @@ Disassembly of section .entry:
    20014:	08409214 	ori	at,at,584
     jmp r1
    20018:	0800683a 	jmp	at
-   2001c:	00000000 	call	0 <__alt_mem_onchip_memory2_0-0x20000>
+   2001c:	00000000 	call	0 <__reset-0x20000>
 
 Disassembly of section .exceptions:
 
@@ -8093,18 +8093,18 @@ void QUEUE_Empty(QUEUE_STRUCT *pQueue){
    25500:	00025ff4 	movhi	zero,2431
    25504:	00025ff4 	movhi	zero,2431
    25508:	00025fa0 	cmpeqi	zero,zero,2430
-   2550c:	00025f40 	call	25f4 <__alt_mem_onchip_memory2_0-0x1da0c>
+   2550c:	00025f40 	call	25f4 <__reset-0x1da0c>
    25510:	0002580c 	andi	zero,zero,2400
    25514:	0002580c 	andi	zero,zero,2400
    25518:	0002580c 	andi	zero,zero,2400
    2551c:	00025f50 	cmplti	zero,zero,2429
-   25520:	00025f40 	call	25f4 <__alt_mem_onchip_memory2_0-0x1da0c>
+   25520:	00025f40 	call	25f4 <__reset-0x1da0c>
    25524:	00025ff4 	movhi	zero,2431
    25528:	00025ff4 	movhi	zero,2431
    2552c:	00025f5c 	xori	zero,zero,2429
    25530:	00025ff4 	movhi	zero,2431
    25534:	00025f6c 	andhi	zero,zero,2429
-   25538:	00025e40 	call	25e4 <__alt_mem_onchip_memory2_0-0x1da1c>
+   25538:	00025e40 	call	25e4 <__reset-0x1da1c>
    2553c:	0002557c 	xorhi	zero,zero,2389
    25540:	00025e60 	cmpeqi	zero,zero,2425
    25544:	00025ff4 	movhi	zero,2431
@@ -14829,12 +14829,12 @@ void QUEUE_Empty(QUEUE_STRUCT *pQueue){
    2bc20:	0002c4d0 	cmplti	zero,zero,2835
    2bc24:	0002c4d0 	cmplti	zero,zero,2835
    2bc28:	0002c114 	movui	zero,2820
-   2bc2c:	0002c140 	call	2c14 <__alt_mem_onchip_memory2_0-0x1d3ec>
+   2bc2c:	0002c140 	call	2c14 <__reset-0x1d3ec>
    2bc30:	0002c4d0 	cmplti	zero,zero,2835
    2bc34:	0002c4d0 	cmplti	zero,zero,2835
    2bc38:	0002c4d0 	cmplti	zero,zero,2835
    2bc3c:	0002c478 	rdprs	zero,zero,2833
-   2bc40:	0002c140 	call	2c14 <__alt_mem_onchip_memory2_0-0x1d3ec>
+   2bc40:	0002c140 	call	2c14 <__reset-0x1d3ec>
    2bc44:	0002c4d0 	cmplti	zero,zero,2835
    2bc48:	0002c4d0 	cmplti	zero,zero,2835
    2bc4c:	0002bfd4 	movui	zero,2815
@@ -14849,7 +14849,7 @@ void QUEUE_Empty(QUEUE_STRUCT *pQueue){
    2bc70:	0002c3fc 	xorhi	zero,zero,2831
    2bc74:	0002c4d0 	cmplti	zero,zero,2835
    2bc78:	0002c4d0 	cmplti	zero,zero,2835
-   2bc7c:	0002c0c0 	call	2c0c <__alt_mem_onchip_memory2_0-0x1d3f4>
+   2bc7c:	0002c0c0 	call	2c0c <__reset-0x1d3f4>
    2bc80:	42000204 	addi	r8,r8,8
    2bc84:	da802317 	ldw	r10,140(sp)
    2bc88:	5455883a 	add	r10,r10,r17
@@ -17966,7 +17966,7 @@ void QUEUE_Empty(QUEUE_STRUCT *pQueue){
    2ec64:	0002ec90 	cmplti	zero,zero,2994
    2ec68:	0002ec90 	cmplti	zero,zero,2994
    2ec6c:	0002ec90 	cmplti	zero,zero,2994
-   2ec70:	0002f140 	call	2f14 <__alt_mem_onchip_memory2_0-0x1d0ec>
+   2ec70:	0002f140 	call	2f14 <__reset-0x1d0ec>
    2ec74:	2404b03a 	or	r2,r4,r16
    2ec78:	1000661e 	bne	r2,zero,2ee14 <__divdf3+0x2d4>
    2ec7c:	04c00204 	movi	r19,8
@@ -18679,7 +18679,7 @@ void QUEUE_Empty(QUEUE_STRUCT *pQueue){
    2f768:	10c5883a 	add	r2,r2,r3
    2f76c:	10800017 	ldw	r2,0(r2)
    2f770:	1000683a 	jmp	r2
-   2f774:	0002f9c0 	call	2f9c <__alt_mem_onchip_memory2_0-0x1d064>
+   2f774:	0002f9c0 	call	2f9c <__reset-0x1d064>
    2f778:	0002f7d4 	movui	zero,3039
    2f77c:	0002f7d4 	movui	zero,3039
    2f780:	0002f7d0 	cmplti	zero,zero,3039
