@@ -691,20 +691,20 @@ void loop() {
       cc=1;
       if(abs(V_mean1-V_mean2)>500){//go to balancing state(1&2)
         
-        next_state = 5;
+        next_state = 17;
         rest_timer = 0;
         
       }else if(abs(V_mean1-V_mean3)>500){//go to balancing state(1&3)
         
-        next_state = 8;
+        next_state = 20;
         rest_timer = 0;
         
       }else if(abs(V_mean2-V_mean3)>500){//gp to balancing state(2&3)
         
-        next_state = 11;
+        next_state = 23;
         rest_timer = 0;
         
-      }else{//otherwise go to cc Cell 1 meas
+      }else{//otherwise go to discharge
         
         next_state = 15;
         rest_timer = 0;
@@ -712,6 +712,249 @@ void loop() {
 
         break; 
      }
+     case 17:{//cell balancing state(1&2)
+      cc = 1;
+      current_ref = 0;
+      if(V_mean1 > V_mean2){//discharge cell1
+        next_state = 18;
+        rest_timer = 0;
+      }else{//discharge cell2
+        next_state = 19;
+        rest_timer = 0;
+      }
+      break;
+     }
+
+      case 18:{//discharge cell1
+        cc = 1;
+        current_ref = 0;
+        if(abs(V_mean1 - V_mean2) < 400){
+          next_state = 16;
+        }else{
+          if(rest_timer < 60){
+            rest_timer++;
+            next_state = 18;
+            V_meas1 = 0;
+          }
+          else if(rest_timer < 65 && rest_timer >= 60){
+            digitalWrite(5,true);
+            digitalWrite(4,true);
+            V_meas1 = analogRead(A3)*4.096/1.03;
+            V_total1 += V_meas1;
+            rest_timer++;
+            next_state = 18;
+          }
+          else if (rest_timer < 66){
+            digitalWrite(4,false);
+            digitalWrite(5,false);
+            V_mean1 = V_total1 / 5;
+            rest_timer++;
+            next_state = 18;
+          }
+          else{
+            next_state = 18;
+            rest_timer = 0;
+          }
+        }
+        break;
+      }
+
+      case 19:{//discharge cell2
+        cc = 1;
+        current_ref = 0;
+       if (abs((V_mean2 - V_mean1) < 400)){
+        next_state = 17;
+       }
+       else{
+        if (rest_timer < 60){
+            rest_timer++;  
+            next_state = 19;
+            V_meas2 = 0;        
+          }
+          else if (rest_timer < 65 && rest_timer >= 60){
+            digitalWrite(10,true);
+            digitalWrite(9,true);
+            V_meas2 = analogRead(A2)*4.096/1.03;
+            V_total2 += V_meas2;
+            rest_timer++;
+            next_state = 19; 
+          }else if(rest_timer <66){
+            digitalWrite(9,false);
+            digitalWrite(10,false);
+            V_mean2 = V_total2 / 5;
+            rest_timer++;
+            next_state = 19; 
+          }
+          else{ 
+            next_state = 19;
+            rest_timer = 0;
+          }
+       }
+        break;   
+        }
+
+      case 20:{//cell balancing state(1&3)
+      cc = 1;
+      current_ref = 0;
+      if(V_mean1 > V_mean3){//discharge cell1
+        next_state = 21;
+        rest_timer = 0;
+      }else{//discharge cell2
+        next_state = 22;
+        rest_timer = 0;
+      }
+      break;
+     }
+
+     case 21:{//discharge cell1
+        cc = 1;
+        current_ref = 0;
+        if(abs(V_mean1 - V_mean3) < 400){
+          next_state = 16;
+        }else{
+          if(rest_timer < 60){
+            rest_timer++;
+            next_state = 21;
+            V_meas1 = 0;
+          }
+          else if(rest_timer < 65 && rest_timer >= 60){
+            digitalWrite(5,true);
+            digitalWrite(4,true);
+            V_meas1 = analogRead(A3)*4.096/1.03;
+            V_total1 += V_meas1;
+            rest_timer++;
+            next_state = 21;
+          }
+          else if (rest_timer < 66){
+            digitalWrite(4,false);
+            digitalWrite(5,false);
+            V_mean1 = V_total1 / 5;
+            rest_timer++;
+            next_state = 21;
+          }
+          else{
+            next_state = 21;
+            rest_timer = 0;
+          }
+        }
+        break;
+      }
+
+      case 22:{//discharge cell3
+        cc = 1;
+        current_ref = 0;
+       if (abs((V_mean3 - V_mean1) < 400)){
+        next_state = 16;
+       }
+       else{
+        if (rest_timer < 60){
+            rest_timer++;  
+            next_state = 22;
+            V_meas3 = 0;        
+          }
+          else if (rest_timer < 65 && rest_timer >= 60){
+            digitalWrite(8,true);
+            digitalWrite(7,true);
+            V_meas3 = analogRead(A1)*4.096/1.03;
+            V_total3 += V_meas3;
+            rest_timer++;
+            next_state = 22; 
+          }else if(rest_timer <66){
+            digitalWrite(7,false);
+            digitalWrite(8,false);
+            V_mean3 = V_total3 / 5;
+            rest_timer++;
+            next_state = 22;
+          }
+          else{ 
+            next_state = 22;
+            rest_timer = 0;
+          }
+       }
+        break;   
+        }
+
+      case 23:{//cell balancing state(2&3)
+      cc = 1;
+      current_ref = 0;
+      if(V_mean2 > V_mean3){//discharge cell2
+        next_state = 24;
+        rest_timer = 0;
+      }else{//discharge cell3
+        next_state = 25;
+        rest_timer = 0;
+      }
+      break;
+     }
+
+     case 24:{//discharge cell2
+        cc = 1;
+        current_ref = 0;
+       if (abs((V_mean2 - V_mean3) < 400)){
+        next_state = 16;
+       }
+       else{
+        if (rest_timer < 60){
+            rest_timer++;  
+            next_state = 24;
+            V_meas3 = 0;        
+          }
+          else if (rest_timer < 65 && rest_timer >= 60){
+            digitalWrite(8,true);
+            digitalWrite(7,true);
+            V_meas3 = analogRead(A1)*4.096/1.03;
+            V_total3 += V_meas3;
+            rest_timer++;
+            next_state = 24; 
+          }else if(rest_timer <66){
+            digitalWrite(7,false);
+            digitalWrite(8,false);
+            V_mean3 = V_total3 / 5;
+            rest_timer++;
+            next_state = 24;
+          }
+          else{ 
+            next_state = 24;
+            rest_timer = 0;
+          }
+       }
+        break;   
+        }
+
+      case 25:{//discharge cell3
+        cc = 1;
+        current_ref = 0;
+       if (abs((V_mean3 - V_mean2) < 400)){
+        next_state = 25;
+       }
+       else{
+        if (rest_timer < 60){
+            rest_timer++;  
+            next_state = 25;
+            V_meas3 = 0;        
+          }
+          else if (rest_timer < 65 && rest_timer >= 60){
+            digitalWrite(8,true);
+            digitalWrite(7,true);
+            V_meas3 = analogRead(A1)*4.096/1.03;
+            V_total3 += V_meas3;
+            rest_timer++;
+            next_state = 25; 
+          }else if(rest_timer <66){
+            digitalWrite(7,false);
+            digitalWrite(8,false);
+            V_mean3 = V_total3 / 5;
+            rest_timer++;
+            next_state = 25;
+          }
+          else{ 
+            next_state = 25;
+            rest_timer = 0;
+          }
+       }
+        break;   
+        }
+     
 
      case 14: { // Error state
         current_ref = 0;
