@@ -303,6 +303,7 @@ void sys_timer_isr(){
 
   if((IORD(KEY_BASE,0)&0x03) == 0x01){           // touch KEY1 to trigger auto focus
     Focus_Window(320,240);
+    moving=0;
   }
   if((IORD(KEY_BASE,0)&0x03) == 0x02){           // touch KEY0 to trigger gain adjustment
     gain_calib = 0;
