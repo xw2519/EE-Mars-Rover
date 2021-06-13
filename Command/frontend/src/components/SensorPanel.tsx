@@ -5,6 +5,7 @@ import DateTime from './util/time'
 
 interface SensorReadingProps {
     distance_travelled: number
+    rover_tilt: number
 }
 
 function update(ID, value) {
@@ -21,7 +22,11 @@ class SensorReadings extends React.Component<SensorReadingProps, {}> {
 
         console.log("Distance " + this.props.distance_travelled.toString())
 
+        // Update distance travelled 
         update("DistanceTravelled", this.props.distance_travelled.toString())
+
+        // Update rover tilt
+        update("TiltValue", this.props.rover_tilt.toString())
 
         return (
             <div className="SensorPanel">            
@@ -43,6 +48,11 @@ class SensorReadings extends React.Component<SensorReadingProps, {}> {
                 <div className = "DistanceTravelled"> 
                     <div className="DistanceTravelledTitle"> Distance Travelled: </div>
                     <div className="DistanceTravelledValue"> <output name="DistanceTravelled" id="DistanceTravelled"> </output> [cm] </div>
+                </div>
+
+                <div className = "Tilt"> 
+                    <div className="TiltTitle"> Rover Tilt: </div>
+                    <div className="TiltValue"> <output name="TiltValue" id="TiltValue"> </output> [cm] </div>
                 </div>
             </div>
         );

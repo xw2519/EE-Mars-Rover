@@ -82,3 +82,24 @@
     margin-left: 55%;
     margin-top: -3.5%;
 }
+
+.Tilt {
+
+    position: relative;
+    margin-top: 5%;
+
+    background-color: #272727;
+}
+
+.TiltTitle {   
+    position: relative;
+    width: 40%;
+    margin-left: 10%;
+}
+
+.TiltValue {    
+    position: relative;
+    width: 40%;
+    margin-left: 55%;
+    margin-top: -3.5%;
+}

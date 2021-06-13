@@ -163,15 +163,23 @@ async def websocket_endpoint(websocket: WebSocket):
                 await session_instance.client_connection.send_to_client(received_data_rover)
                 
                 '''
-                Database component: Uploads details and coordinates of the rover and obstacles to MongoDB database server
+                Database component: Uploads 
+                    - details and coordinates of the rover and obstacles to MongoDB database server
+                    - Time and tilt of the rover 
                 
                 # Load JSON
                 data = json.loads(received_data_rover)         
                 
-                # Check if message is rover or obstacle data
+                # Check if message is rover or obstacle data or tilt data
                 if (data.type == "Map"):
                     # Upload to the database
-                    insert_record(Session_collection, data)               
+                    insert_record(Session_collection, data)  
+                     
+                else if (data.type == "Tilt"):
+                    # Upload to the database
+                    current_time = {"time":datetime.now()}
+                    data.update(current_time)
+                    insert_record(Session_collection, data)   
                 '''
                 
     except WebSocketDisconnect:
