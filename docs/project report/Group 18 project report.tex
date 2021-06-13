@@ -2,6 +2,7 @@
 
 \usepackage{graphicx}
 \usepackage{listings}
+\usepackage{color}
 \usepackage{amsmath}
 \usepackage{geometry}
 \usepackage{setspace}
@@ -14,6 +15,27 @@
 \addbibresource{biblography.bib}
 \setlength{\parskip}{0.5em}
 \setlength{\parindent}{0cm}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\footnotesize\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
@@ -234,8 +256,11 @@ The team defined the rover system into three functional layers that each handled
 \subsection{Intellectual property}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+Intellectual property rights are managed and enforced by the World Intellectual Property Organisation and are supposed to protect creations of the mind” through concepts such as patents for inventions, and copyrights for logos and software. Provided the inventor files himself or through a patent company and is granted IP protection by an IP office such as the U.K. Intellectual Property Office, it allows the holder of the IP to treat it as a tangible asset and reduce the risks of associated with commercialisation. This, theoretically, fosters innovation.
 
+However, the team firmly believes that space technologies like the mars rover should not be patented. With traditional sectors like space, well-established entities like NASA holds majority of the patents related to space technology – U.S. NASA holds 1600\cite{NASA_patents} patents while the Indian ISRO only holds 270 \cite{ISRO_patents}. With more companies and countries looking to advance into the space sector, IP laws stifle any potential innovation by increasing the cost and length of development. This directly goes against the fundamental reason of space exploration – advancement of science and exploration of the unknown for the benefit of all humankind. Not for the benefit of a single race or country.
 
+With that mindset, the team endeavoured to use as much open-source software as possible. For example, the Drive module uses the Arduino  Serial Peripheral Interface (SPI) and INA219\_WE library. The Command module uses the FastAPI framework for servers and React for UI design. Depending on the license of the open-source software used and the wording of the patent application, it could affect the success of filing of a patent if the team wanted to patent any component that used the open-source software. These factors are reasons why it is best to hire a professional patent attorney such as Carpmaels \& Ransford LLP.  
 
 
 
@@ -249,44 +274,211 @@ The team defined the rover system into three functional layers that each handled
 \section{Rover Submodules}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Command}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \pagebreak
 \subsection{Control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \pagebreak
 \subsection{Vision}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 
 \subsubsection{Implementation problem}
 
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \pagebreak
 \subsection{Drive}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The design of the Drive module was based off the Drive requirements stated in the project requirement section of the report (Page 2). 
 
+\subsubsection{Design}
+
+The Drive receives nagivation instructions from the Control module and was designed to give user full control over the distance a rover goes per instruction and angle that the rover turns. The Drive instruction was defined as:
+$$
+\text{[Action]} + \text{[Turning angle]} + \text{[Distance]}
+$$
+where:
+\begin{itemize}
+    \item $\text{[Action]}$: Forward (F), Backward (B), Left (L), Right (R), Stop (S), Emergency stop (X)
+    \item $\text{[Turning angle]}$ and $\text{[Distance]}$ defines the position and speed control mechanisms
+\end{itemize}
+
+The instruction decode structure is shown below:
+\begin{lstlisting}
+if(String(instruction[0]) == "F") { // Moving Forward
+    F = true;
+    target_x = 0;
+    // Convert to target distance
+    target_y = 100*(String(instruction[3]).toInt()) + 10*(String(instruction[4]).toInt()) + (String(instruction[5]).toInt()); 
+    B = false;
+    L = false;
+    R = false;
+    S = false;
+    // Accumulate distance or angle
+    tmp_x = total_x + target_x;
+    tmp_y = total_y + target_y;
+}
+\end{lstlisting}
 
 \subsubsection{Movement}
 
-\subsubsection{Speed Control}
+By using the H-bridge circuit, the DC motors of the rover supports four main movement directions: Forward (F), Backward (B), Left (L), Right (R). 
+
+Forward and backward movement was acheived by enabling the H-bridge, setting the PWM signals and the motor states. For example, the code below defines forward movement: 
+
+\begin{lstlisting}
+void MovingForward() {
+    digitalWrite(pwmr, HIGH); // Setting right motor speed at maximum 
+    digitalWrite(pwml, HIGH); // Setting left motor speed at maximum 
+    // Set motor state 
+    DIRRstate = LOW; // LOW - Forward, HIGH - Backward
+    DIRLstate = HIGH; // HIGH - Forward, LOW - Backward
+    digitalWrite(DIRR, DIRRstate); 
+    digitalWrite(DIRL, DIRLstate); 
+} 
+\end{lstlisting}
+
+Turning left and right was achieved by setting the respective wheel state to LOW. After turning, any distance change was in the x-direction and would equal the circumference defined by the rover's optical sensor. Turning angles were defined from the point where the circle's radius was the distance between the optical sensor to the midpoint along the rover shaft which was measured as 15 cm. It was detected that due to the two wheels not outputting the same amount of power. This affected the turning angle calculations since the circle radius i.e. the distance between the optical sensor to the midpoint along the rover shaft was 17.8 cm and calculations had to be compensated as shown below:
+
+\begin{lstlisting}
+float Angle_Conversion(float target_angle) {
+    return (target_angle/90)*28; // Convert input angle to distance along x-axis
+} 
+\end{lstlisting}
+
+The halt instruction was implemented by disabling the H-bridge and set the PWM signal feeding into the left and right wheel pins to LOW.
 
 \subsubsection{Position Control}
 
-\subsubsection{Optical Sensor}
+The rover's position control was implemented with a closed-loop PI controller which used the error margin between the current rover position and the previous rover position. The logic was that if the rover moved forwards and backwards by 20 cm and the optical sensor detected that the rover did not reverse 20 cm, the error margin would be the difference between the current rover position and the previous rover position.  
 
-\subsubsection{Implementation problem}
+The controller was designed such that if the error margin was either in the range $-0.5 \text{cm} < \text{error in } y < 0.5 \text{cm}$ or $-0.78 \text{cm} < \text{error in } x < 0.78 \text{cm}$, the controller would consider the difference insignificant and rover would stop. Otherwise, the rover would either keep executing the current instruction or perform the reverse movement until it was within the error margin. 
 
+\begin{lstlisting}
+if(F){ // Forward movement position control
+    err_y = total_y - tmp_y; // Calculate error
+    cp = pi_d(err_y);
+    Speed_Control(abs(cp)*0.01+0.4); // Using PI controller result to control speed
 
+    // Position Control
+    if(err_y < -0.5) { MovingForward(); }
+    if(err_y > 0.5) { MovingBackward(); }
 
+    if(err_y > -0.5 && err_y < 0.5) {
+        // First time the error lies in the given range
+        if (firstTime) {
+            instructionCompleteTime=millis();
+            firstTime=0; 
+        } 
 
+        // Check the motion after 10sec for position correction
+        if(millis()-instructionCompleteTime > 20000 && !firstTime && !instructionCompleted) {
+            Stop();
+            instructionCompleted=1;
+            Send_Instruction_Completed(total_y,1,'F');        
+        }
 
+        Stop();
+    }       
+}
+\end{lstlisting}
+
+The intial design for position control was a P controller which could acheive proportional controlling but the settling time is too long as a result of the steady-state error. By adding the I (Integral) controller, the steady-state error effect was mitigated. The best effect of the PI-controller was achieved by setting $K_p = 1$ and $K_i = 1$. Taking advantage of the closed-loop control strategy, position control and speed control were linked together to achieve more advanced features that are elaborated in the next section. 
+
+As an additional feature of position control, Drive module returns a SUCCESS signal to the Control module once an instruction was sucessfully completed. After 20 seconds, if the instruction was still not completed, the Drive module will return a FAIL signal and stop the rover immediately to await further commands. These signals can be directed to the Command module to display the rover's movement status on the Terminal interface built into the Command website and, with the WebSocket connection, gives real-time feedback on the rover's Drive status.  
+
+\subsubsection{Speed Control}
+
+The speed control was achieved by using the the PWM signals as inputs into the SMPS board duty cycle to control the output voltage applied to the motors. The implementation of speed control is shown below:
+
+\begin{lstlisting}
+void Speed_Control(float duty){
+    // Use duty cycle as argument to control voltage thus control speed
+    analogWrite(6, (int)(255-duty*255)); 
+}
+\end{lstlisting}
+
+By inputting the position error in either the $x$ or $y$ direction into the PI control function, its output was  inputted into the speed control function. After testing and caliberation, the duty cycle input function was determined as:
+$$
+    (\text{error from PI controller} \times 0.01) + 0.4
+$$
+where $0.4$ was the minimum voltage required to activate the rover. If the rover stays at a place for a long time,due to the presence of the integral controller, the error would accumulated as time increases and the speed control function will increase the rover speed to correct the error. Through testing, the rover initially accelerated due to a significant initial error. As the rover approached the target, the rover decelerated, indicating that the measurements taken by the optical sensor was more accurate. This method effectively reduced the number of oscillations and resulted in a more accurate Drive performance.
+
+By using the formula $\text{speed} = \frac{\text{distance travelled}}{\text{timestamp difference}}$, the relationship between the duty cycle and speed can be displayed as a look-up table:
+\begin{figure} [h!]
+    \centering
+    \includegraphics[scale=0.4]{Speed_duty_cycle.jpg}
+    \caption{Relationship between the speed and duty cycle}
+\end{figure}
+
+This relationship formed the foundation of two advanced Drive features. By using the tilt data from the FPGA in the Vision component, the rover can detect when it is going up a slope and will increase the speed relative to when the rover is on a flat surface. In addition, Drive could support a power-saving mode where the duty would be fixed between 0.4 to 0.8 to conserve the energy used.
 
 \pagebreak
+
+\subsubsection{Optical Sensor}
+
+The optical sensor measures the distance of the rover travelled and the turning angle. To obtain more accurate measurements, the data type was changed from integer to float. The turning angle and travel distance was sent to the Control module for calculating the coordinates along $x$ and $y$ direction. The orientation was defined as:
+\begin{itemize}
+    \item The $y$-coordinate or $x$-coordinate changes positively if the rover faces North or East respectively.
+    \item The $y$-coordinate or $x$-coordinate changes negatively if the rover faces South or West respectively.
+\end{itemize}
+
+\subsubsection{Advanced features}
+
+\begin{itemize}
+    \item Emergency Stop:
+    
+    Drive module has an "Emergency Stop" action (X) which could be issued by the Vision module when it detected an obstacle that was not a ball. The "Emergency Stop" is different from the standard "Stop" where if the "Emergency Stop" was used, the rover status will be updated to display an error has occured which is not the case for the standard "Stop" action. 
+
+    \item Drive pausing:
+    
+    By issung the Pause (P) and Unpause (U) commands, the rover would stop and allow the Vision module to caliberate, detect and process the distances between the rover and an obstacle. After the Unpause command is issued, the rover would continue executing the current set of instructions. The Arduino code for this feature is shown as follows:
+    \begin{lstlisting}
+    if(instruction[0] == 'P'){ // Pause state
+        Stop();
+        while(!Serial1.available() || Serial1.peek()!='U') { // Unpause state
+            delay(50); // Delay 50 ms
+        }
+        Serial1.read(); // Remove 'U' action word
+        instructionStartTime=millis();
+    }
+    \end{lstlisting}
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagebreak
 \subsection{Energy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 
 \subsubsection{Battery Charge Profile Design}
+
+A battery charging profile ensures that the cells are charged to their full capabilities while within the \textbf{constraints of the batteries and solar panels}. The capacity of the cells were determined by the following formula before developing the battery charging profile:
+$$
+\text{Cell capacity} = \frac{\text{Discharging state time}}{3600} \times \text{current}
+$$
+
+The Energy module developed its own charging code that used a combination of Constant Current (CC) and Constant Voltage (CV) instead of the original method in the provided code which only used Constant Current to charge the cells. Constant Current was used when the cell was nearly empty to prevent overheating during charging\cite{Energy_constant_current}. When the battery has been charged to $3500$ mV i.e. around 90\%, Constant Voltage was used to charge it to avoid overcharging. 
+
+The cell capacity measured by the provided standard code is $502$ mAh \textbf{while the value measured by the custom charging code was around } $565.07$ mAh. This difference in measured cell capacity indicates that charging using a combination of Constant Voltage and Constant Current is more effective at fully charging the battery compared to using Constant Current only. The performance of the two charging methods over a period of time is shown below:
+\begin{figure} [h!]
+    \centering
+    \includegraphics[scale=0.5]{CC and CV.JPG}
+    \caption{CC vs CC + CV performance comparison}
+\end{figure} 
 
 \subsubsection{State of Charge}
 
