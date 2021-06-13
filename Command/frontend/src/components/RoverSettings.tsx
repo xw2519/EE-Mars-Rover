@@ -14,13 +14,13 @@ const RoverSettings = (NavUIProps) => {
 
       if(!checked) {
         NavUIProps.myLogger.log('[Sending to rover]: Autonomous mode activated')
+        ws_server.send("Aon");
       }
       else {
         NavUIProps.myLogger.log('[Sending to rover]: Autonomous mode deactivated')
+        ws_server.send("Aoff");
       }
 
-      ws_server.send("Automode");
-      
     };
 
     return (
