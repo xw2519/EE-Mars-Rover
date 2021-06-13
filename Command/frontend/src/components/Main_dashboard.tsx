@@ -45,8 +45,6 @@ const Dashboard = () => {
     var x_rover_previous: number = 0;
     var y_rover_previous: number = 0;
 
-    // var nodes: CustomNode[] = [{x:0, y:0, custom:'Rover', angle:0}];
-
     // Variables
     const [dist_value, setDist] = useState(10);
     const [prop_dist_value, setPropDist] = useState(10);
@@ -80,7 +78,7 @@ const Dashboard = () => {
             if(server_message.map_type === "Rover") {
                 map_type = "Rover"
                 angle = server_message.angle
-                UpdateNodes()
+                UpdateNodes(angle)
                 LinkNodes(nodes)
             }
             else {
@@ -105,7 +103,7 @@ const Dashboard = () => {
 
     const forceUpdate = useForceUpdate();
     
-    function UpdateNodes() {
+    function UpdateNodes(angle?: number) {
 
         if(map_type === "Rover") {
             // Rover - Map plotting logic
@@ -178,7 +176,7 @@ const Dashboard = () => {
             y_plot = y_obstacle_current + y_plot_previous
             
             // Assign coordinate into node 
-            var node: CustomNode = {x: (x_plot), y: (y_plot), custom: 'Obstacle', color: color}
+            var node: CustomNode = {x: (x_plot*2), y: (y_plot*2), custom: 'Obstacle', color: color}
 
             // Update node array 
             set_nodes((nodes) => {
