@@ -277,7 +277,7 @@ void send_ball_data(alt_u8 colour, alt_u8 distance, alt_u8 angle){
       alt_up_rs232_write_data(ctrl_uart, (angle/10)+48);
       alt_up_rs232_write_data(ctrl_uart, (angle%10)+48);
       last_colour = colour;
-      ack = 3;
+      ack = 15;
 
       #ifdef VIEW_UART_MSGS
         printf("UART sent: ball data\n");
@@ -484,7 +484,7 @@ void sys_timer_isr(){
         alt_up_rs232_write_data(ctrl_uart, 's');
         stop_reasoned = 0;
         last_command = 's';
-        stop_ticks = 3;
+        stop_ticks = 9;
       }
 
       #ifdef VIEW_UART_MSGS
@@ -497,7 +497,7 @@ void sys_timer_isr(){
       if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)){
         alt_up_rs232_write_data(ctrl_uart, 'p');
         last_command = 'p';
-        stop_ticks = 3;
+        stop_ticks = 9;
       }
 
       #ifdef VIEW_UART_MSGS
@@ -556,7 +556,7 @@ void sys_timer_isr(){
     if(acc_ticks){ acc_ticks--; }
     if(ack){ ack--; }
     mem_ticks++;
-    if(mem_ticks>=32){                                  // Erase memory every ~10 seconds
+    if(mem_ticks>=64){                                  // Erase memory every ~20 seconds
       mem_ticks = 0;
       ball_sent.used = 0;
     }
