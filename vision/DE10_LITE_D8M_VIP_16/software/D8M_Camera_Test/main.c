@@ -304,6 +304,13 @@ void sys_timer_isr(){
   if((IORD(KEY_BASE,0)&0x03) == 0x01){           // touch KEY1 to trigger auto focus
     Focus_Window(320,240);
     moving=0;
+    last_command='c';
+    last_colour='U';
+    ack=0;
+    stop_ticks=0;
+    acc_ticks=0;
+    mem_ticks=0;
+    ball_sent.used=0;
   }
   if((IORD(KEY_BASE,0)&0x03) == 0x02){           // touch KEY0 to trigger gain adjustment
     gain_calib = 0;
@@ -634,7 +641,30 @@ int main(){
           appendArray_u8(&ball_sent, last_colour);
           ack = 0;
           stop_reasoned = 1;
+        }else if(prompt=='R'){
+          Focus_Window(320,240);
+          moving=0;
+          last_command='c';
+          last_colour='U';
+          ack=0;
+          stop_ticks=0;
+          acc_ticks=0;
+          mem_ticks=0;
+          ball_sent.used=0;
+        }else if(prompt=='C'){
+          gain_calib = 0;
+          gain       = 0x7FF;
+          exposure   = 0x2000;
+
+          OV8865SetGain(gain);
+          OV8865SetExposure(exposure);
+
+          #ifdef VIEW_AUTO_GAIN
+            printf("\nGain = %x\n", gain);
+            printf("Exposure = %x\n", exposure);
+          #endif
         }
+        
         /*else if(prompt=='c'){ moving = 1; }
         else if(prompt=='p'){ moving = 0; }
         else if(prompt=='b'){
