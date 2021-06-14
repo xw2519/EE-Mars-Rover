@@ -16,6 +16,7 @@ import './RoverSettings.css';
 import './SensorPanel.css';
 import './Mapping.css';
 import './NavSettings.css';
+import { ConsoleIcon } from 'evergreen-ui';
 
 const myLogger = new react_console_logger.Logger();
 
@@ -38,12 +39,12 @@ const Dashboard = () => {
     var map_type = '';
     var angle: number = 0;
     var color: string = '';
-    var x_rover_current: number = 0;
-    var y_rover_current: number = 0;
-    var x_plot_previous: number = 0;
-    var y_plot_previous: number = 0;
-    var x_rover_previous: number = 0;
-    var y_rover_previous: number = 0;
+    var x_rover_current: string = '0';
+    var y_rover_current: string = '0';
+    var x_plot_previous: string = '0';
+    var y_plot_previous: string = '0';
+    var x_rover_previous: string = '0';
+    var y_rover_previous: string = '0';
 
     // Variables
     const [dist_value, setDist] = useState(10);
@@ -53,8 +54,8 @@ const Dashboard = () => {
     const [prop_angle_value, setPropAngle] = useState(90);
     
     const [battery_left, set_battery_left] = useState(0);
-    const [distance_travelled, set_distance_travelled] = useState(0);
-    const [tilt, set_tilt] = useState(0);
+    const [distance_travelled, set_distance_travelled] = useState('');
+    const [tilt, set_tilt] = useState('');
     const [distance_left, set_distance_left] = useState(0);
 
     const [nodes, set_nodes] = useState<CustomNode[]>([{x:0, y:0, custom:'Rover', angle:0}]);
@@ -100,12 +101,11 @@ const Dashboard = () => {
 
         else if(server_message.type === "Energy") {
             set_battery_left(server_message.battery_left)
-            set_distance_travelled(server_message.distance_travelled)
             set_distance_left(server_message.distance_left)
         }
 
         else if(server_message.type === "Tilt") {
-            set_tilt(server_message.value)
+            set_tilt((server_message.value).toString())
         }
     }
 
@@ -124,41 +124,44 @@ const Dashboard = () => {
             var y_plot = 0
 
             // Multipled by constant to caliberate zoom
-            x_rover_current= parseInt(x_rover_current.toString())
-            y_rover_current = parseInt(y_rover_current.toString())
+            x_rover_current = (parseFloat(x_rover_current.toString())*2).toString()
+            y_rover_current = (parseFloat(y_rover_current.toString())*2).toString()
 
             // Determine direction
             if(x_rover_current === x_rover_previous) {
                 // x-axis not changing
-                x_plot = x_plot_previous
+                x_plot = parseFloat(x_plot_previous)
+
+                console.log(x_plot)
 
                 // y-axis not changing 
-                if(y_rover_current === y_rover_previous) { y_plot = y_plot_previous }
+                if(y_rover_current === y_rover_previous) { y_plot = parseFloat(y_plot_previous) }
                 else {
                     // y-axis changing 
-                    y_plot = (y_rover_current + y_plot_previous)
-                    y_plot_previous = y_plot
+                    y_plot = ( parseFloat(y_rover_current) + parseFloat(y_plot_previous) )
+                    y_plot_previous = y_plot.toString()
                 }
             }
             else {
                 // x-axis is changing 
-                x_plot = (x_rover_current + x_plot_previous)
+                x_plot = ( parseFloat(x_rover_current) + parseFloat(x_plot_previous) )
 
                 // y-axis not changing 
-                if(y_rover_current === y_rover_previous) { y_plot = y_plot_previous }
+                if(y_rover_current === y_rover_previous) { y_plot = parseFloat(y_plot_previous) }
                 else {
                     // y-axis changing 
-                    y_plot = (y_rover_current + y_plot_previous)
-                    y_plot_previous = y_plot
+                    y_plot = ( parseFloat(y_rover_current) + parseFloat(y_plot_previous) )
+                    y_plot_previous = y_plot.toString()
                 }
-                x_plot_previous = x_plot
+                x_plot_previous = x_plot.toString()
             }
             
             // Assign coordinate into node 
+            console.log(x_plot)
             var node: CustomNode = {x: (x_plot*3), y: (y_plot*3), custom: 'Rover', angle: angle}
 
             // Update distance travelled
-            set_distance_travelled((Math.abs(x_plot) + Math.abs(y_plot)))
+            set_distance_travelled((Math.abs(x_plot) + Math.abs(y_plot)).toString())
 
             // Update node array 
             set_nodes((nodes) => {
@@ -175,18 +178,18 @@ const Dashboard = () => {
         }
         else {
             // Obstacle - Map plotting logic
-            var x_plot = 0
-            var y_plot = 0
+            var x_plot = 0.00
+            var y_plot = 0.00
 
-            var x_obstacle_current = 0
-            var y_obstacle_current = 0
+            var x_obstacle_current = ''
+            var y_obstacle_current = ''
 
-            x_obstacle_current = parseInt(x_rover_current.toString())*3
-            y_obstacle_current = parseInt(y_rover_current.toString())*3
+            x_obstacle_current = (parseFloat(x_rover_current.toString())*3).toString()
+            y_obstacle_current = (parseFloat(y_rover_current.toString())*3).toString()
 
             // Assign coordinates 
-            x_plot = x_obstacle_current + x_plot_previous
-            y_plot = y_obstacle_current + y_plot_previous
+            x_plot =  (parseFloat(x_obstacle_current) + parseFloat(x_plot_previous))
+            y_plot = (parseFloat(y_obstacle_current) + parseFloat(y_plot_previous))
             
             // Assign coordinate into node 
             var node: CustomNode = {x: (x_plot*2), y: (y_plot*2), custom: 'Obstacle', color: color}

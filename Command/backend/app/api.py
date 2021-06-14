@@ -136,7 +136,7 @@ async def websocket_client(websocket: WebSocket):
         while True:
             # Receive messages from command client 
             received_data = await websocket.receive_text()
-                  
+            
             if (received_data != ""):
                 print("[Server Info]: Sending to rover: " + received_data)              
                 await session_instance.rover_connection.send_to_rover(received_data)
