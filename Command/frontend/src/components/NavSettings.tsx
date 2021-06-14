@@ -6,6 +6,8 @@ const NavSettings = (NavSettings) => {
 
   const [value, setValue] = useState(10);
 
+  const [angle, setAngle] = useState(90);
+
   const handleDistChange = (event) => {
     // Limiting the range of allowed input
     if(event >= 100) {
@@ -16,7 +18,18 @@ const NavSettings = (NavSettings) => {
       NavSettings.setDist(event)
       setValue(event)
     }
-    
+  };
+
+  const handleAngleChange = (event) => {
+    // Limiting the range of allowed input
+    if(event >= 90) {
+      setAngle(90)
+      NavSettings.setAngle(90)
+    }
+    else {
+      NavSettings.setAngle(event)
+      setAngle(event)
+    }
   };
 
   return (
@@ -24,7 +37,7 @@ const NavSettings = (NavSettings) => {
     <div className="Unit">
 
       <div className="Unit_title"> 
-          <span> Unit distance [cm] </span>
+          <span> Unit Distance [cm] </span>
       </div>
 
       <div className="Unit_switch"> 
@@ -41,7 +54,32 @@ const NavSettings = (NavSettings) => {
               min={1}
               maxLength={2}
               onChange={e => handleDistChange(e.target.value)}
+            />
+          </label>
+      </div>
+          
+    </div>
 
+    <div className="Angle">
+
+      <div className="Angle_title"> 
+          <span> Turning Angle </span>
+      </div>
+
+      <div className="Angle_switch"> 
+          <label>
+            <input
+              id="Angle_value"
+              value={angle}
+              className="Angle_value"
+              type = "number"
+              placeholder="Angle"
+              defaultValue="90"
+              size={10}
+              max={90}
+              min={1}
+              maxLength={2}
+              onChange={e => handleAngleChange(e.target.value)}
             />
           </label>
       </div>

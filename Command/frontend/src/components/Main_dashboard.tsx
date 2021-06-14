@@ -48,6 +48,9 @@ const Dashboard = () => {
     // Variables
     const [dist_value, setDist] = useState(10);
     const [prop_dist_value, setPropDist] = useState(10);
+
+    const [angle_value, setAngle] = useState(90);
+    const [prop_angle_value, setPropAngle] = useState(90);
     
     const [battery_left, set_battery_left] = useState(0);
     const [distance_travelled, set_distance_travelled] = useState(0);
@@ -61,6 +64,11 @@ const Dashboard = () => {
         const timeOutId = setTimeout(() => setPropDist(dist_value), 500);
         return () => clearTimeout(timeOutId);
     }, [dist_value]);
+
+    useEffect(() => {
+        const timeOutId = setTimeout(() => setPropAngle(angle_value), 500);
+        return () => clearTimeout(timeOutId);
+    }, [angle_value]);
 
     ws_server.onmessage = (e) => {  
         // Check if server JSON is intended for terminal
@@ -266,9 +274,9 @@ const Dashboard = () => {
         
                     <div className="grid RoverSettings"> Rover Quick Settings <RoverSettings myLogger={myLogger}/> </div>
         
-                    <div className="grid NavigationUI"> Navigation Panel <NavUI myLogger={myLogger} prop_dist_value={prop_dist_value}/> </div>
+                    <div className="grid NavigationUI"> Navigation Panel <NavUI myLogger={myLogger} prop_dist_value={prop_dist_value} prop_angle_value={prop_angle_value}/> </div>
                     
-                    <div className="grid CommandSettings"> Navigation Settings <NavSettings myLogger={myLogger} setDist={setDist}/> </div>
+                    <div className="grid CommandSettings"> Navigation Settings <NavSettings myLogger={myLogger} setDist={setDist} setAngle={setAngle}/> </div>
                 </div>
 
             </div>

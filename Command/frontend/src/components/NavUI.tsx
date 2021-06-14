@@ -8,7 +8,8 @@ import { Icon } from '@blueprintjs/core';
 // Add in angle and stuffies 
 interface NavUIProps {
     myLogger: any;
-    prop_dist_value: number
+    prop_dist_value: number;
+    prop_angle_value: number;
 }
 
 class NavUI extends React.Component<NavUIProps, {}> {
@@ -40,14 +41,28 @@ class NavUI extends React.Component<NavUIProps, {}> {
 
     NavRight = () => {
         console.log("RIGHT");
-        ws_server.send("R9000");
-        this.props.myLogger.info('[Sending to rover]: Turn RIGHT')
+
+        if(this.props.prop_angle_value < 10) {
+            ws_server.send("R0" + this.props.prop_angle_value + "00");
+        }
+        else {
+            ws_server.send("R" + this.props.prop_angle_value + "00");
+        }
+        
+        this.props.myLogger.info('[Sending to rover]: Turn RIGHT by ' + this.props.prop_angle_value)
     }
 
     NavLeft = () => {
         console.log("LEFT");
-        ws_server.send("L9000");
-        this.props.myLogger.info('[Sending to rover]: Turn LEFT')
+
+        if(this.props.prop_angle_value < 10) {
+            ws_server.send("L0" + this.props.prop_angle_value + "00");
+        }
+        else {
+            ws_server.send("L" + this.props.prop_angle_value + "00");
+        }
+
+        this.props.myLogger.info('[Sending to rover]: Turn LEFT by ' + this.props.prop_angle_value)
     }
 
     NavHalt = () => {
