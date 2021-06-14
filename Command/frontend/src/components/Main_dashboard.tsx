@@ -124,8 +124,8 @@ const Dashboard = () => {
             var y_plot = 0
 
             // Multipled by constant to caliberate zoom
-            x_rover_current = (parseFloat(x_rover_current.toString())*2).toString()
-            y_rover_current = (parseFloat(y_rover_current.toString())*2).toString()
+            x_rover_current = x_rover_current.toString()
+            y_rover_current = y_rover_current.toString()
 
             // Determine direction
             if(x_rover_current === x_rover_previous) {
@@ -157,7 +157,6 @@ const Dashboard = () => {
             }
             
             // Assign coordinate into node 
-            console.log(x_plot)
             var node: CustomNode = {x: (x_plot*3), y: (y_plot*3), custom: 'Rover', angle: angle}
 
             // Update distance travelled
