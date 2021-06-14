@@ -259,10 +259,10 @@ The team defined the rover system into three functional layers that each handled
 
 Intellectual property rights are managed and enforced by the World Intellectual Property Organisation and are supposed to protect creations of the mind” through concepts such as patents for inventions, and copyrights for logos and software. Provided the inventor files himself or through a patent company and is granted IP protection by an IP office such as the U.K. Intellectual Property Office, it allows the holder of the IP to treat it as a tangible asset and reduce the risks of associated with commercialisation. This, theoretically, fosters innovation.
 
-However, the team firmly believes that space technologies like the mars rover should not be patented. With traditional sectors like space, well-established entities like NASA holds majority of the patents related to space technology – U.S. NASA holds 1600\cite{NASA_patents} patents while the Indian ISRO only holds 270 \cite{ISRO_patents}. With more companies and countries looking to advance into the space sector, IP laws stifle any potential innovation by increasing the cost and length of development. This directly goes against the fundamental reason of space exploration – advancement of science and exploration of the unknown for the benefit of all humankind. Not for the benefit of a single race or country.
+However, the team firmly believes that space technologies like the Mars rover should not be patented. In traditional sectors like space, well-established entities like NASA hold majority of the patents related to it – NASA holds 1600\cite{NASA_patents} patents while the Indian ISRO only holds 270 \cite{ISRO_patents}. With more companies and countries looking to advance into the space sector, IP laws stifle any potential innovation by increasing the cost and length of development. This directly goes against the fundamental reason of space exploration – advancement of science and exploration of the unknown for the benefit of all humankind. Not for the benefit of a single race or country.
 
 With that mindset, the team endeavoured to use as much open-source software as possible. For example, the Drive module uses the Arduino  Serial Peripheral Interface (SPI) and INA219\_WE library. The Command module uses the FastAPI framework for servers and React for UI design. Depending on the license of the open-source software used and the wording of the patent application, it could affect the success of filing of a patent if the team wanted to patent any component that used the open-source software. These factors are reasons why it is best to hire a professional patent attorney such as Carpmaels \& Ransford LLP.  
-
+ 
 
 
 \pagebreak
@@ -464,14 +464,14 @@ The optical sensor measures the distance of the rover travelled and the turning 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Battery Charge Profile Design}
 
-A battery charging profile ensures that the cells are charged to their full capabilities while within the \textbf{constraints of the batteries and solar panels}. The capacity of the cells were determined by the following formula before developing the battery charging profile:
+A battery charging profile ensures that the cells are charged to their full capabilities while within the constraints of the batteries which was max $3.6$ V and min $2.4$ for the battery. The capacity of the cells were determined by the following formula before developing the battery charging profile:
 $$
 \text{Cell capacity} = \frac{\text{Discharging state time}}{3600} \times \text{current}
 $$
 
 The Energy module developed its own charging code that used a combination of Constant Current (CC) and Constant Voltage (CV) instead of the original method in the provided code which only used Constant Current to charge the cells. Constant Current was used when the cell was nearly empty to prevent overheating during charging\cite{Energy_constant_current}. When the battery has been charged to $3500$ mV i.e. around 90\%, Constant Voltage was used to charge it to avoid overcharging. 
 
-The cell capacity measured by the provided standard code is $502$ mAh \textbf{while the value measured by the custom charging code was around } $565.07$ mAh. This difference in measured cell capacity indicates that charging using a combination of Constant Voltage and Constant Current is more effective at fully charging the battery compared to using Constant Current only. The performance of the two charging methods over a period of time is shown below:
+The cell capacity measured by the provided standard code is $502$ mAh while the cell capacity value measured by the custom charging code was around $565.07$ mAh. This difference in measured cell capacity indicates that charging using a combination of Constant Voltage and Constant Current is more effective at fully charging the battery compared to using Constant Current only. The performance of the two charging methods over a period of time is shown below:
 \begin{figure} [h!]
     \centering
     \includegraphics[scale=0.5]{CC and CV.JPG}
@@ -493,7 +493,7 @@ The balancing algorithm was design with $13$ states and Figure 4 shows the trans
     \label{fig:State}
 \end{figure}
 
-For example, \textbf{constant current charging state}, the batteries are charged for 60 seconds and each cell was measured for 5 seconds respectively. The average value of each cell was then calculated and the state transition to the comparison state. In the comparison state, difference between the mean of two cells was compared. If it was greater than $500$ mV, the cells needed to be balanced and the higher-voltage cell would be discharged. The current state returns to state 4 after discharge to check if the difference between the other cell voltages was more than $500$ mV. The process repeats itself.
+For example, in the constant current charging state, the batteries are charged for 60 seconds and each cell was measured for 5 seconds respectively. The average value of each cell was then calculated and the state transition to the comparison state. In the comparison state, difference between the mean of two cells was compared. If it was greater than $500$ mV, the cells needed to be balanced and the higher-voltage cell would be discharged. The current state returns to state 4 after discharge to check if the difference between the other cell voltages was more than $500$ mV. The process repeats itself.
 
 \pagebreak
 \subsubsection{State of Charge}
@@ -518,7 +518,7 @@ From Figure \ref{fig:Cell}, $3540$ mV was chosen since the average value of diff
     \includegraphics[scale=0.6]{Energy_SOC.JPG}
 \end{figure}
 
-The in Energy codebase, \textbf{the boundary between each OCV value was modified to make the range more uniform}. The algorithm always checks the value of the SOC before the start of the charging process.
+Referring to the table, the OCV boundaries are not uniform. In the Energy module implementation, the boundaries between each OCV value was slightly modified to make the range more uniform. The algorithm always checks the value of the SOC before the start of the charging process.
 
 The voltage lookup table was incorporated into \textit{State 0} in order to check the initial SOC value at the start of the charging process. During charging process, the SOC can be calculated by through the Coulomb Counting which measured the current drawn out of a cell and integrated the current over time in order to estimate the SOC:
 $$
@@ -564,6 +564,13 @@ The Energy module was design useing cells arranged in parallel. This was conside
 \subsubsection{State of Health}
 
 The State of Health (SOH) is an indicator of the current condition of a cell compared to its ideal conditions. 
+\begin{figure} [h!]
+    \centering
+    \includegraphics[scale=0.4]{Energy_SOH.JPG}
+    \caption{Cycle life vs SOC use \cite{SOH}}
+\end{figure}
+
+Due to the time constaint of the project, it was not possible to charge and discharge the provided cells at least 400 times in order to plot the relationship between the SOH and the cycles. 
 
 The Energy module has implemented several features to ensure the cells are kept as close to its ideal conditions during operation:
 \begin{itemize}
@@ -573,6 +580,7 @@ The Energy module has implemented several features to ensure the cells are kept 
 
 The only concern that could not be mitigated was the battery temperature. A temperature sensor may be added to ensure the cell does not overheated for a long time.  
 
+\pagebreak
 \subsubsection{Energy to Control interface}
 
 Energy module communicates to the Control module through the UART port:
@@ -615,7 +623,9 @@ The Energy module did consider a static charging station which could significant
 
 
 \pagebreak
-\section{Integration: Testing}
+\section{Integration}
+
+\subsection{Energy}
 
 
 
