@@ -55,7 +55,7 @@ const Dashboard = () => {
     
     const [battery_left, set_battery_left] = useState(0);
     const [distance_travelled, set_distance_travelled] = useState('');
-    const [tilt, set_tilt] = useState('');
+    const [tilt, set_tilt] = useState('0');
     const [distance_left, set_distance_left] = useState(0);
 
     const [nodes, set_nodes] = useState<CustomNode[]>([{x:0, y:0, custom:'Rover', angle:0}]);
@@ -105,7 +105,7 @@ const Dashboard = () => {
         }
 
         else if(server_message.type === "Tilt") {
-            set_tilt((server_message.value).toString())
+            set_tilt(server_message.value)
         }
     }
 
