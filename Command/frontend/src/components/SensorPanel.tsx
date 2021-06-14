@@ -52,7 +52,7 @@ class SensorReadings extends React.Component<SensorReadingProps, {}> {
 
                 <div className = "Tilt"> 
                     <div className="TiltTitle"> Rover Tilt: </div>
-                    <div className="TiltValue"> <output name="TiltValue" id="TiltValue"> </output> [cm] </div>
+                    <div className="TiltValue"> <output name="TiltValue" id="TiltValue"> </output> degrees </div>
                 </div>
             </div>
         );
