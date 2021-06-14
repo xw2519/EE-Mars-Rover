@@ -583,29 +583,27 @@ The only concern that could not be mitigated was the battery temperature. A temp
 \pagebreak
 \subsubsection{Energy to Control interface}
 
+\begin{figure} [h!]
+    \centering
+    \includegraphics[scale=0.25]{Energy_functional.PNG}
+    \caption{Energy module functional diagram}
+\end{figure}
+
 Energy module communicates to the Control module through the UART port:
 
 \begin{lstlisting}
 if(Serial.available()>0) {
     command = Serial.read();
-    if (command == 'c') { // Go to charging state
+    if (command == 'c') { // Read SOC value (state 0) and transition to charging state (state 1)
     state_num = 0;
-    } else if(command == 'r') { // Go to read soc
+    } else if(command == 'r') { // Read SOC value passes to the Command module
         Serial.println(soc); // Change to Serial1.print for communication with control sub module
     } else if(command == 's') { // Stop charging, go to rest state
         state_num = 3;
-    } else if(command == 'd') { // Start discharge
+    } else if(command == 'd') { // Start discharge by the drive sub module
         state_num = 15;
     }
 \end{lstlisting}
-
-Referring to the Figure \ref{fig:State} state machine, the Energy module performs the following depends on the instruction received from the Control module:
-\begin{itemize}
-    \item \textbf{'c'}: Battery enters \textit{state 0} where the initial SOC value is measured and transitions to \textit{state 1} i.e. constant current charging state, as shown in the state machine with three cells.
-    \item \textbf{'r'}: SOC value is read and passed to the Command module.
-    \item \textbf{'s'}: Battery will stop charging and enter a rest mode.
-    \item \textbf{'d'}: Battery will be discharged by the drive sub module. 
-\end{itemize}
 
 Because it cannot be tested with Drive module, the discharging process was imitated by a constant current mode with a reference current of 350 mA. 350mA was the value of the current that the Drive module uses while the rover was moving. To make sure all the cells have not been overvoltage/undervoltage, the battery should be balanced while discharging as well.
 
