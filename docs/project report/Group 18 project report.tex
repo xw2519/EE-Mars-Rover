@@ -7,6 +7,7 @@
 \usepackage{geometry}
 \usepackage{setspace}
 \usepackage{biblatex}
+\usepackage{subfig}
 
 % Page master configuration
 \lstset { basicstyle=\ttfamily, breaklines = true, tabsize=2 }
@@ -461,9 +462,6 @@ The optical sensor measures the distance of the rover travelled and the turning 
 \pagebreak
 \subsection{Energy}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
 \subsubsection{Battery Charge Profile Design}
 
 A battery charging profile ensures that the cells are charged to their full capabilities while within the \textbf{constraints of the batteries and solar panels}. The capacity of the cells were determined by the following formula before developing the battery charging profile:
@@ -480,19 +478,139 @@ The cell capacity measured by the provided standard code is $502$ mAh \textbf{wh
     \caption{CC vs CC + CV performance comparison}
 \end{figure} 
 
-\subsubsection{State of Charge}
+\pagebreak
 
 \subsubsection{Battery Balancing Algorithms}
 
+The Energy module was design to use three cells connected in parallel. As a result, in addition to ensuring that each cell had a similar voltage at the start of the charging process, balancing was also required during the charging process. 
+
+The balancing algorithm was design with $13$ states and Figure 4 shows the transitions between each states.    
+
+\begin{figure} [h!]
+    \centering
+    \includegraphics[scale=0.65]{Energy_state.JPG}
+    \caption{Balancing Algorithm State Flow}
+    \label{fig:State}
+\end{figure}
+
+For example, \textbf{constant current charging state}, the batteries are charged for 60 seconds and each cell was measured for 5 seconds respectively. The average value of each cell was then calculated and the state transition to the comparison state. In the comparison state, difference between the mean of two cells was compared. If it was greater than $500$ mV, the cells needed to be balanced and the higher-voltage cell would be discharged. The current state returns to state 4 after discharge to check if the difference between the other cell voltages was more than $500$ mV. The process repeats itself.
+
+\pagebreak
+\subsubsection{State of Charge}
+
+The Energy module uses a combination of voltage lookup tables and coulomb counting to estimate the State of Charge. To obtain the voltage lookup table, a cell was completely charged and then discharged, the average value of the recorded cell voltage measured. To find the associated State of Charge at this voltage, the discharging process was stopped every 10 seconds and measurements taken.
+
+The measured cell voltage from two different cells were plotted: 
+\begin{figure}[h!]
+    \centering
+    \subfloat[\centering]{{\includegraphics[width=7cm]{Energy_cell_v2.JPG} }}
+    \qquad
+    \subfloat[\centering]{{\includegraphics[width=7cm]{Energy_cell_v3.JPG} }}
+    \caption{Cell voltage measurement}
+    \label{fig:Cell}
+\end{figure}
+
+
+From Figure \ref{fig:Cell}, $3540$ mV was chosen since the average value of different cells in \textit{State 2} was approximately $3540$ mV. 
+
+\begin{figure} [h!]
+    \centering
+    \includegraphics[scale=0.6]{Energy_SOC.JPG}
+\end{figure}
+
+The in Energy codebase, \textbf{the boundary between each OCV value was modified to make the range more uniform}. The algorithm always checks the value of the SOC before the start of the charging process.
+
+The voltage lookup table was incorporated into \textit{State 0} in order to check the initial SOC value at the start of the charging process. During charging process, the SOC can be calculated by through the Coulomb Counting which measured the current drawn out of a cell and integrated the current over time in order to estimate the SOC:
+$$
+    \text{SOC} = \text{SOC} + \frac{\text{Measured current}}{\text{Cell capacity} \times 3600} \times 100\%
+$$
+
+\pagebreak
+
 \subsubsection{PV MPPT Algorithms}
 
+MPPT ensures that the PID controller does not encounter a problem when the PV voltage starts to fall where it will ask for more duty cycle. There would be no increase in current so the PID controller would repeat until the duty is maxed and the current is zero \cite{PV_MPPT}.  
+
+In order to implement the MPPT, the PV panels would need to be characterised. The form of a PV cell's IV characteristic was determined to be that of a non-ideal current source \cite{PV_current} where the current decreases gradually at first and then rapidly as the voltage across the source rises.
+
+The intended objective of the Energy module was to convert as much sunlight as possible into useable energy, hence the key design problem was where to operate on the IV characteristic that maximised the IV product. By characterising the PV panel, voltage with largest power can be identified. The PV panel was characterised by connecting different values of loads to buck and boost mode and measuring the current and voltage using a multimeter. From Figure \ref{fig:IV_char}, it can be seen that the voltage that provided the largest power was $4.7$ V.
+
+\begin{figure} [h!]
+    \centering
+    \includegraphics[scale=0.6]{Energy_PV_characteristic.JPG}
+    \caption{PV IV characteristic}
+    \label{fig:IV_char}
+\end{figure}
+
+The MPPT was designed and implemented with the Perturb and Observe Method \cite{PV_current}. This was due to the consideration that the intended use of the PV panels would be on the Mars rover and the IV characteristics of PV panels may vary in different environments. Therefore, the Energy module has incorporated a feedback system that maximises the value of the voltage output by using the fluctuating temperature and irradiance to determine the optimal operating point. The MPPT algorithm was implemented within the constant current component. If the measured current was smaller than $200$ mA, the algorithm will perform do MPPT. Otherwise, it perform constant current.
+
+By using Perturb and Observe method, the maximum power point was found by comparing the present and previous power value, and varying the PWM accordingly. By varying the PWM, the resistance of the load changes, and the value of current and voltage change as well. By using the buck mode, if the present power was larger than the previous power, the PWM would be decreased by $0.005$. If the present power was smaller than the previous power, the PWM would be increased by $0.005$. A change of $0.005$ was selected because teh value was a reasonably large enough range where the settling process of the values could be observed.
+
+\pagebreak
 \subsubsection{Circuit Design}
+
+\begin{figure} [h!]
+    \centering
+    \includegraphics[scale=0.5]{Energy_parallel.JPG}
+    \caption{Parallel cell design}
+\end{figure}
+The Energy module was design useing cells arranged in parallel. This was considered advantageous due to the following:
+\begin{itemize}
+    \item The whole energy system still operates even if one cell suffers an unexpected failure. The only effect to the Energy system would be an decrease in total cell capacity.
+    \item Parallel cell arrangements also balance automatically provided that there was no significant difference between the voltage of all the cells before charging begins.
+    \item The larger total current capacity of the system enables the system to function even on a cloudy day where PV panels are less efficient.
+\end{itemize}
 
 \subsubsection{State of Health}
 
+The State of Health (SOH) is an indicator of the current condition of a cell compared to its ideal conditions. 
+
+The Energy module has implemented several features to ensure the cells are kept as close to its ideal conditions during operation:
+\begin{itemize}
+    \item Overvoltage/undervoltage of each cell is consistently monitored by adding an error state for every single cell.
+    \item The battery balancing algorithm implemented in the state machine ensures overcurrent does not occur.
+\end{itemize}
+
+The only concern that could not be mitigated was the battery temperature. A temperature sensor may be added to ensure the cell does not overheated for a long time.  
+
 \subsubsection{Energy to Control interface}
 
-\subsubsection{Implementation problem}
+Energy module communicates to the Control module through the UART port:
+
+\begin{lstlisting}
+if(Serial.available()>0) {
+    command = Serial.read();
+    if (command == 'c') { // Go to charging state
+    state_num = 0;
+    } else if(command == 'r') { // Go to read soc
+        Serial.println(soc); // Change to Serial1.print for communication with control sub module
+    } else if(command == 's') { // Stop charging, go to rest state
+        state_num = 3;
+    } else if(command == 'd') { // Start discharge
+        state_num = 15;
+    }
+\end{lstlisting}
+
+Referring to the Figure \ref{fig:State} state machine, the Energy module performs the following depends on the instruction received from the Control module:
+\begin{itemize}
+    \item \textbf{'c'}: Battery enters \textit{state 0} where the initial SOC value is measured and transitions to \textit{state 1} i.e. constant current charging state, as shown in the state machine with three cells.
+    \item \textbf{'r'}: SOC value is read and passed to the Command module.
+    \item \textbf{'s'}: Battery will stop charging and enter a rest mode.
+    \item \textbf{'d'}: Battery will be discharged by the drive sub module. 
+\end{itemize}
+
+Because it cannot be tested with Drive module, the discharging process was imitated by a constant current mode with a reference current of 350 mA. 350mA was the value of the current that the Drive module uses while the rover was moving. To make sure all the cells have not been overvoltage/undervoltage, the battery should be balanced while discharging as well.
+
+The Energy module passes the SOC value to the Control module which can be used to estimate the range that rover has left based on the battery remaining by using this equation:
+\begin{gather*}
+    \text{Time available} = \frac{\frac{\text{SOC value}}{100} \times \text{Total cell capacity}}{\text{Current drawn out}} \\
+    \text{Range left} = \text{Time available} \times \text{Speed}
+\end{gather*}
+where "Total cell capacity" is defined as $565.07 + 543.68 + 554.51 = 1663.26$ mAh
+
+The Energy module decided to place the PV panels directly on the rover since the rover's range will be limited if it has return to a static charging station when the battery is low. If the PV panels are placed on the rover, the rover would be able to stop and charge anytime the battery is low. 
+
+The Energy module did consider a static charging station which could significantly reduce the weight of the Mars rover. A reduced rover weight would mean more efficiency and less possible failure points. The charging station could include with other functionalities like additional sensors checking if everything on the rover functions normally and replacing failed parts like the battery cells. Ultimately, the advantage of not being constrained to an area due to the static charging station was more important than the advantages offered by the static charging station.
 
 
 
