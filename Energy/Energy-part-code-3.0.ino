@@ -633,7 +633,7 @@ void loop() {
 
      case 15:{//Discharging state
         cc = 1;
-        current_ref = -350;
+        current_ref = -350; // To mimic the current discharged by the drive part
         if (V_mean_total > 2500) { 
           soc = soc + (current_measure/57600);//remember to change the correct battery capacity after testing
           if (rest_timer < 60){
@@ -678,7 +678,7 @@ void loop() {
             V_mean_total = 0;
       }
         
-      }else{//go to cv charge state
+      }else{//Go to rest state
         next_state = 3;
         rest_timer = 0;
       }
@@ -763,7 +763,7 @@ void loop() {
         cc = 1;
         current_ref = 0;
        if (abs((V_mean2 - V_mean1) < 400)){
-        next_state = 17;
+        next_state = 16;
        }
        else{
         if (rest_timer < 60){
