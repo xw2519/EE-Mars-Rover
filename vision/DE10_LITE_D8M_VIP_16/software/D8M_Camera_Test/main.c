@@ -75,11 +75,14 @@ s - Emergency Stop            - If stopping reason unknown, send {bX00+00} after
 p - Pause to gather data
 c - Continue after gathering data
 b - Ball data                 {'b', colour, 2 digit distance, sign, 2 digit other distance} (+right, -left) (R,P,Y,G,B,U - Colours)
-t - Tilt data                 {'t', 3 digit y reading, 3 digit z reading} (Readings in 10-bit 2's complement)
+t - Tilt data                 {'t', sign, 2-digit inclination}
 
 Control ---> Vision
 m - Movement command received
 s - Stop command received
+a - Acknowledgement, sent after each set of ball data
+R - Reset all variables, trigger autofocus
+C - Calibrate gain and accelerometer
 */
 
 alt_up_rs232_dev             *ctrl_uart;             // UART connection to control
@@ -99,7 +102,10 @@ alt_u16   distance, diameter, mid_pos, angle, colour, touching_edge;
 array_u8  ball_colours, ball_distances, ball_angles, ball_sent;
 
 // Used to read, store and process accelerometer data
-alt_32    x_read, y_read, z_read, x_drift, y_drift, z_drift;
+alt_32    x_read, y_read, z_read;
+alt_32    x_drift, y_drift, z_drift;
+alt_u32   a, a2, a3, a5;
+alt_u8    incl;
 
 // Flags used to control flow of program
 alt_u8    balls_detected, filter_id;
@@ -314,6 +320,7 @@ void sys_timer_isr(){
   }
   if((IORD(KEY_BASE,0)&0x03) == 0x02){           // touch KEY0 to trigger gain adjustment
     gain_calib = 0;
+    acc_calib  = 0;
     gain       = 0x7FF;
     exposure   = 0x2000;
 
@@ -461,14 +468,20 @@ void sys_timer_isr(){
 
     //----------------------------------------------------------------- Read and process accelerometer data
 
-    /*alt_up_accelerometer_spi_read_x_axis(acc_dev, &x_read);
+    alt_up_accelerometer_spi_read_x_axis(acc_dev, &x_read);
     alt_up_accelerometer_spi_read_y_axis(acc_dev, &y_read);
     alt_up_accelerometer_spi_read_z_axis(acc_dev, &z_read);
 
     if(acc_calib<CALIBRATION_MAX){
-      x_drift = x_read;
-      y_drift = x_read;
-      z_drift = x_read;
+      if(!acc_calib){
+        x_drift = x_read;
+        y_drift = y_read;
+        z_drift = z_read;
+      }else{
+        x_drift = (x_read + x_drift)>>1;
+        y_drift = (y_read + y_drift)>>1;
+        z_drift = (z_read + z_drift)>>1;
+      }
       acc_calib++;
     }
 
@@ -476,13 +489,22 @@ void sys_timer_isr(){
     y_read -= y_drift;
     z_read -= z_drift;
 
-    x_read &= 0x3FF;
-    y_read &= 0x3FF;
-    z_read &= 0x3FF;
+    if(y_read<0){ a = (((-y_read)<<22)/z_read)>>16; }
+    else{ a = ((y_read<<22)/z_read)>>16; }
+
+    a2 = a*a;
+    a3 = a*a2;
+    a5 = a2*a3;
+
+    a  <<= 24;
+    a3 <<= 12;
+
+    incl = (a - (a>>3) + (a3>>2) - (a5>>3))>>24;
 
     #ifdef VIEW_ACC_READS
-      printf("X = %03x   Y = %03x   Z = %03x\n", x_read, y_read, z_read);
-    #endif*/
+      printf("X = %04x   Y = %04x   Z = %04x\n", x_read, y_read, z_read);
+      printf("Tilt: %02d\n", incl);
+    #endif
 
     //----------------------------------------------------------------- Send messages to UART using processed data
 
@@ -545,18 +567,16 @@ void sys_timer_isr(){
     }
 
     // If UART is free otherwise, send tilt sensor data
-    /*if(ctrl_uart&&(!stop_ticks)&&(!ack)&&(!acc_ticks)&&(acc_calib>=CALIBRATION_MAX)){
-      if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)>7){
+    if(ctrl_uart&&(!stop_ticks)&&(!ack)&&(last_command=='c')&&(!acc_ticks)){
+      if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)>4){
         alt_up_rs232_write_data(ctrl_uart, 't');
-        alt_up_rs232_write_data(ctrl_uart, (y_read/100)+48);
-        alt_up_rs232_write_data(ctrl_uart, ((y_read%100)/10)+48);
-        alt_up_rs232_write_data(ctrl_uart, (y_read%10)+48);
-        alt_up_rs232_write_data(ctrl_uart, (z_read/100)+48);
-        alt_up_rs232_write_data(ctrl_uart, ((z_read%100)/10)+48);
-        alt_up_rs232_write_data(ctrl_uart, (z_read%10)+48);
-        acc_ticks = 3;
+        if(y_read<0){ alt_up_rs232_write_data(ctrl_uart, '-'); }
+        else{ alt_up_rs232_write_data(ctrl_uart, '+'); }
+        alt_up_rs232_write_data(ctrl_uart, (incl/10)+48);
+        alt_up_rs232_write_data(ctrl_uart, (incl%10)+48);
+        acc_ticks = 6;
       }
-    }*/
+    }
 
     //----------------------------------------------------------------- Update ime variables
 
@@ -566,7 +586,7 @@ void sys_timer_isr(){
     mem_ticks++;
     if(mem_ticks>=64){                                  // Erase memory every ~20 seconds
       mem_ticks = 0;
-      ball_sent.used = 0;
+      //ball_sent.used = 0;
     }
 
     process = 0;
@@ -653,6 +673,7 @@ int main(){
           ball_sent.used=0;
         }else if(prompt=='C'){
           gain_calib = 0;
+          acc_calib  = 0;
           gain       = 0x7FF;
           exposure   = 0x2000;
 
@@ -664,7 +685,7 @@ int main(){
             printf("Exposure = %x\n", exposure);
           #endif
         }
-        
+
         /*else if(prompt=='c'){ moving = 1; }
         else if(prompt=='p'){ moving = 0; }
         else if(prompt=='b'){
