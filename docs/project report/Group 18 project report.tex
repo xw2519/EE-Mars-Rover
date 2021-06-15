@@ -215,7 +215,7 @@ Due to certain complications like Quartus, the timelines of Vision and Control h
 
 The team found using the Gantt chart has its advantages and disadvantages. The chart was a great place for team members to see the progress of other team members and plan their own module to coincide with certain testing milestone. On the other hand, it got quite complicated and changes occured often so team members had to constantly check the chart to see if they are in sync with modules like Control. This was mitigated by editing the Gantt chart live during each meeting so members know exactly what changed and what they need to be aware of.
 
-
+An additional problem was the fact that the size of the bars do not indicate the amount of work.
 
 
 
@@ -568,7 +568,7 @@ The optical sensor measures the distance of the rover travelled and the turning 
 
 \subsubsection{Advanced features}
 
-The Vision module is able to directly issue commands to the Drive module through the Control module. Vision module issues three commands: Pause (P), Next coordinate (N) and Unpause (U). This was implemented to allow the Vision module to stop the rover if it detected an obstacle like a ball or an object that could collide with the rover. During Pause, the rover will send the x-position of the rover. Once Control has received it, Control would send the N flag which Drive will send the y-position. After the Unpause command is issued, the rover would continue executing the current set of instructions.
+The Vision module is able to directly issue commands to the Drive module through the Control module. Vision module issues three commands: Pause (P), Next coordinate (N) and Unpause (U). This was implemented to allow the Vision module to stop the rover if it detected an obstacle like a ball or an object that could collide with the rover. During Pause, the rover will send the x-position of the rover. Once Control has received it, Control would send the N flag which Drive will send the y-position. After the Unpause command is issued, the rover would continue executing the current set of instructions \footnote{The implementation is attached in the Appendix: Drive module: Pause feature}.
     
 "Emergency Stop" action (X) is issued by Vision when a ball is in the path of the rover and would collide if the rover did not stop. The "Emergency Stop" is different from the standard "Stop" where if the "Emergency Stop" was used, the rover status will be updated to display an error has occured which is not the case for the standard "Stop" action. 
 
@@ -744,7 +744,7 @@ Placing the PV panels on the rover would mean the rover's range is not constrain
 
 \subsection{Energy}
 
-
+The in Energy module, it was stated that the team opted to mount the PV panels on the Mars rover as this design choice was seen as more advantageous than the alternative which was a static charging station. The Integration module was tasked to research the best method to mount the PV panels and connect the system to the existing Mars rover interface. 
 
 
 
@@ -756,6 +756,100 @@ Placing the PV panels on the rover would mean the rover's range is not constrain
 \printbibliography[heading=bibnumbered, title={References}]
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagebreak
+\section{Appendix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Meeting minute sample}
+
+\begin{figure} [h!]
+    \centering
+    \includegraphics[scale=0.8]{Minute_sample.JPG}
+\end{figure}
+
+\subsection{Proposed wireframe website design}
+
+\begin{figure} [h!]
+    \centering
+    \includegraphics[scale=0.5]{Wireframe.JPG}
+\end{figure}
+
+\pagebreak
+\subsection{Command module: Server code}
+\begin{lstlisting}
+@app.websocket("/ws/server") // Website client connection
+async def websocket_client(websocket: WebSocket):
+    '''
+    Handle server <-> website websocket connection
+    '''
+    print('[Server]: Establishing command client websocket connection')
+    await session_instance.client_connection.connect(websocket)
+    
+    try:
+        while True:
+            # Receive messages from command client 
+            received_data = await websocket.receive_text()
+                  
+            if (received_data != ""):
+                print("[Server Info]: Sending to rover: " + received_data)              
+                await session_instance.rover_connection.send_to_rover(received_data)
+            
+    except WebSocketDisconnect:
+        print("[Server Error]: Command client websocket terminated")
+
+
+@app.websocket("/ws/rover") // Rover connection
+async def websocket_endpoint(websocket: WebSocket):
+    '''
+    Handle server <-> rover websocket connection
+    '''
+    print("[Server Error]: Establishing websocket connection with rover")
+    await session_instance.rover_connection.connect(websocket)
+    
+    try:
+        while True:
+            # Receive messages from the rover 
+            received_data_rover = await websocket.receive_text()
+            
+            if (received_data_rover != ""):
+                print("[Server Info]: Sending to client: " + received_data_rover)  
+                await session_instance.client_connection.send_to_client(received_data_rover)
+                
+    except WebSocketDisconnect:
+        print("[Server Error]: Rover websocket terminated")
+\end{lstlisting}
+
+\pagebreak
+\subsection{Drive module: Pause feature}
+\begin{lstlisting}
+if(instruction[0] == 'P') { // Pause
+    Stop();
+    delay(100);
+    Serial.write('p');
+    Serial.print(String(total_x)); // Total x
+
+    while(!Serial.available() || Serial.peek()!='N') { // Control has received 'x' value and tell 'y' to Control
+    delay(1);
+    }
+
+    Serial.read(); // Remove the N
+    Serial.print('y');
+    Serial.print(String(total_y)); // total y
+
+    while(!Serial.available() || Serial.peek()!='U') { // Unpause
+    delay(50); // 50ms
+    }
+    Serial.read(); //get rid of the U
+    Serial.println("Received U");
+    instructionStartTime=millis();
+
+    Serial.println("FBLRS");
+    Serial.print(F); Serial.print(B); Serial.print(L); Serial.print(R); Serial.println(S);
+    return;
+
+}
+\end{lstlisting}
 
 
 
