@@ -472,23 +472,22 @@ void sys_timer_isr(){
     alt_up_accelerometer_spi_read_y_axis(acc_dev, &y_read);
     alt_up_accelerometer_spi_read_z_axis(acc_dev, &z_read);
 
-    /*if(acc_calib<CALIBRATION_MAX){
+    if(acc_calib<CALIBRATION_MAX){
       if(!acc_calib){
         x_drift = x_read;
         y_drift = y_read;
-        z_drift = z_read;
+        //z_drift = z_read;
       }else{
         x_drift = (x_read + x_drift)>>1;
         y_drift = (y_read + y_drift)>>1;
-        z_drift = (z_read + z_drift)>>1;
+        //z_drift = (z_read + z_drift)>>1;
       }
       acc_calib++;
-      printf("acc calibing\n");
     }
 
     x_read -= x_drift;
     y_read -= y_drift;
-    z_read -= z_drift;*/
+    //z_read -= z_drift;
 
     y_read += 0x10;
 
