@@ -1,0 +1,92 @@
+html, body {
+    text-align: center;
+    background-color: #1A1A1D;
+    font-family: Lato;
+    font-size: 10px;
+    color: #D1E8E2;
+  }
+  
+  /* Header */
+  .logo {
+    float: left;
+  }
+  
+  .container {
+    position: relative;
+    display: grid;
+    grid-template-columns: 0.3fr 0.4fr 0.3fr;
+    grid-template-rows: auto;
+    column-gap: 10px;
+    row-gap: 10px;
+    height: calc(100vh - 10px);
+  }
+  
+  /* Grid design */
+  .grid {
+    background-color: #272727;
+    color: #D1E8E2;
+    padding: 10px;
+    font-size: 3rem;
+    height: auto;
+    width: auto;
+  }
+
+  .HeaderTitle {
+    vertical-align: middle;
+    text-align: center;
+    font-size: small;
+    grid-column: 1 / 4;
+    grid-row: 1 / 2;
+    background-color: #272727;
+  }
+
+  .SensorReading {
+    grid-column: 1 / 2;
+    grid-row: 2 / 10;
+    background-color: #272727;
+  }
+
+  .RoverSettings {
+    grid-column: 1 / 2;
+    grid-row: 10 / 18;
+    background-color: #272727;
+  }
+
+  .Map {
+    position: relative;
+    grid-column: 2 / 3;
+    grid-row: 2 / 12;
+    background-color: #272727;
+    min-height: 0px; 
+    height: auto;
+    width: auto;
+  }
+
+  .NavigationUI {
+    grid-column: 2 / 3;
+    grid-row: 12 / 18;
+    background-color: #272727;
+    max-height: 600px; 
+  }
+
+  .Terminal {
+    grid-column: 3 / 4;
+    grid-row: 2 / 10;
+    background-color: #272727;
+  }
+
+  .TerminalLog {
+    position: relative;
+    height: 80%;
+    text-align: left;
+    font-size: 15px;
+    color: #D1E8E2;
+    background-color: #272727;
+  }
+
+  .CommandSettings {
+    grid-column: 3 / 4;
+    grid-row: 10 / 18;
+    background-color: #272727;
+  }
+  

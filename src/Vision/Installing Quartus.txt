@@ -1,0 +1,26 @@
+1. Download files from (https://fpgasoftware.intel.com/16.0/?edition=lite).
+  a) Quartus Prime (includes Nios II EDS)                Size: 1.8   GB   MD5: D620B0A1CF43150462658B713C7F96B5
+  b) ModelSim-Altera Edition (includes Starter Edition)  Size: 1.4   GB   MD5: 8C8ED25D6ACF152CEF2FCFE69DB052C5
+  c) MAX 10 FPGA device support                          Size: 339.9 MB   MD5: 6E5A3587BFD61936F0AA024B2BBCC1A0
+
+2) Install somewhere with a lot of space with default settings, requires around 16GB.
+
+In the following instructions, project folder refers to /DE10_LITE_D8M_VIP_16/, NOT the git repository.
+
+3) Move project folder to a path with no spaces ( ) or dashes (-),
+   best to move it somewhere with no punctuation or eclipse will die :c
+
+4) Open project folder in Quartus, press the "Start Compilation" button (or Ctrl + L).
+
+5) Go to "tools -> Nios II Software Build Tools for Eclipse" and choose a workspace directory (default is ok).
+  a) Right-click in the Project Explorer panel on the left, select Import.
+  b) Select "General -> Existing Projects into Workspace".
+  c) Click browse and choose the "DE10_LITE_D8M_VIP_16/software" folder.
+  d) The folders "D8M_Camera_Test" and "D8M_Camera_Test_bsp" should be listed.
+  e) Click finish with default settings.
+
+6) Right click on the BSP and select "Nios II -> Generate BSP".
+  a) Right click on the project and choose "Build project".
+
+7) Use programmer to flash the .sof file in the "output_files" folder.
+  a) Right click on the project in eclipse and choose "Run As -> 3 Nios II Hardware".

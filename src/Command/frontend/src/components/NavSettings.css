@@ -1,0 +1,84 @@
+
+
+.Nav_Settings {
+    position: relative;
+    margin-left: 20%;
+    margin-top: 4%;
+    width: 60%;
+}
+
+.Unit {
+    font-size: 20px;
+    text-align: left;
+}
+
+.Unit_title {
+    position: relative;
+    width: 50%;
+    margin-top: 0%;
+}
+
+.Unit_switch {
+    position: relative;
+    width: 20%;
+    margin-top: -10%;
+    margin-left: 80%;
+    background-color:#272727;
+    text-align: center;
+    color: #D1E8E2;
+}
+
+.Dist_value {
+    position: relative;
+    background-color:#272727;
+    text-align: center;
+    color: #D1E8E2;
+    font-size: large;
+    margin-top: 12%;
+    height: 40px;
+    border: 3px solid #D1E8E2;
+}
+
+.Angle {
+    font-size: 20px;
+    text-align: left;
+    margin-top: 10%;
+}
+
+.Angle_title {
+    position: relative;
+    width: 50%;
+    margin-top: 0%;
+}
+
+.Angle_switch {
+    position: relative;
+    width: 20%;
+    margin-top: -10%;
+    margin-left: 80%;
+    background-color:#272727;
+    text-align: center;
+    color: #D1E8E2;
+}
+
+.Angle_value {
+    position: relative;
+    background-color:#272727;
+    text-align: center;
+    color: #D1E8E2;
+    font-size: large;
+    margin-top: 12%;
+    height: 40px;
+    border: 3px solid #D1E8E2;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
