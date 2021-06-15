@@ -25,7 +25,7 @@
 //#define VIEW_BALL_DATA
 #define VIEW_UART_MSGS
 #define VIEW_AUTO_GAIN
-//#define VIEW_ACC_READS
+#define VIEW_ACC_READS
 
 //offsets for image processor memory mapped interface
 #define EEE_IMGPROC_STATUS 0
@@ -472,7 +472,7 @@ void sys_timer_isr(){
     alt_up_accelerometer_spi_read_y_axis(acc_dev, &y_read);
     alt_up_accelerometer_spi_read_z_axis(acc_dev, &z_read);
 
-    if(acc_calib<CALIBRATION_MAX){
+    /*if(acc_calib<CALIBRATION_MAX){
       if(!acc_calib){
         x_drift = x_read;
         y_drift = y_read;
@@ -483,11 +483,14 @@ void sys_timer_isr(){
         z_drift = (z_read + z_drift)>>1;
       }
       acc_calib++;
+      printf("acc calibing\n");
     }
 
     x_read -= x_drift;
     y_read -= y_drift;
-    z_read -= z_drift;
+    z_read -= z_drift;*/
+
+    y_read += 0x10;
 
     if(y_read<0){ a = (((-y_read)<<22)/z_read)>>16; }
     else{ a = ((y_read<<22)/z_read)>>16; }
