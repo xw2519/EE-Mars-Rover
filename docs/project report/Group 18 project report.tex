@@ -744,7 +744,34 @@ Placing the PV panels on the rover would mean the rover's range is not constrain
 
 \subsection{Energy}
 
-The in Energy module, it was stated that the team opted to mount the PV panels on the Mars rover as this design choice was seen as more advantageous than the alternative which was a static charging station. The Integration module was tasked to research the best method to mount the PV panels and connect the system to the existing Mars rover interface. 
+In the Energy module, it was stated that the team opted to mount the PV panels on the Mars rover as this design choice was seen as more advantageous than the alternative which was a static charging station. The Integration module was tasked to research the best method to mount the PV panels and connect the system to the existing Mars rover interface. 
+
+Having taken into account the current equipment provided to the project team, it was not possible to directly connect the Energy module to the Drive module. The Drive module was in Buck mode due to the requirement of having only voltages between $0$-$5$ V. The Energy module was using Buck mode due to the parallel cell connection design. However, in that situation, the voltage for Drive would constantly be fixed in the range of $2.4$ – $5$ V which meant the velocity range of the rover would be limited in the range as well.
+
+There were two possible solutions proposed for this design problem:
+\begin{itemize}
+    \item \textbf{Relays}: Using two relays arranged in the following arrangement:
+    \begin{figure} [h!]
+        \centering
+        \includegraphics[scale=0.5]{Energy_int.JPG}
+        \caption{Proposed two relay arrangement}
+    \end{figure}
+
+    When charging the battery, the relay on the left will be connected to the PV panels and the relay on the right will be connected to the battery. The Arduino Nano Every would be powered by the voltage produced by the PV panels by adding a regulator to make sure the Arduino was powered with $5$ V.
+
+    When the rover moves, the relay on the left will be connected to Boost and the relay on the right will be connected to the Motor. The motor will be powered by the battery. However, the voltage across the battery decreases while discharging. Therefore, to make sure the output voltage of the battery was always at $5$ V, a PID controller can be added in the Arduino Nano Every on Boost to ensure the output voltage was fixed at $5$ V.
+    
+    \item \textbf{Add a third SMPS}: The second option would be to simply boost the output voltage of battery to $5$ V. But the drawback is that SMPS is more expensive than a relay.
+    \begin{figure} [h!]
+        \centering
+        \includegraphics[scale=0.6]{Energy_int2.JPG}
+        \caption{Proposed additional SMPS}
+    \end{figure}
+    
+\end{itemize}
+
+The second option was chosen as the most preffered option since the SMPS, though more costly, was more efficient than the relay. Increased efficieny was seen as more important than increased cost of development.
+
 
 
 
