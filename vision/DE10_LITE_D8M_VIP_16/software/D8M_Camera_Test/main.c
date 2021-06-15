@@ -489,8 +489,6 @@ void sys_timer_isr(){
     y_read -= y_drift;
     //z_read -= z_drift;
 
-    y_read += 0x10;
-
     if(y_read<0){ a = (((-y_read)<<22)/z_read)>>16; }
     else{ a = ((y_read<<22)/z_read)>>16; }
 
