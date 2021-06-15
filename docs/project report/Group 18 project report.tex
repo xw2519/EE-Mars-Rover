@@ -8,7 +8,10 @@
 \usepackage{setspace}
 \usepackage{biblatex}
 \usepackage{subfig}
+\usepackage{float}
 
+\usepackage[export]{adjustbox}
+ 
 % Page master configuration
 \lstset { basicstyle=\ttfamily, breaklines = true, tabsize=2 }
 \geometry { a4paper, total={170mm,257mm}, left=20mm, top=20mm, right=20mm, bottom=20mm }
@@ -209,13 +212,11 @@ With the advantage of the Gantt chart, the Integration module was able to identi
 
 \subsubsection{Gantt chart}
 
-The project team used the Gantt chart provided at the start of the project and consistently updated it throughout the timeline of the project. With the team meeting twice a week to give updates on each module's progress, the Gnatt was updated after every meeting to reflect any change in development time and any additional work. 
+The project team used the Gantt chart provided at the start of the project and consistently updated it throughout the timeline of the project. With the team meeting twice a week to give updates on each module's progress, the Gantt was updated after every meeting to reflect any change in development time and any additional work. 
 
 Due to certain complications like Quartus, the timelines of Vision and Control had to be modified several times. With the whole team having access to the Gantt chart, it allowed the team identify a module's completed feature and to more easily arrange any inter-module testing such as Command to Control to Drive.  
 
 The team found using the Gantt chart has its advantages and disadvantages. The chart was a great place for team members to see the progress of other team members and plan their own module to coincide with certain testing milestone. On the other hand, it got quite complicated and changes occured often so team members had to constantly check the chart to see if they are in sync with modules like Control. This was mitigated by editing the Gantt chart live during each meeting so members know exactly what changed and what they need to be aware of.
-
-An additional problem was the fact that the size of the bars do not indicate the amount of work.
 
 
 
@@ -262,10 +263,13 @@ The team established the structural design of the rover system during the first 
 
 \end{enumerate}  
 
-\subsection{Functional design}
+\subsection{Functional design} 
 
-The team defined the rover system into three functional layers that each handled a different aspect of the system. 
-
+\begin{figure} [h!]
+    \centering
+    \includegraphics[scale=0.6]{Rover functional.png}
+    \caption{Rover system context diagram}
+\end{figure}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -399,27 +403,166 @@ The design of the authentication system incorporating Okta is shown below:
 
 
 \pagebreak
+
 \subsection{Control}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+The Control module acts as a central data hub that passes the necessary data from other modules to the intended module. For example, the Drive module sends rover coordinates to the Command module.
 
+\begin{figure} [h!]
+    \centering
+    \includegraphics[scale=0.6]{Control_functional.png}
+    \caption{Control module context diagrams}
+\end{figure}
 
+With the Arduino architecture, Command supports various interfaces. Each interface has advantages and disadvantages as summarised below:
+\begin{figure} [h!]
+    \centering
+    \includegraphics[scale=0.7]{Control_table.JPG}
+\end{figure}
 
+\subsubsection{Drive}
 
-
-
-\subsubsection{Drive confirmation}
-
-
+As the Mars rover was designed to operate in a remote location, the system was design to ensure the user knows when an instruction has failed to execute. In the Drive module, the Drive module sends a "Instruction Successful" signal to the Control module whenever an instruction finishes. In a situation the instruction failed to execute, like when the rover detects an obstacle, it will send an error message to be displayed on Command.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \pagebreak
 \subsection{Vision}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+In additional the the functional requirements stated in the Project Management section, the Vision module has the following non-function requirements that helped enhance the rover system:
+\begin{enumerate}
+    \item Collect the position and colour of balls provided that:
+    \begin{itemize}
+        \item Distance between ball and rover was within $20$ cm - $80$ cm
+        \item The ball does not touch the edges of the frame
+        \item Rover inclination angle was less than $45$ degrees
+        \item Rover operates under natural sunlight conditions
+    \end{itemize}
+
+    \item Balls can be detected but data cannot be recorded if the ball was within:
+    \begin{itemize}
+        \item Distance between ball and rover was greater than $14$ cm
+        \item Rover inclination angle was smaller than $50$ degrees
+    \end{itemize}
+
+    \item Automatic gain and exposure calibration to adapt to different light levels.
+    \item Accelerometer used to calculate inclination of rover.
+\end{enumerate}
+
+\subsubsection{Ball detection algorithm}
+
+\begin{figure}[ht]
+    \begin{minipage}[t]{0.5\linewidth}
+    \centering
+    \includegraphics[%scale=1
+                     width=0.9\linewidth, valign=t]{Vision diagram.png}
+    \caption{Vision module functional diagram}
+    \label{GIS_Mapping_Software}
+    \end{minipage}%
+    \begin{minipage}[t]{0.5\linewidth}
+        The image processor receives a stream of RGB pixel values from the camera which could have been converted to HSV format. However, RGB format was used rather than HSV format because the hue varied greatly with different lighting conditions, which led to poor ball detection and obstacle avoidance. Using HSV format would have also required single cycle division in hardware, which would be expensive in terms of chip area.
+        \\
+        The image processor used filters to determine whether a given pixel could belong to a ball or not. There are two sets of these filters:
+        \begin{itemize}
+            \item Ball detection filters: Designed to reduce the reporting of false negatives, across a wide range of lighting conditions but provides no data about colour.
+            \item Colour filters: This set has five filters, one for each ball colour. The colour filters have a very low chance of reporting false positives under sunlight, but they are very inaccurate under other lighting conditions.
+        \end{itemize}
+        
+        The NIOS II processor remove erroneous data from the detected balls, then compare the data with the bounds of the colour filters, this give the positions and colours of all visible balls. 
+    \end{minipage}
+\end{figure}
+
+If a ball was in the path of the rover while rover is currently moving, a signal will be transmitted over UART to stop the Drive module and send data of the blocking ball to Control. Otherwise, if a new ball was visible, but has not been seen before, its data will be transmitted to the command subsystem.
+
+\subsubsection{Rover inclination calculation}
+
+The accelerometer data was transmitted to the NIOS II processor over SPI, the y-axis and z-axis readings are used to calculate the inclination angle of the rover. This required the $arctan$ function, a fixed point approximation was created for this using the first three terms of the Taylor series. This approximation is only accurate for inclination between $\pm 20$ degrees:
+\begin{gather*}
+    a = \frac{y}{z} \\
+    \arctan(a) \approx 56a - 16a^3 + 8a^5
+\end{gather*}
+
+\subsubsection{Testing conditions}
+
+The testing conditions during the development of the Vision module are as follows:
+\begin{itemize}
+    \item Tested under sunlight (approximately 6500K) and 3000K 5W LED lamp:
+    \begin{itemize}
+        \item Varied brightness by varying distance to lamp or closing blinds partially.
+        \item Varied direction of lamp and sunlight by rotating Vision camera and balls.
+    \end{itemize}
+    \item Background was a matte painted wall with wooden floor.
+\end{itemize} 
+
+\subsubsection{Calibration}
+
+The gain and exposure could automatically adjusted when there are no balls in the field of view. The calibration system first sets both parameters to their maximum value, then reduces them until none of the colour filters are triggered and no balls are detected. This calibration process could be triggered remotely over UART.
+
+\subsubsection{UART interface}
+
+The UART implementation has "acknowledgement" signals designed to ensure all messages are transmitted successfully. The UART implementation also uses a ‘loose’ handshake protocol when transmitting data i.e. processor can process data, rather than idle, when waiting for responses. This was chosen over a ‘firm’ handshake because this method is much more resilient against errant characters or missing characters in transmission which has been detected during testing.
 
 
-\subsubsection{Implementation problem}
+
+The UART interface transmits the following information to the Control module in the following events:
+\begin{itemize}
+    \item If there was a ball within 30 cm range of the camera view, an emergency stop signal was sent to the Control module.
+    \item If a new ball had been detected, the "Pause" signal was sent to Control which was redirected to Drive in order to gather data.
+    \item Ball data such as obstacle coordinates and ball color was transmitted after pausing the Drive module. If an emergency stop has been occurred, the first batch of data describes the particular obstacle causing the emergency stop.
+    \item If no new ball data was left to transmit, a Continue signal was transmitted. This enables Drive to continue moving, or in the case of an emergency stop, informs Command that a ball was in the path of the rover.
+\end{itemize}
+
+\subsubsection{FPGA resource utilisation}
+
+\begin{verbatim}
+Flow Status	Successful                  Tue Jun 15 15:37:23 2021
+Quartus Prime Version:                  16.0.0 Build 211 04/27/2016 SJ Lite Edition
+Revision Name:                          DE10_LITE_D8M_VIP
+Top-level Entity Name:                  DE10_LITE_D8M_VIP
+Family:                                 MAX 10
+Device:                                 10M50DAF484C7G
+Timing Models:                          Final
+Total logic elements:                   12,204 / 49,760 ( 25 % )
+Total combinational functions:          10,595 / 49,760 ( 21 % )
+Dedicated logic registers:              7,474 / 49,760 ( 15 % )
+Total registers:                        7541
+Total pins:                             171 / 360 ( 48 % )
+Total virtual pins:                     0
+Total memory bits:                      1,319,096 / 1,677,312 ( 79 % )
+Embedded Multiplier 9-bit elements:     6 / 288 ( 2 % )
+Total PLLs:                             1 / 4 ( 25 % )
+UFM blocks:                             0 / 1 ( 0 % )
+ADC blocks:                             0 / 2 ( 0 % )
+Estimated Total logic elements:         13,020
+Total combinational functions:          10569
+
+Logic element usage by LUT inputs	
+-- 4 input functions:                   5418
+-- 3 input functions:                   2869
+-- <=2 input functions:                 2282
+
+Logic elements by mode	
+-- normal mode:                         9093
+-- arithmetic mode:                     1476
+
+Total registers:                        7581
+-- Dedicated logic registers:           7581
+-- I/O registers:                       0
+
+I/O pins:                               171
+Total memory bits:                      1319096
+Embedded Multiplier 9-bit elements:     6
+
+Total PLLs	                            1
+-- PLLs	                                1
+
+Maximum fan-out:                        4232
+Total fan-out:                          72189
+Average fan-out:                        3.77
+\end{verbatim}
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -573,6 +716,7 @@ The Vision module is able to directly issue commands to the Drive module through
 "Emergency Stop" action (X) is issued by Vision when a ball is in the path of the rover and would collide if the rover did not stop. The "Emergency Stop" is different from the standard "Stop" where if the "Emergency Stop" was used, the rover status will be updated to display an error has occured which is not the case for the standard "Stop" action. 
 
 
+\vfill
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \pagebreak
 \subsection{Energy}
@@ -740,7 +884,84 @@ Placing the PV panels on the rover would mean the rover's range is not constrain
 
 \subsection{Testing}
 
+The Integration module was very reliant on the progress of other modules since its role was largely testing and debugging any errors. Every individual module was extensively tested before being combined with other modules to form more complicated systems. The only module that could not be fully tested was the Energy module due to Integration not having the hardware required. Only basic tests were performed since the Energy module used the Arduino Nano Every which the Drive module also used. 
+
+The Integration module approached testing in the following phases: 
+\begin{itemize}
+    \item Stage 1: Each individual module 
+    \item Stage 2:
+    \begin{itemize}
+        \item Command and Control 
+        \item Vision and Control 
+        \item Drive and Control
+    \end{itemize}
+    \item Stage 3: 
+    \begin{itemize}
+        \item Command to Control to Drive 
+        \item Vision to Control to Drive
+    \end{itemize}
+    \item Stage 4: Full rover system test 
+    \item Stage 5: Autonomous mode test 
+\end{itemize}
+
+\subsection{Drive}
+
+Extensive testing was performed with the Drive module due to the low quality of the DC motors. The provided two DC motors were not outting the same amount of power due to a natural production variation. Due to the difference in value, its effects had to be considered and mitigated in the software in order to accurately calculate the rover coordinates. 
+
+A further aspect that was discovered through testing was the weight of the rover. Any additional weights such as a powerbank to power the rover would cause the wheels of the DC motor to turn inwards which would cause the rover to not perform turns accurately. 
+
 \subsection{Vision}
+\subsubsection{Vision to Control Interface}
+The connection of the Vision module to the Control module was one of the most complicated aspects of the project that required extensive testing and debugging to identify the error. Due to the lack of electrical lab equipment, the team could comprehensively test if the Vision fault was due to hardware like the FPGA board or software. 
+
+Using a spare Arduino board, the team managed to convert the spare Arduino into an oscilloscope that allowed the team to check if the FPGA was transmitting any form of signal. 
+
+\begin{figure}[!h]
+    \centering
+    \subfloat[Oscilloscope output showing electrical activities]{\includegraphics[width=0.5\textwidth]{Inte_Osci1.png}}
+    \hfill
+    \subfloat[Oscilloscope output showing no electrical activities]{\includegraphics[width=0.5\textwidth]{Inte_Osci2.png}}
+    \caption{}
+\end{figure}
+
+\pagebreak
+
+The oscilloscope tool was implemented in Arduino code as shown below:
+\begin{lstlisting}
+    void setup() {
+        Serial.begin(19200);
+        pinMode(A0, INPUT);
+    }
+
+    void loop() {
+        // Program code 
+        Serial.println(analogRead(A0)*(5.0/1024.0));
+        delay(7);
+    }
+\end{lstlisting}
+
+\subsubsection{Ball recognition}
+
+Through practical testing, the camera on the Vision module only recognises balls that are fully within its frame. If only part of the ball was in the frame, Vision would not be able to recognise it. This meant that, considering the height of the camera, Vision cannot recognise balls that are too close to the rover which risks the rover colliding with the obstacle. 
+
+Vision has implemented a feature that detects obstacles that would collide with the rover and issue an "Emergency Stop" signal to Control which is the directed to Drive. This feature was fully implemented in the "main.c" file:
+\begin{lstlisting}
+if(ctrl_uart&&moving&&(!stop_ticks)&&((closest_distance<30)||(ball_bounds[3]>=472))){
+    if(alt_up_rs232_get_available_space_in_write_FIFO(ctrl_uart)){
+        alt_up_rs232_write_data(ctrl_uart, 's');
+        stop_reasoned = 0;
+        last_command = 's';
+        stop_ticks = 9;
+    }
+
+    #ifdef VIEW_UART_MSGS
+        printf("UART sent: s\n");
+    #endif
+    }
+
+\end{lstlisting}
+
+\pagebreak
 
 \subsection{Energy}
 
@@ -765,17 +986,12 @@ There were two possible solutions proposed for this design problem:
     \begin{figure} [h!]
         \centering
         \includegraphics[scale=0.6]{Energy_int2.JPG}
-        \caption{Proposed additional SMPS}
+        \caption{Proposed additional SMPS arrangement}
     \end{figure}
     
 \end{itemize}
 
 The second option was chosen as the most preffered option since the SMPS, though more costly, was more efficient than the relay. Increased efficieny was seen as more important than increased cost of development.
-
-
-
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \pagebreak
