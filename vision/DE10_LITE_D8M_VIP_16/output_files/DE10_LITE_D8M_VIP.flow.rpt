@@ -1,5 +1,5 @@
 Flow report for DE10_LITE_D8M_VIP
-Sat Jun 12 09:24:25 2021
+Tue Jun 15 02:09:50 2021
 Quartus Prime Version 16.0.0 Build 211 04/27/2016 SJ Lite Edition
 
 
@@ -41,15 +41,15 @@ agreement for further details.
 +----------------------------------------------------------------------------------+
 ; Flow Summary                                                                     ;
 +------------------------------------+---------------------------------------------+
-; Flow Status                        ; Successful - Sat Jun 12 09:23:58 2021       ;
+; Flow Status                        ; Successful - Tue Jun 15 02:09:30 2021       ;
 ; Quartus Prime Version              ; 16.0.0 Build 211 04/27/2016 SJ Lite Edition ;
 ; Revision Name                      ; DE10_LITE_D8M_VIP                           ;
 ; Top-level Entity Name              ; DE10_LITE_D8M_VIP                           ;
 ; Family                             ; MAX 10                                      ;
 ; Device                             ; 10M50DAF484C7G                              ;
 ; Timing Models                      ; Final                                       ;
-; Total logic elements               ; 12,167 / 49,760 ( 24 % )                    ;
-;     Total combinational functions  ; 10,614 / 49,760 ( 21 % )                    ;
+; Total logic elements               ; 12,111 / 49,760 ( 24 % )                    ;
+;     Total combinational functions  ; 10,560 / 49,760 ( 21 % )                    ;
 ;     Dedicated logic registers      ; 7,456 / 49,760 ( 15 % )                     ;
 ; Total registers                    ; 7523                                        ;
 ; Total pins                         ; 171 / 360 ( 48 % )                          ;
@@ -67,7 +67,7 @@ agreement for further details.
 +-------------------+---------------------+
 ; Option            ; Setting             ;
 +-------------------+---------------------+
-; Start date & time ; 06/12/2021 09:16:48 ;
+; Start date & time ; 06/15/2021 02:03:46 ;
 ; Main task         ; Compilation         ;
 ; Revision Name     ; DE10_LITE_D8M_VIP   ;
 +-------------------+---------------------+
@@ -78,7 +78,7 @@ agreement for further details.
 +-------------------------------------+---------------------------------------+---------------+-------------+------------+
 ; Assignment Name                     ; Value                                 ; Default Value ; Entity Name ; Section Id ;
 +-------------------------------------+---------------------------------------+---------------+-------------+------------+
-; COMPILER_SIGNATURE_ID               ; 345052807169.162348580715224          ; --            ; --          ; --         ;
+; COMPILER_SIGNATURE_ID               ; 345052807169.162371902609756          ; --            ; --          ; --         ;
 ; ENABLE_SIGNALTAP                    ; Off                                   ; --            ; --          ; --         ;
 ; FITTER_EFFORT                       ; Standard Fit                          ; Auto Fit      ; --          ; --         ;
 ; MAX_CORE_JUNCTION_TEMP              ; 85                                    ; --            ; --          ; --         ;
@@ -100,11 +100,11 @@ agreement for further details.
 +---------------------------+--------------+-------------------------+---------------------+------------------------------------+
 ; Module Name               ; Elapsed Time ; Average Processors Used ; Peak Virtual Memory ; Total CPU Time (on all processors) ;
 +---------------------------+--------------+-------------------------+---------------------+------------------------------------+
-; Analysis & Synthesis      ; 00:03:32     ; 1.0                     ; 5337 MB             ; 00:03:42                           ;
-; Fitter                    ; 00:03:23     ; 1.0                     ; 5631 MB             ; 00:02:41                           ;
-; Assembler                 ; 00:00:04     ; 1.0                     ; 4935 MB             ; 00:00:03                           ;
-; TimeQuest Timing Analyzer ; 00:00:26     ; 1.0                     ; 5156 MB             ; 00:00:21                           ;
-; Total                     ; 00:07:25     ; --                      ; --                  ; 00:06:47                           ;
+; Analysis & Synthesis      ; 00:03:04     ; 1.0                     ; 5343 MB             ; 00:03:29                           ;
+; Fitter                    ; 00:02:28     ; 1.0                     ; 5596 MB             ; 00:02:26                           ;
+; Assembler                 ; 00:00:03     ; 1.0                     ; 4933 MB             ; 00:00:03                           ;
+; TimeQuest Timing Analyzer ; 00:00:19     ; 1.0                     ; 5157 MB             ; 00:00:18                           ;
+; Total                     ; 00:05:54     ; --                      ; --                  ; 00:06:16                           ;
 +---------------------------+--------------+-------------------------+---------------------+------------------------------------+
 
 

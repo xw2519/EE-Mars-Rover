@@ -1,5 +1,5 @@
 TimeQuest Timing Analyzer report for DE10_LITE_D8M_VIP
-Sat Jun 12 09:24:25 2021
+Tue Jun 15 02:09:50 2021
 Quartus Prime Version 16.0.0 Build 211 04/27/2016 SJ Lite Edition
 
 
@@ -103,11 +103,11 @@ Parallel compilation was disabled, but you have multiple processors available. E
 +--------------------------------------------------------------------------------------------+--------+--------------------------+
 ; SDC File Path                                                                              ; Status ; Read at                  ;
 +--------------------------------------------------------------------------------------------+--------+--------------------------+
-; DE10_LITE_D8M_VIP.SDC                                                                      ; OK     ; Sat Jun 12 09:24:02 2021 ;
-; e:/de10_lite_d8m_vip_16/db/ip/qsys/submodules/qsys_nios2_gen2_cpu.sdc                      ; OK     ; Sat Jun 12 09:24:02 2021 ;
-; e:/de10_lite_d8m_vip_16/db/ip/qsys/submodules/alt_vipitc131_cvo.sdc                        ; OK     ; Sat Jun 12 09:24:02 2021 ;
-; e:/de10_lite_d8m_vip_16/db/ip/qsys/submodules/altera_avalon_st_handshake_clock_crosser.sdc ; OK     ; Sat Jun 12 09:24:02 2021 ;
-; e:/de10_lite_d8m_vip_16/db/ip/qsys/submodules/altera_reset_controller.sdc                  ; OK     ; Sat Jun 12 09:24:02 2021 ;
+; DE10_LITE_D8M_VIP.SDC                                                                      ; OK     ; Tue Jun 15 02:09:34 2021 ;
+; e:/de10_lite_d8m_vip_16/db/ip/qsys/submodules/qsys_nios2_gen2_cpu.sdc                      ; OK     ; Tue Jun 15 02:09:34 2021 ;
+; e:/de10_lite_d8m_vip_16/db/ip/qsys/submodules/alt_vipitc131_cvo.sdc                        ; OK     ; Tue Jun 15 02:09:34 2021 ;
+; e:/de10_lite_d8m_vip_16/db/ip/qsys/submodules/altera_avalon_st_handshake_clock_crosser.sdc ; OK     ; Tue Jun 15 02:09:34 2021 ;
+; e:/de10_lite_d8m_vip_16/db/ip/qsys/submodules/altera_reset_controller.sdc                  ; OK     ; Tue Jun 15 02:09:34 2021 ;
 +--------------------------------------------------------------------------------------------+--------+--------------------------+
 
 
@@ -135,12 +135,12 @@ Parallel compilation was disabled, but you have multiple processors available. E
 +------------+-----------------+-----------------------------+------+
 ; Fmax       ; Restricted Fmax ; Clock Name                  ; Note ;
 +------------+-----------------+-----------------------------+------+
-; 64.01 MHz  ; 64.01 MHz       ; MIPI_PIXEL_CLK              ;      ;
-; 69.83 MHz  ; 69.83 MHz       ; MAX10_CLK1_50               ;      ;
-; 100.62 MHz ; 100.62 MHz      ; altera_reserved_tck         ;      ;
-; 102.42 MHz ; 102.42 MHz      ; u0|altpll_0|sd1|pll7|clk[2] ;      ;
-; 107.12 MHz ; 107.12 MHz      ; u0|altpll_0|sd1|pll7|clk[3] ;      ;
-; 165.89 MHz ; 165.89 MHz      ; MAX10_CLK2_50               ;      ;
+; 70.58 MHz  ; 70.58 MHz       ; MIPI_PIXEL_CLK              ;      ;
+; 71.46 MHz  ; 71.46 MHz       ; MAX10_CLK1_50               ;      ;
+; 102.15 MHz ; 102.15 MHz      ; u0|altpll_0|sd1|pll7|clk[3] ;      ;
+; 102.52 MHz ; 102.52 MHz      ; u0|altpll_0|sd1|pll7|clk[2] ;      ;
+; 114.39 MHz ; 114.39 MHz      ; altera_reserved_tck         ;      ;
+; 161.68 MHz ; 161.68 MHz      ; MAX10_CLK2_50               ;      ;
 +------------+-----------------+-----------------------------+------+
 This panel reports FMAX for every clock in the design, regardless of the user-specified clock periods.  FMAX is only computed for paths where the source and destination registers or ports are driven by the same clock.  Paths of different clocks, including generated clocks, are ignored.  For paths between a clock and its inversion, FMAX is computed as if the rising and falling edges are scaled along with FMAX, such that the duty cycle (in terms of a percentage) is maintained. Altera recommends that you always use clock constraints and other slack reports for sign-off analysis.
 
@@ -150,13 +150,13 @@ This panel reports FMAX for every clock in the design, regardless of the user-sp
 +-----------------------------+--------+---------------+
 ; Clock                       ; Slack  ; End Point TNS ;
 +-----------------------------+--------+---------------+
-; u0|altpll_0|sd1|pll7|clk[2] ; 0.236  ; 0.000         ;
-; MAX10_CLK1_50               ; 5.679  ; 0.000         ;
-; clk_dram_ext                ; 6.427  ; 0.000         ;
-; MAX10_CLK2_50               ; 9.012  ; 0.000         ;
-; MIPI_PIXEL_CLK              ; 11.292 ; 0.000         ;
-; u0|altpll_0|sd1|pll7|clk[3] ; 30.665 ; 0.000         ;
-; altera_reserved_tck         ; 45.031 ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[2] ; 0.246  ; 0.000         ;
+; MAX10_CLK1_50               ; 6.007  ; 0.000         ;
+; clk_dram_ext                ; 6.422  ; 0.000         ;
+; MAX10_CLK2_50               ; 9.289  ; 0.000         ;
+; MIPI_PIXEL_CLK              ; 11.277 ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[3] ; 30.210 ; 0.000         ;
+; altera_reserved_tck         ; 45.629 ; 0.000         ;
 +-----------------------------+--------+---------------+
 
 
@@ -165,12 +165,12 @@ This panel reports FMAX for every clock in the design, regardless of the user-sp
 +-----------------------------+--------+---------------+
 ; Clock                       ; Slack  ; End Point TNS ;
 +-----------------------------+--------+---------------+
-; u0|altpll_0|sd1|pll7|clk[2] ; -1.500 ; -23.386       ;
-; clk_dram_ext                ; -0.321 ; -9.604        ;
-; MAX10_CLK1_50               ; 0.325  ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[2] ; -1.505 ; -23.423       ;
+; clk_dram_ext                ; -0.312 ; -9.533        ;
+; MAX10_CLK1_50               ; 0.251  ; 0.000         ;
+; altera_reserved_tck         ; 0.339  ; 0.000         ;
 ; u0|altpll_0|sd1|pll7|clk[3] ; 0.340  ; 0.000         ;
-; altera_reserved_tck         ; 0.341  ; 0.000         ;
-; MAX10_CLK2_50               ; 0.348  ; 0.000         ;
+; MAX10_CLK2_50               ; 0.347  ; 0.000         ;
 ; MIPI_PIXEL_CLK              ; 0.378  ; 0.000         ;
 +-----------------------------+--------+---------------+
 
@@ -180,11 +180,11 @@ This panel reports FMAX for every clock in the design, regardless of the user-sp
 +-----------------------------+--------+---------------+
 ; Clock                       ; Slack  ; End Point TNS ;
 +-----------------------------+--------+---------------+
-; MAX10_CLK1_50               ; 4.661  ; 0.000         ;
-; u0|altpll_0|sd1|pll7|clk[2] ; 4.911  ; 0.000         ;
-; u0|altpll_0|sd1|pll7|clk[3] ; 6.036  ; 0.000         ;
-; MIPI_PIXEL_CLK              ; 36.890 ; 0.000         ;
-; altera_reserved_tck         ; 47.097 ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[2] ; 2.175  ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[3] ; 3.346  ; 0.000         ;
+; MAX10_CLK1_50               ; 4.730  ; 0.000         ;
+; MIPI_PIXEL_CLK              ; 36.099 ; 0.000         ;
+; altera_reserved_tck         ; 47.781 ; 0.000         ;
 +-----------------------------+--------+---------------+
 
 
@@ -193,11 +193,11 @@ This panel reports FMAX for every clock in the design, regardless of the user-sp
 +-----------------------------+-------+---------------+
 ; Clock                       ; Slack ; End Point TNS ;
 +-----------------------------+-------+---------------+
-; u0|altpll_0|sd1|pll7|clk[3] ; 0.939 ; 0.000         ;
-; altera_reserved_tck         ; 1.111 ; 0.000         ;
-; MAX10_CLK1_50               ; 1.515 ; 0.000         ;
-; MIPI_PIXEL_CLK              ; 1.827 ; 0.000         ;
-; u0|altpll_0|sd1|pll7|clk[2] ; 2.533 ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[3] ; 0.945 ; 0.000         ;
+; altera_reserved_tck         ; 1.064 ; 0.000         ;
+; MAX10_CLK1_50               ; 1.780 ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[2] ; 2.014 ; 0.000         ;
+; MIPI_PIXEL_CLK              ; 2.203 ; 0.000         ;
 +-----------------------------+-------+---------------+
 
 
@@ -206,13 +206,13 @@ This panel reports FMAX for every clock in the design, regardless of the user-sp
 +-----------------------------+--------+---------------+
 ; Clock                       ; Slack  ; End Point TNS ;
 +-----------------------------+--------+---------------+
-; u0|altpll_0|sd1|pll7|clk[2] ; 4.675  ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[2] ; 4.674  ; 0.000         ;
 ; u0|altpll_0|sd1|pll7|clk[1] ; 4.853  ; 0.000         ;
 ; clk_dram_ext                ; 5.790  ; 0.000         ;
-; MAX10_CLK1_50               ; 9.439  ; 0.000         ;
-; MAX10_CLK2_50               ; 9.660  ; 0.000         ;
-; MIPI_PIXEL_CLK              ; 19.583 ; 0.000         ;
-; u0|altpll_0|sd1|pll7|clk[3] ; 19.704 ; 0.000         ;
+; MAX10_CLK1_50               ; 9.442  ; 0.000         ;
+; MAX10_CLK2_50               ; 9.659  ; 0.000         ;
+; MIPI_PIXEL_CLK              ; 19.539 ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[3] ; 19.706 ; 0.000         ;
 ; altera_reserved_tck         ; 49.626 ; 0.000         ;
 ; ADC_CLK_10                  ; 96.000 ; 0.000         ;
 +-----------------------------+--------+---------------+
@@ -227,7 +227,7 @@ Typical MTBF of Design is 1e+09 years or 3.15e+16 seconds.
 Number of Synchronizer Chains Found: 92
 Shortest Synchronizer Chain: 2 Registers
 Fraction of Chains for which MTBFs Could Not be Calculated: 0.326
-Worst Case Available Settling Time: 10.542 ns
+Worst Case Available Settling Time: 11.157 ns
 
 Worst-Case MTBF values are calculated based on the worst-case silicon characteristics, with worst-case operating conditions.
   - Under worst-case conditions, an increase of 100ps in available settling time will increase MTBF values by a factor of 1.8
@@ -241,12 +241,12 @@ Typical MTBF values are calculated based on the nominal silicon characteristics,
 +------------+-----------------+-----------------------------+------+
 ; Fmax       ; Restricted Fmax ; Clock Name                  ; Note ;
 +------------+-----------------+-----------------------------+------+
-; 69.44 MHz  ; 69.44 MHz       ; MIPI_PIXEL_CLK              ;      ;
-; 76.04 MHz  ; 76.04 MHz       ; MAX10_CLK1_50               ;      ;
-; 111.23 MHz ; 111.23 MHz      ; altera_reserved_tck         ;      ;
-; 111.72 MHz ; 111.72 MHz      ; u0|altpll_0|sd1|pll7|clk[2] ;      ;
-; 116.5 MHz  ; 116.5 MHz       ; u0|altpll_0|sd1|pll7|clk[3] ;      ;
-; 180.7 MHz  ; 180.7 MHz       ; MAX10_CLK2_50               ;      ;
+; 76.51 MHz  ; 76.51 MHz       ; MIPI_PIXEL_CLK              ;      ;
+; 78.08 MHz  ; 78.08 MHz       ; MAX10_CLK1_50               ;      ;
+; 109.61 MHz ; 109.61 MHz      ; u0|altpll_0|sd1|pll7|clk[3] ;      ;
+; 112.2 MHz  ; 112.2 MHz       ; u0|altpll_0|sd1|pll7|clk[2] ;      ;
+; 125.91 MHz ; 125.91 MHz      ; altera_reserved_tck         ;      ;
+; 176.12 MHz ; 176.12 MHz      ; MAX10_CLK2_50               ;      ;
 +------------+-----------------+-----------------------------+------+
 This panel reports FMAX for every clock in the design, regardless of the user-specified clock periods.  FMAX is only computed for paths where the source and destination registers or ports are driven by the same clock.  Paths of different clocks, including generated clocks, are ignored.  For paths between a clock and its inversion, FMAX is computed as if the rising and falling edges are scaled along with FMAX, such that the duty cycle (in terms of a percentage) is maintained. Altera recommends that you always use clock constraints and other slack reports for sign-off analysis.
 
@@ -256,13 +256,13 @@ This panel reports FMAX for every clock in the design, regardless of the user-sp
 +-----------------------------+--------+---------------+
 ; Clock                       ; Slack  ; End Point TNS ;
 +-----------------------------+--------+---------------+
-; u0|altpll_0|sd1|pll7|clk[2] ; 1.049  ; 0.000         ;
-; clk_dram_ext                ; 6.545  ; 0.000         ;
-; MAX10_CLK1_50               ; 6.849  ; 0.000         ;
-; MAX10_CLK2_50               ; 9.492  ; 0.000         ;
-; MIPI_PIXEL_CLK              ; 11.581 ; 0.000         ;
-; u0|altpll_0|sd1|pll7|clk[3] ; 31.416 ; 0.000         ;
-; altera_reserved_tck         ; 45.505 ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[2] ; 1.087  ; 0.000         ;
+; clk_dram_ext                ; 6.540  ; 0.000         ;
+; MAX10_CLK1_50               ; 7.192  ; 0.000         ;
+; MAX10_CLK2_50               ; 9.746  ; 0.000         ;
+; MIPI_PIXEL_CLK              ; 11.589 ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[3] ; 30.877 ; 0.000         ;
+; altera_reserved_tck         ; 46.029 ; 0.000         ;
 +-----------------------------+--------+---------------+
 
 
@@ -271,9 +271,9 @@ This panel reports FMAX for every clock in the design, regardless of the user-sp
 +-----------------------------+--------+---------------+
 ; Clock                       ; Slack  ; End Point TNS ;
 +-----------------------------+--------+---------------+
-; u0|altpll_0|sd1|pll7|clk[2] ; -2.068 ; -32.532       ;
-; clk_dram_ext                ; -0.374 ; -11.468       ;
-; MAX10_CLK1_50               ; 0.292  ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[2] ; -2.076 ; -32.576       ;
+; clk_dram_ext                ; -0.365 ; -11.398       ;
+; MAX10_CLK1_50               ; 0.257  ; 0.000         ;
 ; altera_reserved_tck         ; 0.305  ; 0.000         ;
 ; u0|altpll_0|sd1|pll7|clk[3] ; 0.305  ; 0.000         ;
 ; MAX10_CLK2_50               ; 0.312  ; 0.000         ;
@@ -286,11 +286,11 @@ This panel reports FMAX for every clock in the design, regardless of the user-sp
 +-----------------------------+--------+---------------+
 ; Clock                       ; Slack  ; End Point TNS ;
 +-----------------------------+--------+---------------+
-; MAX10_CLK1_50               ; 4.694  ; 0.000         ;
-; u0|altpll_0|sd1|pll7|clk[2] ; 5.380  ; 0.000         ;
-; u0|altpll_0|sd1|pll7|clk[3] ; 6.367  ; 0.000         ;
-; MIPI_PIXEL_CLK              ; 37.111 ; 0.000         ;
-; altera_reserved_tck         ; 47.295 ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[2] ; 2.881  ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[3] ; 3.878  ; 0.000         ;
+; MAX10_CLK1_50               ; 4.824  ; 0.000         ;
+; MIPI_PIXEL_CLK              ; 36.341 ; 0.000         ;
+; altera_reserved_tck         ; 47.975 ; 0.000         ;
 +-----------------------------+--------+---------------+
 
 
@@ -299,11 +299,11 @@ This panel reports FMAX for every clock in the design, regardless of the user-sp
 +-----------------------------+-------+---------------+
 ; Clock                       ; Slack ; End Point TNS ;
 +-----------------------------+-------+---------------+
-; u0|altpll_0|sd1|pll7|clk[3] ; 0.862 ; 0.000         ;
-; altera_reserved_tck         ; 1.034 ; 0.000         ;
-; MAX10_CLK1_50               ; 1.374 ; 0.000         ;
-; MIPI_PIXEL_CLK              ; 1.650 ; 0.000         ;
-; u0|altpll_0|sd1|pll7|clk[2] ; 2.304 ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[3] ; 0.869 ; 0.000         ;
+; altera_reserved_tck         ; 0.984 ; 0.000         ;
+; MAX10_CLK1_50               ; 1.611 ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[2] ; 1.869 ; 0.000         ;
+; MIPI_PIXEL_CLK              ; 1.966 ; 0.000         ;
 +-----------------------------+-------+---------------+
 
 
@@ -312,12 +312,12 @@ This panel reports FMAX for every clock in the design, regardless of the user-sp
 +-----------------------------+--------+---------------+
 ; Clock                       ; Slack  ; End Point TNS ;
 +-----------------------------+--------+---------------+
-; u0|altpll_0|sd1|pll7|clk[2] ; 4.690  ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[2] ; 4.691  ; 0.000         ;
 ; u0|altpll_0|sd1|pll7|clk[1] ; 4.876  ; 0.000         ;
 ; clk_dram_ext                ; 5.790  ; 0.000         ;
-; MAX10_CLK1_50               ; 9.455  ; 0.000         ;
+; MAX10_CLK1_50               ; 9.453  ; 0.000         ;
 ; MAX10_CLK2_50               ; 9.669  ; 0.000         ;
-; MIPI_PIXEL_CLK              ; 19.655 ; 0.000         ;
+; MIPI_PIXEL_CLK              ; 19.607 ; 0.000         ;
 ; u0|altpll_0|sd1|pll7|clk[3] ; 19.700 ; 0.000         ;
 ; altera_reserved_tck         ; 49.648 ; 0.000         ;
 ; ADC_CLK_10                  ; 96.000 ; 0.000         ;
@@ -333,7 +333,7 @@ Typical MTBF of Design is 1e+09 years or 3.15e+16 seconds.
 Number of Synchronizer Chains Found: 92
 Shortest Synchronizer Chain: 2 Registers
 Fraction of Chains for which MTBFs Could Not be Calculated: 0.326
-Worst Case Available Settling Time: 11.289 ns
+Worst Case Available Settling Time: 11.822 ns
 
 Worst-Case MTBF values are calculated based on the worst-case silicon characteristics, with worst-case operating conditions.
   - Under worst-case conditions, an increase of 100ps in available settling time will increase MTBF values by a factor of 1.8
@@ -347,13 +347,13 @@ Typical MTBF values are calculated based on the nominal silicon characteristics,
 +-----------------------------+--------+---------------+
 ; Clock                       ; Slack  ; End Point TNS ;
 +-----------------------------+--------+---------------+
-; u0|altpll_0|sd1|pll7|clk[2] ; 5.814  ; 0.000         ;
-; clk_dram_ext                ; 6.502  ; 0.000         ;
-; MAX10_CLK2_50               ; 11.386 ; 0.000         ;
-; MIPI_PIXEL_CLK              ; 12.667 ; 0.000         ;
-; MAX10_CLK1_50               ; 13.494 ; 0.000         ;
-; u0|altpll_0|sd1|pll7|clk[3] ; 36.190 ; 0.000         ;
-; altera_reserved_tck         ; 48.124 ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[2] ; 5.964  ; 0.000         ;
+; clk_dram_ext                ; 6.501  ; 0.000         ;
+; MAX10_CLK2_50               ; 11.522 ; 0.000         ;
+; MIPI_PIXEL_CLK              ; 12.656 ; 0.000         ;
+; MAX10_CLK1_50               ; 13.771 ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[3] ; 35.692 ; 0.000         ;
+; altera_reserved_tck         ; 48.294 ; 0.000         ;
 +-----------------------------+--------+---------------+
 
 
@@ -362,13 +362,13 @@ Typical MTBF values are calculated based on the nominal silicon characteristics,
 +-----------------------------+--------+---------------+
 ; Clock                       ; Slack  ; End Point TNS ;
 +-----------------------------+--------+---------------+
-; u0|altpll_0|sd1|pll7|clk[2] ; -4.589 ; -73.012       ;
-; clk_dram_ext                ; -0.660 ; -21.635       ;
-; MAX10_CLK1_50               ; 0.141  ; 0.000         ;
-; altera_reserved_tck         ; 0.147  ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[2] ; -4.596 ; -73.042       ;
+; clk_dram_ext                ; -0.656 ; -21.590       ;
+; MAX10_CLK1_50               ; 0.102  ; 0.000         ;
+; altera_reserved_tck         ; 0.146  ; 0.000         ;
 ; u0|altpll_0|sd1|pll7|clk[3] ; 0.147  ; 0.000         ;
 ; MAX10_CLK2_50               ; 0.152  ; 0.000         ;
-; MIPI_PIXEL_CLK              ; 0.152  ; 0.000         ;
+; MIPI_PIXEL_CLK              ; 0.162  ; 0.000         ;
 +-----------------------------+--------+---------------+
 
 
@@ -377,11 +377,11 @@ Typical MTBF values are calculated based on the nominal silicon characteristics,
 +-----------------------------+--------+---------------+
 ; Clock                       ; Slack  ; End Point TNS ;
 +-----------------------------+--------+---------------+
-; MAX10_CLK1_50               ; 7.051  ; 0.000         ;
-; u0|altpll_0|sd1|pll7|clk[2] ; 7.592  ; 0.000         ;
-; u0|altpll_0|sd1|pll7|clk[3] ; 8.001  ; 0.000         ;
-; MIPI_PIXEL_CLK              ; 38.627 ; 0.000         ;
-; altera_reserved_tck         ; 48.843 ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[2] ; 6.165  ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[3] ; 6.595  ; 0.000         ;
+; MAX10_CLK1_50               ; 7.082  ; 0.000         ;
+; MIPI_PIXEL_CLK              ; 38.231 ; 0.000         ;
+; altera_reserved_tck         ; 49.233 ; 0.000         ;
 +-----------------------------+--------+---------------+
 
 
@@ -390,11 +390,11 @@ Typical MTBF values are calculated based on the nominal silicon characteristics,
 +-----------------------------+-------+---------------+
 ; Clock                       ; Slack ; End Point TNS ;
 +-----------------------------+-------+---------------+
-; u0|altpll_0|sd1|pll7|clk[3] ; 0.410 ; 0.000         ;
-; altera_reserved_tck         ; 0.480 ; 0.000         ;
-; MAX10_CLK1_50               ; 0.665 ; 0.000         ;
-; MIPI_PIXEL_CLK              ; 0.819 ; 0.000         ;
-; u0|altpll_0|sd1|pll7|clk[2] ; 1.045 ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[3] ; 0.411 ; 0.000         ;
+; altera_reserved_tck         ; 0.464 ; 0.000         ;
+; MAX10_CLK1_50               ; 0.770 ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[2] ; 0.850 ; 0.000         ;
+; MIPI_PIXEL_CLK              ; 0.957 ; 0.000         ;
 +-----------------------------+-------+---------------+
 
 
@@ -405,12 +405,12 @@ Typical MTBF values are calculated based on the nominal silicon characteristics,
 +-----------------------------+--------+---------------+
 ; clk_dram_ext                ; 2.000  ; 0.000         ;
 ; u0|altpll_0|sd1|pll7|clk[1] ; 2.000  ; 0.000         ;
-; u0|altpll_0|sd1|pll7|clk[2] ; 4.712  ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[2] ; 4.711  ; 0.000         ;
 ; MAX10_CLK1_50               ; 9.263  ; 0.000         ;
 ; MAX10_CLK2_50               ; 9.331  ; 0.000         ;
-; MIPI_PIXEL_CLK              ; 19.172 ; 0.000         ;
-; u0|altpll_0|sd1|pll7|clk[3] ; 19.729 ; 0.000         ;
-; altera_reserved_tck         ; 49.422 ; 0.000         ;
+; MIPI_PIXEL_CLK              ; 19.178 ; 0.000         ;
+; u0|altpll_0|sd1|pll7|clk[3] ; 19.728 ; 0.000         ;
+; altera_reserved_tck         ; 49.416 ; 0.000         ;
 ; ADC_CLK_10                  ; 96.000 ; 0.000         ;
 +-----------------------------+--------+---------------+
 
@@ -424,7 +424,7 @@ Typical MTBF of Design is 1e+09 years or 3.15e+16 seconds.
 Number of Synchronizer Chains Found: 92
 Shortest Synchronizer Chain: 2 Registers
 Fraction of Chains for which MTBFs Could Not be Calculated: 0.326
-Worst Case Available Settling Time: 15.763 ns
+Worst Case Available Settling Time: 16.108 ns
 
 Worst-Case MTBF values are calculated based on the worst-case silicon characteristics, with worst-case operating conditions.
   - Under worst-case conditions, an increase of 100ps in available settling time will increase MTBF values by a factor of 1.8
@@ -438,25 +438,25 @@ Typical MTBF values are calculated based on the nominal silicon characteristics,
 +------------------------------+--------+---------+----------+---------+---------------------+
 ; Clock                        ; Setup  ; Hold    ; Recovery ; Removal ; Minimum Pulse Width ;
 +------------------------------+--------+---------+----------+---------+---------------------+
-; Worst-case Slack             ; 0.236  ; -4.589  ; 4.661    ; 0.410   ; 2.000               ;
+; Worst-case Slack             ; 0.246  ; -4.596  ; 2.175    ; 0.411   ; 2.000               ;
 ;  ADC_CLK_10                  ; N/A    ; N/A     ; N/A      ; N/A     ; 96.000              ;
-;  MAX10_CLK1_50               ; 5.679  ; 0.141   ; 4.661    ; 0.665   ; 9.263               ;
-;  MAX10_CLK2_50               ; 9.012  ; 0.152   ; N/A      ; N/A     ; 9.331               ;
-;  MIPI_PIXEL_CLK              ; 11.292 ; 0.152   ; 36.890   ; 0.819   ; 19.172              ;
-;  altera_reserved_tck         ; 45.031 ; 0.147   ; 47.097   ; 0.480   ; 49.422              ;
-;  clk_dram_ext                ; 6.427  ; -0.660  ; N/A      ; N/A     ; 2.000               ;
+;  MAX10_CLK1_50               ; 6.007  ; 0.102   ; 4.730    ; 0.770   ; 9.263               ;
+;  MAX10_CLK2_50               ; 9.289  ; 0.152   ; N/A      ; N/A     ; 9.331               ;
+;  MIPI_PIXEL_CLK              ; 11.277 ; 0.162   ; 36.099   ; 0.957   ; 19.178              ;
+;  altera_reserved_tck         ; 45.629 ; 0.146   ; 47.781   ; 0.464   ; 49.416              ;
+;  clk_dram_ext                ; 6.422  ; -0.656  ; N/A      ; N/A     ; 2.000               ;
 ;  u0|altpll_0|sd1|pll7|clk[1] ; N/A    ; N/A     ; N/A      ; N/A     ; 2.000               ;
-;  u0|altpll_0|sd1|pll7|clk[2] ; 0.236  ; -4.589  ; 4.911    ; 1.045   ; 4.675               ;
-;  u0|altpll_0|sd1|pll7|clk[3] ; 30.665 ; 0.147   ; 6.036    ; 0.410   ; 19.700              ;
-; Design-wide TNS              ; 0.0    ; -94.647 ; 0.0      ; 0.0     ; 0.0                 ;
+;  u0|altpll_0|sd1|pll7|clk[2] ; 0.246  ; -4.596  ; 2.175    ; 0.850   ; 4.674               ;
+;  u0|altpll_0|sd1|pll7|clk[3] ; 30.210 ; 0.147   ; 3.346    ; 0.411   ; 19.700              ;
+; Design-wide TNS              ; 0.0    ; -94.632 ; 0.0      ; 0.0     ; 0.0                 ;
 ;  ADC_CLK_10                  ; N/A    ; N/A     ; N/A      ; N/A     ; 0.000               ;
 ;  MAX10_CLK1_50               ; 0.000  ; 0.000   ; 0.000    ; 0.000   ; 0.000               ;
 ;  MAX10_CLK2_50               ; 0.000  ; 0.000   ; N/A      ; N/A     ; 0.000               ;
 ;  MIPI_PIXEL_CLK              ; 0.000  ; 0.000   ; 0.000    ; 0.000   ; 0.000               ;
 ;  altera_reserved_tck         ; 0.000  ; 0.000   ; 0.000    ; 0.000   ; 0.000               ;
-;  clk_dram_ext                ; 0.000  ; -21.635 ; N/A      ; N/A     ; 0.000               ;
+;  clk_dram_ext                ; 0.000  ; -21.590 ; N/A      ; N/A     ; 0.000               ;
 ;  u0|altpll_0|sd1|pll7|clk[1] ; N/A    ; N/A     ; N/A      ; N/A     ; 0.000               ;
-;  u0|altpll_0|sd1|pll7|clk[2] ; 0.000  ; -73.012 ; 0.000    ; 0.000   ; 0.000               ;
+;  u0|altpll_0|sd1|pll7|clk[2] ; 0.000  ; -73.042 ; 0.000    ; 0.000   ; 0.000               ;
 ;  u0|altpll_0|sd1|pll7|clk[3] ; 0.000  ; 0.000   ; 0.000    ; 0.000   ; 0.000               ;
 +------------------------------+--------+---------+----------+---------+---------------------+
 
@@ -1150,11 +1150,11 @@ Typical MTBF values are calculated based on the nominal silicon characteristics,
 +-----------------------------+-----------------------------+------------+------------+------------+----------+
 ; From Clock                  ; To Clock                    ; RR Paths   ; FR Paths   ; RF Paths   ; FF Paths ;
 +-----------------------------+-----------------------------+------------+------------+------------+----------+
-; altera_reserved_tck         ; altera_reserved_tck         ; 1842       ; 0          ; 51         ; 2        ;
+; altera_reserved_tck         ; altera_reserved_tck         ; 1846       ; 0          ; 51         ; 2        ;
 ; MAX10_CLK1_50               ; altera_reserved_tck         ; false path ; 0          ; 0          ; 0        ;
 ; u0|altpll_0|sd1|pll7|clk[2] ; clk_dram_ext                ; 51         ; 0          ; 0          ; 0        ;
 ; altera_reserved_tck         ; MAX10_CLK1_50               ; false path ; false path ; 0          ; 0        ;
-; MAX10_CLK1_50               ; MAX10_CLK1_50               ; 490276     ; 0          ; 0          ; 0        ;
+; MAX10_CLK1_50               ; MAX10_CLK1_50               ; 492720     ; 0          ; 0          ; 0        ;
 ; u0|altpll_0|sd1|pll7|clk[2] ; MAX10_CLK1_50               ; 49         ; 0          ; 0          ; 0        ;
 ; MAX10_CLK2_50               ; MAX10_CLK2_50               ; 1823       ; 0          ; 0          ; 0        ;
 ; MIPI_PIXEL_CLK_ext          ; MAX10_CLK2_50               ; 9          ; 0          ; 0          ; 0        ;
@@ -1164,7 +1164,7 @@ Typical MTBF values are calculated based on the nominal silicon characteristics,
 ; clk_dram_ext                ; u0|altpll_0|sd1|pll7|clk[2] ; 16         ; 0          ; 0          ; 0        ;
 ; MAX10_CLK1_50               ; u0|altpll_0|sd1|pll7|clk[2] ; 58         ; 0          ; 0          ; 0        ;
 ; MIPI_PIXEL_CLK              ; u0|altpll_0|sd1|pll7|clk[2] ; 0          ; false path ; 0          ; 0        ;
-; u0|altpll_0|sd1|pll7|clk[2] ; u0|altpll_0|sd1|pll7|clk[2] ; 658766     ; 0          ; 0          ; 0        ;
+; u0|altpll_0|sd1|pll7|clk[2] ; u0|altpll_0|sd1|pll7|clk[2] ; 660339     ; 0          ; 0          ; 0        ;
 ; u0|altpll_0|sd1|pll7|clk[3] ; u0|altpll_0|sd1|pll7|clk[2] ; 11         ; 0          ; 0          ; 0        ;
 ; u0|altpll_0|sd1|pll7|clk[2] ; u0|altpll_0|sd1|pll7|clk[3] ; 11         ; 0          ; 0          ; 0        ;
 ; u0|altpll_0|sd1|pll7|clk[3] ; u0|altpll_0|sd1|pll7|clk[3] ; 11767      ; 0          ; 0          ; 0        ;
@@ -1177,11 +1177,11 @@ Entries labeled "false path" only account for clock-to-clock false paths and not
 +-----------------------------+-----------------------------+------------+------------+------------+----------+
 ; From Clock                  ; To Clock                    ; RR Paths   ; FR Paths   ; RF Paths   ; FF Paths ;
 +-----------------------------+-----------------------------+------------+------------+------------+----------+
-; altera_reserved_tck         ; altera_reserved_tck         ; 1842       ; 0          ; 51         ; 2        ;
+; altera_reserved_tck         ; altera_reserved_tck         ; 1846       ; 0          ; 51         ; 2        ;
 ; MAX10_CLK1_50               ; altera_reserved_tck         ; false path ; 0          ; 0          ; 0        ;
 ; u0|altpll_0|sd1|pll7|clk[2] ; clk_dram_ext                ; 51         ; 0          ; 0          ; 0        ;
 ; altera_reserved_tck         ; MAX10_CLK1_50               ; false path ; false path ; 0          ; 0        ;
-; MAX10_CLK1_50               ; MAX10_CLK1_50               ; 490276     ; 0          ; 0          ; 0        ;
+; MAX10_CLK1_50               ; MAX10_CLK1_50               ; 492720     ; 0          ; 0          ; 0        ;
 ; u0|altpll_0|sd1|pll7|clk[2] ; MAX10_CLK1_50               ; 49         ; 0          ; 0          ; 0        ;
 ; MAX10_CLK2_50               ; MAX10_CLK2_50               ; 1823       ; 0          ; 0          ; 0        ;
 ; MIPI_PIXEL_CLK_ext          ; MAX10_CLK2_50               ; 9          ; 0          ; 0          ; 0        ;
@@ -1191,7 +1191,7 @@ Entries labeled "false path" only account for clock-to-clock false paths and not
 ; clk_dram_ext                ; u0|altpll_0|sd1|pll7|clk[2] ; 16         ; 0          ; 0          ; 0        ;
 ; MAX10_CLK1_50               ; u0|altpll_0|sd1|pll7|clk[2] ; 58         ; 0          ; 0          ; 0        ;
 ; MIPI_PIXEL_CLK              ; u0|altpll_0|sd1|pll7|clk[2] ; 0          ; false path ; 0          ; 0        ;
-; u0|altpll_0|sd1|pll7|clk[2] ; u0|altpll_0|sd1|pll7|clk[2] ; 658766     ; 0          ; 0          ; 0        ;
+; u0|altpll_0|sd1|pll7|clk[2] ; u0|altpll_0|sd1|pll7|clk[2] ; 660339     ; 0          ; 0          ; 0        ;
 ; u0|altpll_0|sd1|pll7|clk[3] ; u0|altpll_0|sd1|pll7|clk[2] ; 11         ; 0          ; 0          ; 0        ;
 ; u0|altpll_0|sd1|pll7|clk[2] ; u0|altpll_0|sd1|pll7|clk[3] ; 11         ; 0          ; 0          ; 0        ;
 ; u0|altpll_0|sd1|pll7|clk[3] ; u0|altpll_0|sd1|pll7|clk[3] ; 11767      ; 0          ; 0          ; 0        ;
@@ -1393,7 +1393,7 @@ No non-DPA dedicated SERDES Receiver circuitry present in device or used in desi
 Info: *******************************************************************
 Info: Running Quartus Prime TimeQuest Timing Analyzer
     Info: Version 16.0.0 Build 211 04/27/2016 SJ Lite Edition
-    Info: Processing started: Sat Jun 12 09:23:59 2021
+    Info: Processing started: Tue Jun 15 02:09:31 2021
 Info: Command: quartus_sta DE10_LITE_D8M_VIP -c DE10_LITE_D8M_VIP
 Info: qsta_default_script.tcl version: #1
 Warning (20028): Parallel compilation is not licensed and has been disabled
@@ -1594,7 +1594,7 @@ Info (332104): Reading SDC File: 'e:/de10_lite_d8m_vip_16/db/ip/qsys/submodules/
 Warning (332060): Node: Qsys:u0|Qsys_alt_vip_vfb_0:alt_vip_vfb_0|ALT_CUSP160_AVALON_ST_OUTPUT:dout|startofpacket was determined to be a clock but was found without an associated clock assignment.
     Info (13166): Register Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|VCM_CTRL_P:vcm_ctrl|F_VCM:f|VCM_END is being clocked by Qsys:u0|Qsys_alt_vip_vfb_0:alt_vip_vfb_0|ALT_CUSP160_AVALON_ST_OUTPUT:dout|startofpacket
 Warning (332060): Node: Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|VCM_CTRL_P:vcm_ctrl|F_VCM:f|V_C was determined to be a clock but was found without an associated clock assignment.
-    Info (13166): Latch Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|VCM_CTRL_P:vcm_ctrl|F_VCM:f|STEP_f[7]~21 is being clocked by Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|VCM_CTRL_P:vcm_ctrl|F_VCM:f|V_C
+    Info (13166): Latch Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|VCM_CTRL_P:vcm_ctrl|F_VCM:f|STEP_f[1]~13 is being clocked by Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|VCM_CTRL_P:vcm_ctrl|F_VCM:f|V_C
 Warning (332060): Node: Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|I2C_VCM_Config:vcm_i2c|mI2C_CTRL_CLK was determined to be a clock but was found without an associated clock assignment.
     Info (13166): Register Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|I2C_VCM_Config:vcm_i2c|I2C_VCM_Controller:u0|SD_COUNTER[0] is being clocked by Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|I2C_VCM_Config:vcm_i2c|mI2C_CTRL_CLK
 Info (332097): The following timing edges are non-unate.  TimeQuest will assume pos-unate behavior for these edges in the clock network.
@@ -1603,53 +1603,53 @@ Info (332123): Deriving Clock Uncertainty. Please refer to report_sdc in TimeQue
 Info: Found TIMEQUEST_REPORT_SCRIPT_INCLUDE_DEFAULT_ANALYSIS = ON
 Info: Analyzing Slow 1200mV 85C Model
 Info: Can't run Report Timing Closure Recommendations. The current device family is not supported.
-Info (332146): Worst-case setup slack is 0.236
+Info (332146): Worst-case setup slack is 0.246
     Info (332119):     Slack       End Point TNS Clock 
     Info (332119): ========= =================== =====================
-    Info (332119):     0.236               0.000 u0|altpll_0|sd1|pll7|clk[2] 
-    Info (332119):     5.679               0.000 MAX10_CLK1_50 
-    Info (332119):     6.427               0.000 clk_dram_ext 
-    Info (332119):     9.012               0.000 MAX10_CLK2_50 
-    Info (332119):    11.292               0.000 MIPI_PIXEL_CLK 
-    Info (332119):    30.665               0.000 u0|altpll_0|sd1|pll7|clk[3] 
-    Info (332119):    45.031               0.000 altera_reserved_tck 
+    Info (332119):     0.246               0.000 u0|altpll_0|sd1|pll7|clk[2] 
+    Info (332119):     6.007               0.000 MAX10_CLK1_50 
+    Info (332119):     6.422               0.000 clk_dram_ext 
+    Info (332119):     9.289               0.000 MAX10_CLK2_50 
+    Info (332119):    11.277               0.000 MIPI_PIXEL_CLK 
+    Info (332119):    30.210               0.000 u0|altpll_0|sd1|pll7|clk[3] 
+    Info (332119):    45.629               0.000 altera_reserved_tck 
 Critical Warning (332148): Timing requirements not met
-Info (332146): Worst-case hold slack is -1.500
+Info (332146): Worst-case hold slack is -1.505
     Info (332119):     Slack       End Point TNS Clock 
     Info (332119): ========= =================== =====================
-    Info (332119):    -1.500             -23.386 u0|altpll_0|sd1|pll7|clk[2] 
-    Info (332119):    -0.321              -9.604 clk_dram_ext 
-    Info (332119):     0.325               0.000 MAX10_CLK1_50 
+    Info (332119):    -1.505             -23.423 u0|altpll_0|sd1|pll7|clk[2] 
+    Info (332119):    -0.312              -9.533 clk_dram_ext 
+    Info (332119):     0.251               0.000 MAX10_CLK1_50 
+    Info (332119):     0.339               0.000 altera_reserved_tck 
     Info (332119):     0.340               0.000 u0|altpll_0|sd1|pll7|clk[3] 
-    Info (332119):     0.341               0.000 altera_reserved_tck 
-    Info (332119):     0.348               0.000 MAX10_CLK2_50 
+    Info (332119):     0.347               0.000 MAX10_CLK2_50 
     Info (332119):     0.378               0.000 MIPI_PIXEL_CLK 
-Info (332146): Worst-case recovery slack is 4.661
+Info (332146): Worst-case recovery slack is 2.175
     Info (332119):     Slack       End Point TNS Clock 
     Info (332119): ========= =================== =====================
-    Info (332119):     4.661               0.000 MAX10_CLK1_50 
-    Info (332119):     4.911               0.000 u0|altpll_0|sd1|pll7|clk[2] 
-    Info (332119):     6.036               0.000 u0|altpll_0|sd1|pll7|clk[3] 
-    Info (332119):    36.890               0.000 MIPI_PIXEL_CLK 
-    Info (332119):    47.097               0.000 altera_reserved_tck 
-Info (332146): Worst-case removal slack is 0.939
+    Info (332119):     2.175               0.000 u0|altpll_0|sd1|pll7|clk[2] 
+    Info (332119):     3.346               0.000 u0|altpll_0|sd1|pll7|clk[3] 
+    Info (332119):     4.730               0.000 MAX10_CLK1_50 
+    Info (332119):    36.099               0.000 MIPI_PIXEL_CLK 
+    Info (332119):    47.781               0.000 altera_reserved_tck 
+Info (332146): Worst-case removal slack is 0.945
     Info (332119):     Slack       End Point TNS Clock 
     Info (332119): ========= =================== =====================
-    Info (332119):     0.939               0.000 u0|altpll_0|sd1|pll7|clk[3] 
-    Info (332119):     1.111               0.000 altera_reserved_tck 
-    Info (332119):     1.515               0.000 MAX10_CLK1_50 
-    Info (332119):     1.827               0.000 MIPI_PIXEL_CLK 
-    Info (332119):     2.533               0.000 u0|altpll_0|sd1|pll7|clk[2] 
-Info (332146): Worst-case minimum pulse width slack is 4.675
+    Info (332119):     0.945               0.000 u0|altpll_0|sd1|pll7|clk[3] 
+    Info (332119):     1.064               0.000 altera_reserved_tck 
+    Info (332119):     1.780               0.000 MAX10_CLK1_50 
+    Info (332119):     2.014               0.000 u0|altpll_0|sd1|pll7|clk[2] 
+    Info (332119):     2.203               0.000 MIPI_PIXEL_CLK 
+Info (332146): Worst-case minimum pulse width slack is 4.674
     Info (332119):     Slack       End Point TNS Clock 
     Info (332119): ========= =================== =====================
-    Info (332119):     4.675               0.000 u0|altpll_0|sd1|pll7|clk[2] 
+    Info (332119):     4.674               0.000 u0|altpll_0|sd1|pll7|clk[2] 
     Info (332119):     4.853               0.000 u0|altpll_0|sd1|pll7|clk[1] 
     Info (332119):     5.790               0.000 clk_dram_ext 
-    Info (332119):     9.439               0.000 MAX10_CLK1_50 
-    Info (332119):     9.660               0.000 MAX10_CLK2_50 
-    Info (332119):    19.583               0.000 MIPI_PIXEL_CLK 
-    Info (332119):    19.704               0.000 u0|altpll_0|sd1|pll7|clk[3] 
+    Info (332119):     9.442               0.000 MAX10_CLK1_50 
+    Info (332119):     9.659               0.000 MAX10_CLK2_50 
+    Info (332119):    19.539               0.000 MIPI_PIXEL_CLK 
+    Info (332119):    19.706               0.000 u0|altpll_0|sd1|pll7|clk[3] 
     Info (332119):    49.626               0.000 altera_reserved_tck 
     Info (332119):    96.000               0.000 ADC_CLK_10 
 Info (332114): Report Metastability: Found 92 synchronizer chains.
@@ -1659,7 +1659,7 @@ Info (332114): Report Metastability: Found 92 synchronizer chains.
     Info (332114): Number of Synchronizer Chains Found: 92
     Info (332114): Shortest Synchronizer Chain: 2 Registers
     Info (332114): Fraction of Chains for which MTBFs Could Not be Calculated: 0.326
-    Info (332114): Worst Case Available Settling Time: 10.542 ns
+    Info (332114): Worst Case Available Settling Time: 11.157 ns
     Info (332114): 
     Info (332114): Worst-Case MTBF values are calculated based on the worst-case silicon characteristics, with worst-case operating conditions.
     Info (332114):   - Under worst-case conditions, an increase of 100ps in available settling time will increase MTBF values by a factor of 1.8
@@ -1671,58 +1671,58 @@ Info (334004): Delay annotation completed successfully
 Warning (332060): Node: Qsys:u0|Qsys_alt_vip_vfb_0:alt_vip_vfb_0|ALT_CUSP160_AVALON_ST_OUTPUT:dout|startofpacket was determined to be a clock but was found without an associated clock assignment.
     Info (13166): Register Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|VCM_CTRL_P:vcm_ctrl|F_VCM:f|VCM_END is being clocked by Qsys:u0|Qsys_alt_vip_vfb_0:alt_vip_vfb_0|ALT_CUSP160_AVALON_ST_OUTPUT:dout|startofpacket
 Warning (332060): Node: Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|VCM_CTRL_P:vcm_ctrl|F_VCM:f|V_C was determined to be a clock but was found without an associated clock assignment.
-    Info (13166): Latch Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|VCM_CTRL_P:vcm_ctrl|F_VCM:f|STEP_f[7]~21 is being clocked by Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|VCM_CTRL_P:vcm_ctrl|F_VCM:f|V_C
+    Info (13166): Latch Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|VCM_CTRL_P:vcm_ctrl|F_VCM:f|STEP_f[1]~13 is being clocked by Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|VCM_CTRL_P:vcm_ctrl|F_VCM:f|V_C
 Warning (332060): Node: Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|I2C_VCM_Config:vcm_i2c|mI2C_CTRL_CLK was determined to be a clock but was found without an associated clock assignment.
     Info (13166): Register Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|I2C_VCM_Config:vcm_i2c|I2C_VCM_Controller:u0|SD_COUNTER[0] is being clocked by Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|I2C_VCM_Config:vcm_i2c|mI2C_CTRL_CLK
 Info (332097): The following timing edges are non-unate.  TimeQuest will assume pos-unate behavior for these edges in the clock network.
     Info (332098): Cell: altera_internal_jtag  from: tck  to: tckutap
 Info (332123): Deriving Clock Uncertainty. Please refer to report_sdc in TimeQuest to see clock uncertainties.
-Info (332146): Worst-case setup slack is 1.049
+Info (332146): Worst-case setup slack is 1.087
     Info (332119):     Slack       End Point TNS Clock 
     Info (332119): ========= =================== =====================
-    Info (332119):     1.049               0.000 u0|altpll_0|sd1|pll7|clk[2] 
-    Info (332119):     6.545               0.000 clk_dram_ext 
-    Info (332119):     6.849               0.000 MAX10_CLK1_50 
-    Info (332119):     9.492               0.000 MAX10_CLK2_50 
-    Info (332119):    11.581               0.000 MIPI_PIXEL_CLK 
-    Info (332119):    31.416               0.000 u0|altpll_0|sd1|pll7|clk[3] 
-    Info (332119):    45.505               0.000 altera_reserved_tck 
+    Info (332119):     1.087               0.000 u0|altpll_0|sd1|pll7|clk[2] 
+    Info (332119):     6.540               0.000 clk_dram_ext 
+    Info (332119):     7.192               0.000 MAX10_CLK1_50 
+    Info (332119):     9.746               0.000 MAX10_CLK2_50 
+    Info (332119):    11.589               0.000 MIPI_PIXEL_CLK 
+    Info (332119):    30.877               0.000 u0|altpll_0|sd1|pll7|clk[3] 
+    Info (332119):    46.029               0.000 altera_reserved_tck 
 Critical Warning (332148): Timing requirements not met
-Info (332146): Worst-case hold slack is -2.068
+Info (332146): Worst-case hold slack is -2.076
     Info (332119):     Slack       End Point TNS Clock 
     Info (332119): ========= =================== =====================
-    Info (332119):    -2.068             -32.532 u0|altpll_0|sd1|pll7|clk[2] 
-    Info (332119):    -0.374             -11.468 clk_dram_ext 
-    Info (332119):     0.292               0.000 MAX10_CLK1_50 
+    Info (332119):    -2.076             -32.576 u0|altpll_0|sd1|pll7|clk[2] 
+    Info (332119):    -0.365             -11.398 clk_dram_ext 
+    Info (332119):     0.257               0.000 MAX10_CLK1_50 
     Info (332119):     0.305               0.000 altera_reserved_tck 
     Info (332119):     0.305               0.000 u0|altpll_0|sd1|pll7|clk[3] 
     Info (332119):     0.312               0.000 MAX10_CLK2_50 
     Info (332119):     0.338               0.000 MIPI_PIXEL_CLK 
-Info (332146): Worst-case recovery slack is 4.694
+Info (332146): Worst-case recovery slack is 2.881
     Info (332119):     Slack       End Point TNS Clock 
     Info (332119): ========= =================== =====================
-    Info (332119):     4.694               0.000 MAX10_CLK1_50 
-    Info (332119):     5.380               0.000 u0|altpll_0|sd1|pll7|clk[2] 
-    Info (332119):     6.367               0.000 u0|altpll_0|sd1|pll7|clk[3] 
-    Info (332119):    37.111               0.000 MIPI_PIXEL_CLK 
-    Info (332119):    47.295               0.000 altera_reserved_tck 
-Info (332146): Worst-case removal slack is 0.862
+    Info (332119):     2.881               0.000 u0|altpll_0|sd1|pll7|clk[2] 
+    Info (332119):     3.878               0.000 u0|altpll_0|sd1|pll7|clk[3] 
+    Info (332119):     4.824               0.000 MAX10_CLK1_50 
+    Info (332119):    36.341               0.000 MIPI_PIXEL_CLK 
+    Info (332119):    47.975               0.000 altera_reserved_tck 
+Info (332146): Worst-case removal slack is 0.869
     Info (332119):     Slack       End Point TNS Clock 
     Info (332119): ========= =================== =====================
-    Info (332119):     0.862               0.000 u0|altpll_0|sd1|pll7|clk[3] 
-    Info (332119):     1.034               0.000 altera_reserved_tck 
-    Info (332119):     1.374               0.000 MAX10_CLK1_50 
-    Info (332119):     1.650               0.000 MIPI_PIXEL_CLK 
-    Info (332119):     2.304               0.000 u0|altpll_0|sd1|pll7|clk[2] 
-Info (332146): Worst-case minimum pulse width slack is 4.690
+    Info (332119):     0.869               0.000 u0|altpll_0|sd1|pll7|clk[3] 
+    Info (332119):     0.984               0.000 altera_reserved_tck 
+    Info (332119):     1.611               0.000 MAX10_CLK1_50 
+    Info (332119):     1.869               0.000 u0|altpll_0|sd1|pll7|clk[2] 
+    Info (332119):     1.966               0.000 MIPI_PIXEL_CLK 
+Info (332146): Worst-case minimum pulse width slack is 4.691
     Info (332119):     Slack       End Point TNS Clock 
     Info (332119): ========= =================== =====================
-    Info (332119):     4.690               0.000 u0|altpll_0|sd1|pll7|clk[2] 
+    Info (332119):     4.691               0.000 u0|altpll_0|sd1|pll7|clk[2] 
     Info (332119):     4.876               0.000 u0|altpll_0|sd1|pll7|clk[1] 
     Info (332119):     5.790               0.000 clk_dram_ext 
-    Info (332119):     9.455               0.000 MAX10_CLK1_50 
+    Info (332119):     9.453               0.000 MAX10_CLK1_50 
     Info (332119):     9.669               0.000 MAX10_CLK2_50 
-    Info (332119):    19.655               0.000 MIPI_PIXEL_CLK 
+    Info (332119):    19.607               0.000 MIPI_PIXEL_CLK 
     Info (332119):    19.700               0.000 u0|altpll_0|sd1|pll7|clk[3] 
     Info (332119):    49.648               0.000 altera_reserved_tck 
     Info (332119):    96.000               0.000 ADC_CLK_10 
@@ -1733,7 +1733,7 @@ Info (332114): Report Metastability: Found 92 synchronizer chains.
     Info (332114): Number of Synchronizer Chains Found: 92
     Info (332114): Shortest Synchronizer Chain: 2 Registers
     Info (332114): Fraction of Chains for which MTBFs Could Not be Calculated: 0.326
-    Info (332114): Worst Case Available Settling Time: 11.289 ns
+    Info (332114): Worst Case Available Settling Time: 11.822 ns
     Info (332114): 
     Info (332114): Worst-Case MTBF values are calculated based on the worst-case silicon characteristics, with worst-case operating conditions.
     Info (332114):   - Under worst-case conditions, an increase of 100ps in available settling time will increase MTBF values by a factor of 1.8
@@ -1743,60 +1743,60 @@ Info: Analyzing Fast 1200mV 0C Model
 Warning (332060): Node: Qsys:u0|Qsys_alt_vip_vfb_0:alt_vip_vfb_0|ALT_CUSP160_AVALON_ST_OUTPUT:dout|startofpacket was determined to be a clock but was found without an associated clock assignment.
     Info (13166): Register Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|VCM_CTRL_P:vcm_ctrl|F_VCM:f|VCM_END is being clocked by Qsys:u0|Qsys_alt_vip_vfb_0:alt_vip_vfb_0|ALT_CUSP160_AVALON_ST_OUTPUT:dout|startofpacket
 Warning (332060): Node: Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|VCM_CTRL_P:vcm_ctrl|F_VCM:f|V_C was determined to be a clock but was found without an associated clock assignment.
-    Info (13166): Latch Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|VCM_CTRL_P:vcm_ctrl|F_VCM:f|STEP_f[7]~21 is being clocked by Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|VCM_CTRL_P:vcm_ctrl|F_VCM:f|V_C
+    Info (13166): Latch Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|VCM_CTRL_P:vcm_ctrl|F_VCM:f|STEP_f[1]~13 is being clocked by Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|VCM_CTRL_P:vcm_ctrl|F_VCM:f|V_C
 Warning (332060): Node: Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|I2C_VCM_Config:vcm_i2c|mI2C_CTRL_CLK was determined to be a clock but was found without an associated clock assignment.
     Info (13166): Register Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|I2C_VCM_Config:vcm_i2c|I2C_VCM_Controller:u0|SD_COUNTER[0] is being clocked by Qsys:u0|TERASIC_AUTO_FOCUS:terasic_auto_focus_0|I2C_VCM_Config:vcm_i2c|mI2C_CTRL_CLK
 Info (332097): The following timing edges are non-unate.  TimeQuest will assume pos-unate behavior for these edges in the clock network.
     Info (332098): Cell: altera_internal_jtag  from: tck  to: tckutap
 Info (332123): Deriving Clock Uncertainty. Please refer to report_sdc in TimeQuest to see clock uncertainties.
-Info (332146): Worst-case setup slack is 5.814
+Info (332146): Worst-case setup slack is 5.964
     Info (332119):     Slack       End Point TNS Clock 
     Info (332119): ========= =================== =====================
-    Info (332119):     5.814               0.000 u0|altpll_0|sd1|pll7|clk[2] 
-    Info (332119):     6.502               0.000 clk_dram_ext 
-    Info (332119):    11.386               0.000 MAX10_CLK2_50 
-    Info (332119):    12.667               0.000 MIPI_PIXEL_CLK 
-    Info (332119):    13.494               0.000 MAX10_CLK1_50 
-    Info (332119):    36.190               0.000 u0|altpll_0|sd1|pll7|clk[3] 
-    Info (332119):    48.124               0.000 altera_reserved_tck 
+    Info (332119):     5.964               0.000 u0|altpll_0|sd1|pll7|clk[2] 
+    Info (332119):     6.501               0.000 clk_dram_ext 
+    Info (332119):    11.522               0.000 MAX10_CLK2_50 
+    Info (332119):    12.656               0.000 MIPI_PIXEL_CLK 
+    Info (332119):    13.771               0.000 MAX10_CLK1_50 
+    Info (332119):    35.692               0.000 u0|altpll_0|sd1|pll7|clk[3] 
+    Info (332119):    48.294               0.000 altera_reserved_tck 
 Critical Warning (332148): Timing requirements not met
-Info (332146): Worst-case hold slack is -4.589
+Info (332146): Worst-case hold slack is -4.596
     Info (332119):     Slack       End Point TNS Clock 
     Info (332119): ========= =================== =====================
-    Info (332119):    -4.589             -73.012 u0|altpll_0|sd1|pll7|clk[2] 
-    Info (332119):    -0.660             -21.635 clk_dram_ext 
-    Info (332119):     0.141               0.000 MAX10_CLK1_50 
-    Info (332119):     0.147               0.000 altera_reserved_tck 
+    Info (332119):    -4.596             -73.042 u0|altpll_0|sd1|pll7|clk[2] 
+    Info (332119):    -0.656             -21.590 clk_dram_ext 
+    Info (332119):     0.102               0.000 MAX10_CLK1_50 
+    Info (332119):     0.146               0.000 altera_reserved_tck 
     Info (332119):     0.147               0.000 u0|altpll_0|sd1|pll7|clk[3] 
     Info (332119):     0.152               0.000 MAX10_CLK2_50 
-    Info (332119):     0.152               0.000 MIPI_PIXEL_CLK 
-Info (332146): Worst-case recovery slack is 7.051
+    Info (332119):     0.162               0.000 MIPI_PIXEL_CLK 
+Info (332146): Worst-case recovery slack is 6.165
     Info (332119):     Slack       End Point TNS Clock 
     Info (332119): ========= =================== =====================
-    Info (332119):     7.051               0.000 MAX10_CLK1_50 
-    Info (332119):     7.592               0.000 u0|altpll_0|sd1|pll7|clk[2] 
-    Info (332119):     8.001               0.000 u0|altpll_0|sd1|pll7|clk[3] 
-    Info (332119):    38.627               0.000 MIPI_PIXEL_CLK 
-    Info (332119):    48.843               0.000 altera_reserved_tck 
-Info (332146): Worst-case removal slack is 0.410
+    Info (332119):     6.165               0.000 u0|altpll_0|sd1|pll7|clk[2] 
+    Info (332119):     6.595               0.000 u0|altpll_0|sd1|pll7|clk[3] 
+    Info (332119):     7.082               0.000 MAX10_CLK1_50 
+    Info (332119):    38.231               0.000 MIPI_PIXEL_CLK 
+    Info (332119):    49.233               0.000 altera_reserved_tck 
+Info (332146): Worst-case removal slack is 0.411
     Info (332119):     Slack       End Point TNS Clock 
     Info (332119): ========= =================== =====================
-    Info (332119):     0.410               0.000 u0|altpll_0|sd1|pll7|clk[3] 
-    Info (332119):     0.480               0.000 altera_reserved_tck 
-    Info (332119):     0.665               0.000 MAX10_CLK1_50 
-    Info (332119):     0.819               0.000 MIPI_PIXEL_CLK 
-    Info (332119):     1.045               0.000 u0|altpll_0|sd1|pll7|clk[2] 
+    Info (332119):     0.411               0.000 u0|altpll_0|sd1|pll7|clk[3] 
+    Info (332119):     0.464               0.000 altera_reserved_tck 
+    Info (332119):     0.770               0.000 MAX10_CLK1_50 
+    Info (332119):     0.850               0.000 u0|altpll_0|sd1|pll7|clk[2] 
+    Info (332119):     0.957               0.000 MIPI_PIXEL_CLK 
 Info (332146): Worst-case minimum pulse width slack is 2.000
     Info (332119):     Slack       End Point TNS Clock 
     Info (332119): ========= =================== =====================
     Info (332119):     2.000               0.000 clk_dram_ext 
     Info (332119):     2.000               0.000 u0|altpll_0|sd1|pll7|clk[1] 
-    Info (332119):     4.712               0.000 u0|altpll_0|sd1|pll7|clk[2] 
+    Info (332119):     4.711               0.000 u0|altpll_0|sd1|pll7|clk[2] 
     Info (332119):     9.263               0.000 MAX10_CLK1_50 
     Info (332119):     9.331               0.000 MAX10_CLK2_50 
-    Info (332119):    19.172               0.000 MIPI_PIXEL_CLK 
-    Info (332119):    19.729               0.000 u0|altpll_0|sd1|pll7|clk[3] 
-    Info (332119):    49.422               0.000 altera_reserved_tck 
+    Info (332119):    19.178               0.000 MIPI_PIXEL_CLK 
+    Info (332119):    19.728               0.000 u0|altpll_0|sd1|pll7|clk[3] 
+    Info (332119):    49.416               0.000 altera_reserved_tck 
     Info (332119):    96.000               0.000 ADC_CLK_10 
 Info (332114): Report Metastability: Found 92 synchronizer chains.
     Info (332114): Worst-Case MTBF of Design is 1e+09 years or 3.15e+16 seconds.
@@ -1805,7 +1805,7 @@ Info (332114): Report Metastability: Found 92 synchronizer chains.
     Info (332114): Number of Synchronizer Chains Found: 92
     Info (332114): Shortest Synchronizer Chain: 2 Registers
     Info (332114): Fraction of Chains for which MTBFs Could Not be Calculated: 0.326
-    Info (332114): Worst Case Available Settling Time: 15.763 ns
+    Info (332114): Worst Case Available Settling Time: 16.108 ns
     Info (332114): 
     Info (332114): Worst-Case MTBF values are calculated based on the worst-case silicon characteristics, with worst-case operating conditions.
     Info (332114):   - Under worst-case conditions, an increase of 100ps in available settling time will increase MTBF values by a factor of 1.8
@@ -1814,9 +1814,9 @@ Info (332114): Report Metastability: Found 92 synchronizer chains.
 Info (332102): Design is not fully constrained for setup requirements
 Info (332102): Design is not fully constrained for hold requirements
 Info: Quartus Prime TimeQuest Timing Analyzer was successful. 0 errors, 96 warnings
-    Info: Peak virtual memory: 5156 megabytes
-    Info: Processing ended: Sat Jun 12 09:24:25 2021
-    Info: Elapsed time: 00:00:26
-    Info: Total CPU time (on all processors): 00:00:21
+    Info: Peak virtual memory: 5157 megabytes
+    Info: Processing ended: Tue Jun 15 02:09:50 2021
+    Info: Elapsed time: 00:00:19
+    Info: Total CPU time (on all processors): 00:00:18
 
 

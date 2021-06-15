@@ -50,7 +50,7 @@ wire   red_unique, pink_unique, yellow_unique, green_unique, blue_unique;
 assign    red_detect = (red>=64)&(((red>>1)+(red>>3))>=green)&((red>>1)>=blue);
 assign   pink_detect = (red>=192)&(green<128)&(blue<128);
 assign  green_detect = (green>=32)&(((green>>1)+(green>>3))>=red)&(green>=(blue>>1));
-assign   blue_detect = (blue>=48)&(blue>=red)&(blue>=green)&(blue<144);
+assign   blue_detect = (blue>=48)&(blue>=(red<<1))&(blue>=green)&(blue<144);
 assign bright_detect = (red>=160)|(green>=192)|(blue>=128);
 assign   ball_detect = (bright_detect|blue_detect|green_detect|pink_detect|red_detect)&(y>=224);
 
@@ -67,9 +67,9 @@ wire [23:0] new_image;         // Debug view, shows bounding box and filter data
 wire [23:0] ball_high;         // Shows which filters are triggered
 
 assign ball_high =   pink_detect ? {8'hdd, 8'h00, 8'hdd} :
+										green_detect ? {8'h00, 8'hdd, 8'h00} :
 									   blue_detect ? {8'h00, 8'h00, 8'hdd} :
 									    red_detect ? {8'hdd, 8'h00, 8'h00} :
-									  green_detect ? {8'h00, 8'hdd, 8'h00} :
 									 bright_detect ? {8'hdd, 8'hdd, 8'h00} :
  									                 {8'h00, 8'h00, 8'h00} ;
 /*
