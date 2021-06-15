@@ -179,32 +179,43 @@ The project team had a significant amount of freedom in designing and developing
 \pagebreak
 \subsection{Performance and Control}
 
-\subsubsection{Project timeline}
-
-\begin{center}
-    [Timeline chart image]
-\end{center}
-
-
-\subsubsection{Gnatt chart}
-
-\begin{center}
-    [Gnatt chart image]
-\end{center}
-
-
-\pagebreak
-
 \subsubsection{Team communication}
 
-\begin{center}
-    [Communication heirarchy chart]
-\end{center}
+\begin{figure} [h!]
+    \centering
+    \includegraphics[scale=0.4]{Comms.png}
+    \caption{Project Communication Hierarchy}
+\end{figure}
 
-During the first week of the project, the team implemented a communication hierarchy that showed the communication flow between each module and any related components between the modules. Due to the importance of Control and Integration, both modules are located at the top of the hierarchy.
+During the first week of the project, the team implemented a communication hierarchy that showed the communication flow between each module and any related components between the modules. The hierarchy was split into four classifications that reflected the primary responsibility of its member modules in order to help with easily identifying the responsibilities a module had. 
 
-The project team met twice each week on Wednesday and Sunday to ensure each module's progress was on track and the Control module was aware of any changes. The Control module was responsible for leading each session and taking the meeting minutes\footnote{Example meeting minute avaiable in appendix}. 
+The project team met twice each week on Wednesday and Sunday to ensure each module's progress was on track and the Control module was aware of any changes. The Control module was responsible for leading each session and taking the meeting minutes \footnote{Example meeting minute avaiable in appendix}. 
  
+
+\subsubsection{Project timeline}
+
+\begin{figure} [h!]
+    \centering
+    \includegraphics[scale=0.4]{Timeline.png}
+    \caption{Group 18 Project Timelines}
+\end{figure}
+
+The project timeline is divided into three phases which placed priority in different aspects of the project. The Design phase included project and individual module research where the design themes are implemented. The Module developement phase was where the Integration module worked with the individual modules to test certain aspects of the module. The Integration phase was where modules are linked and tested together, gradually increasing the complexity.
+
+With the advantage of the Gantt chart, the Integration module was able to identify which module was near testing capable and arrange with the related modules e.g. Command - Control - Drive for testing. 
+
+\vfill
+\pagebreak
+
+\subsubsection{Gantt chart}
+
+The project team used the Gantt chart provided at the start of the project and consistently updated it throughout the timeline of the project. With the team meeting twice a week to give updates on each module's progress, the Gnatt was updated after every meeting to reflect any change in development time and any additional work. 
+
+Due to certain complications like Quartus, the timelines of Vision and Control had to be modified several times. With the whole team having access to the Gantt chart, it allowed the team identify a module's completed feature and to more easily arrange any inter-module testing such as Command to Control to Drive.  
+
+The team found using the Gantt chart has its advantages and disadvantages. The chart was a great place for team members to see the progress of other team members and plan their own module to coincide with certain testing milestone. On the other hand, it got quite complicated and changes occured often so team members had to constantly check the chart to see if they are in sync with modules like Control. This was mitigated by editing the Gantt chart live during each meeting so members know exactly what changed and what they need to be aware of.
+
+
 
 
 
@@ -415,8 +426,6 @@ The design of the authentication system incorporating Okta is shown below:
 \pagebreak
 \subsection{Drive}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-The design of the Drive module was based off the Drive requirements stated in the project requirement section of the report (Page 2). 
-
 \subsubsection{Design}
 
 \begin{figure} [h!]
@@ -454,7 +463,7 @@ if(String(instruction[0]) == "F") { // Moving Forward
 
 \subsubsection{Movement}
 
-By using the H-bridge circuit, the DC motors of the rover supports four main movement directions: Forward (F), Backward (B), Left (L), Right (R). 
+Through H-bridge circuit, the DC motors could support four main movement directions: Forward (F), Backward (B), Left (L), Right (R). 
 
 Forward and backward movement was acheived by enabling the H-bridge, setting the PWM signals and the motor states. For example, the code below defines forward movement: 
 
@@ -536,7 +545,7 @@ $$
 $$
 where $0.4$ was the minimum voltage required to activate the rover. If the rover stays at a place for a long time,due to the presence of the integral controller, the error would accumulated as time increases and the speed control function will increase the rover speed to correct the error. Through testing, the rover initially accelerated due to a significant initial error. As the rover approached the target, the rover decelerated, indicating that the measurements taken by the optical sensor was more accurate. This method effectively reduced the number of oscillations and resulted in a more accurate Drive performance.
 
-By using the formula $\text{speed} = \frac{\text{distance travelled}}{\text{timestamp difference}}$, the relationship between the duty cycle and speed can be displayed as a look-up table as shown in Figure \ref{fig:duty}. This relationship formed the foundation of two advanced Drive features. By using the tilt data from the FPGA in the Vision component, the rover can detect when it is going up a slope and will increase the speed relative to when the rover is on a flat surface.
+By using the formula: $\text{speed} = \frac{\text{distance travelled}}{\text{timestamp difference}}$, the relationship between the duty cycle and speed can be displayed as a look-up table as shown in Figure \ref{fig:duty}. This relationship formed the foundation of two advanced Drive features. By using the tilt data from the FPGA in the Vision component, the rover can detect when it is going up a slope and will increase the speed relative to when the rover is on a flat surface. In addition, Drive supports a power-saving mode where the duty would be fixed between 0.4 to 0.7 to conserve the energy used.
 
 \pagebreak
 
@@ -547,7 +556,7 @@ By using the formula $\text{speed} = \frac{\text{distance travelled}}{\text{time
     \label{fig:duty}
 \end{figure}
 
-In addition, Drive supports a power-saving mode where the duty would be fixed between 0.4 to 0.7 to conserve the energy used.
+
 
 \subsubsection{Optical Sensor}
 
@@ -559,27 +568,10 @@ The optical sensor measures the distance of the rover travelled and the turning 
 
 \subsubsection{Advanced features}
 
-\begin{itemize}
-
-    \item Drive pausing:
+The Vision module is able to directly issue commands to the Drive module through the Control module. Vision module issues three commands: Pause (P), Next coordinate (N) and Unpause (U). This was implemented to allow the Vision module to stop the rover if it detected an obstacle like a ball or an object that could collide with the rover. During Pause, the rover will send the x-position of the rover. Once Control has received it, Control would send the N flag which Drive will send the y-position. After the Unpause command is issued, the rover would continue executing the current set of instructions.
     
-    By issuing the Pause (P) and Unpause (U) commands, the rover would stop and allow the Vision module to caliberate, detect and process the distances between the rover and an obstacle. During the pause, the rover will send the position of the rover. After the Unpause command is issued, the rover would continue executing the current set of instructions. The Arduino code for this feature is shown as follows:
-    \begin{lstlisting}
-    if(instruction[0] == 'P'){ // Pause state
-        Stop();
-        while(!Serial1.available() || Serial1.peek()!='U') { // Unpause state
-            delay(50); // Delay 50 ms
-        }
-        Serial1.read(); // Remove 'U' action word
-        instructionStartTime=millis();
-    }
-    \end{lstlisting}
+"Emergency Stop" action (X) is issued by Vision when a ball is in the path of the rover and would collide if the rover did not stop. The "Emergency Stop" is different from the standard "Stop" where if the "Emergency Stop" was used, the rover status will be updated to display an error has occured which is not the case for the standard "Stop" action. 
 
-    \item Emergency Stop:
-    
-    "Emergency Stop" action (X) is issued by Vision when a ball is in the path of the rover and would collide if the rover did not stop. The "Emergency Stop" is different from the standard "Stop" where if the "Emergency Stop" was used, the rover status will be updated to display an error has occured which is not the case for the standard "Stop" action. 
-
-\end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \pagebreak
