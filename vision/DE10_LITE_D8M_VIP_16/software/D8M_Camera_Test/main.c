@@ -476,18 +476,15 @@ void sys_timer_isr(){
       if(!acc_calib){
         x_drift = x_read;
         y_drift = y_read;
-        //z_drift = z_read;
       }else{
         x_drift = (x_read + x_drift)>>1;
         y_drift = (y_read + y_drift)>>1;
-        //z_drift = (z_read + z_drift)>>1;
       }
       acc_calib++;
     }
 
     x_read -= x_drift;
     y_read -= y_drift;
-    //z_read -= z_drift;
 
     if(y_read<0){ a = (((-y_read)<<22)/z_read)>>16; }
     else{ a = ((y_read<<22)/z_read)>>16; }
@@ -584,9 +581,9 @@ void sys_timer_isr(){
     if(acc_ticks){ acc_ticks--; }
     if(ack){ ack--; }
     mem_ticks++;
-    if(mem_ticks>=64){                                  // Erase memory every ~20 seconds
+    if(mem_ticks>=128){                                  // Erase memory every ~40 seconds
       mem_ticks = 0;
-      //ball_sent.used = 0;
+      ball_sent.used = 0;
     }
 
     process = 0;
