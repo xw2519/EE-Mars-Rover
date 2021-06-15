@@ -101,28 +101,14 @@ export default function Map({ width, height, nodes, links}: NetworkProps) {
 
       <Graph<CustomLink, CustomNode>
         graph={graph}
-        top={350}
-        left={425}
+        top={550}
+        left={150}
 
         nodeComponent={({ node: { custom, color, angle }  }) =>
           // RoverNode takes "angle" parameter to define direction of rover
           // ObstacleNode takes "color" parameter to define the color of the obstacle 
           (custom === 'Rover') ? <RoverNode angle={angle}/> : ((custom === 'Location') ? <LocationNode /> : <ObstacleNode color={color} />)
         }
-
-        linkComponent={({ link: { source, target } }) => (
-          
-          <line
-            x1={source.x}
-            y1={source.y}
-            x2={target.x}
-            y2={target.y}
-            strokeWidth={2.5}
-            stroke="#999"
-            strokeOpacity={0.6}
-          />
-
-        )}
       />
     </svg>
     
