@@ -421,6 +421,10 @@ With the Arduino architecture, Command supports various interfaces. Each interfa
     \includegraphics[scale=0.7]{Control_table.JPG}
 \end{figure}
 
+\subsubsection{Command}
+
+The Control module needed to constantly exchange information with the Command module in real-time. With the implementation of WebSocket protocol and taking advantage of the Arduino library, the Control module uses JSON to transmit a batch of information like sensor data in a single lightweight packet. This reduces transmission bandwidth and increases efficiency.
+
 \subsubsection{Drive}
 
 As the Mars rover was designed to operate in a remote location, the system was design to ensure the user knows when an instruction has failed to execute. In the Drive module, the Drive module sends a "Instruction Successful" signal to the Control module whenever an instruction finishes. In a situation the instruction failed to execute, like when the rover detects an obstacle, it will send an error message to be displayed on Command.
@@ -711,12 +715,40 @@ The optical sensor measures the distance of the rover travelled and the turning 
 
 \subsubsection{Advanced features}
 
-The Vision module is able to directly issue commands to the Drive module through the Control module. Vision module issues three commands: Pause (P), Next coordinate (N) and Unpause (U). This was implemented to allow the Vision module to stop the rover if it detected an obstacle like a ball or an object that could collide with the rover. During Pause, the rover will send the x-position of the rover. Once Control has received it, Control would send the N flag which Drive will send the y-position. After the Unpause command is issued, the rover would continue executing the current set of instructions \footnote{The implementation is attached in the Appendix: Drive module: Pause feature}.
+The Vision module is able to directly issue commands to the Drive module through the Control module. Vision module issues three commands: Pause (P), Next coordinate (N) and Unpause (U). This was implemented to allow the Vision module to stop the rover if it detected an obstacle like a ball or an object that could collide with the rover. During Pause, the rover will send the x-position of the rover. Once Control has received it, Control would send the N flag which Drive will send the y-position. After the Unpause command is issued, the rover would continue executing the current set of instructions.
+
+\begin{lstlisting}
+    if(instruction[0] == 'P') { // Pause
+        Stop();
+        delay(100);
+        Serial.write('p');
+        Serial.print(String(total_x)); // Total x
+    
+        while(!Serial.available() || Serial.peek()!='N') { // Control has received 'x' value and tell 'y' to Control
+        delay(1);
+        }
+    
+        Serial.read(); // Remove the N
+        Serial.print('y');
+        Serial.print(String(total_y)); // total y
+    
+        while(!Serial.available() || Serial.peek()!='U') { // Unpause
+        delay(50); // 50ms
+        }
+        Serial.read(); //get rid of the U
+        Serial.println("Received U");
+        instructionStartTime=millis();
+    
+        Serial.println("FBLRS");
+        Serial.print(F); Serial.print(B); Serial.print(L); Serial.print(R); Serial.println(S);
+        return;
+    
+    }
+\end{lstlisting}
     
 "Emergency Stop" action (X) is issued by Vision when a ball is in the path of the rover and would collide if the rover did not stop. The "Emergency Stop" is different from the standard "Stop" where if the "Emergency Stop" was used, the rover status will be updated to display an error has occured which is not the case for the standard "Stop" action. 
 
 
-\vfill
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \pagebreak
 \subsection{Energy}
@@ -1062,38 +1094,6 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         print("[Server Error]: Rover websocket terminated")
 \end{lstlisting}
-
-\pagebreak
-\subsection{Drive module: Pause feature}
-\begin{lstlisting}
-if(instruction[0] == 'P') { // Pause
-    Stop();
-    delay(100);
-    Serial.write('p');
-    Serial.print(String(total_x)); // Total x
-
-    while(!Serial.available() || Serial.peek()!='N') { // Control has received 'x' value and tell 'y' to Control
-    delay(1);
-    }
-
-    Serial.read(); // Remove the N
-    Serial.print('y');
-    Serial.print(String(total_y)); // total y
-
-    while(!Serial.available() || Serial.peek()!='U') { // Unpause
-    delay(50); // 50ms
-    }
-    Serial.read(); //get rid of the U
-    Serial.println("Received U");
-    instructionStartTime=millis();
-
-    Serial.println("FBLRS");
-    Serial.print(F); Serial.print(B); Serial.print(L); Serial.print(R); Serial.println(S);
-    return;
-
-}
-\end{lstlisting}
-
 
 
 
