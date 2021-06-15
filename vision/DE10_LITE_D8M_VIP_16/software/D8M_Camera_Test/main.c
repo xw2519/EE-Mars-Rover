@@ -20,12 +20,12 @@
 #include <unistd.h>
 
 
-//debug defines
+//debug defines, uncomment to print information to JTAG
 //#define VIEW_BALL_COUNT
 //#define VIEW_BALL_DATA
 #define VIEW_UART_MSGS
 #define VIEW_AUTO_GAIN
-#define VIEW_ACC_READS
+//#define VIEW_ACC_READS
 
 //offsets for image processor memory mapped interface
 #define EEE_IMGPROC_STATUS 0
@@ -307,7 +307,7 @@ void sys_timer_isr(){
 
   //////////////////////////////////////////////////////////////////////// - Process button inputs(KEY0 & KEY1)
 
-  if((IORD(KEY_BASE,0)&0x03) == 0x01){           // touch KEY1 to trigger auto focus
+  if((IORD(KEY_BASE,0)&0x03) == 0x01){           // touch KEY1 to trigger auto focus & reset states and variables
     Focus_Window(320,240);
     moving=0;
     last_command='c';
@@ -318,7 +318,7 @@ void sys_timer_isr(){
     mem_ticks=0;
     ball_sent.used=0;
   }
-  if((IORD(KEY_BASE,0)&0x03) == 0x02){           // touch KEY0 to trigger gain adjustment
+  if((IORD(KEY_BASE,0)&0x03) == 0x02){           // touch KEY0 to trigger gain &accelerometer calibration
     gain_calib = 0;
     acc_calib  = 0;
     gain       = 0x7FF;
@@ -578,7 +578,7 @@ void sys_timer_isr(){
       }
     }
 
-    //----------------------------------------------------------------- Update ime variables
+    //----------------------------------------------------------------- Update time variables
 
     if(stop_ticks){ stop_ticks--; }
     if(acc_ticks){ acc_ticks--; }
@@ -686,7 +686,7 @@ int main(){
           #endif
         }
 
-        /*else if(prompt=='c'){ moving = 1; }
+        /*else if(prompt=='c'){ moving = 1; }            // Debug - test UART by connecting RX to TX
         else if(prompt=='p'){ moving = 0; }
         else if(prompt=='b'){
           appendArray_u8(&ball_sent, last_colour);
