@@ -193,13 +193,17 @@ The project team had a significant amount of freedom in designing and developing
 \end{center}
 
 
+\pagebreak
+
 \subsubsection{Team communication}
 
 \begin{center}
     [Communication heirarchy chart]
 \end{center}
 
-\textit{Due to the remote collaborative nature required, every member was encouraged to design and implement with a standardised minimalistic approach \footnote{Minimalistic coding guidelines: https://dev.to/paulasantamaria/6-ways-minimalism-can-help-you-write-clean-code-45kp} such as concise code documentation, avoiding too many dependencies and consistent code revisions. }
+During the first week of the project, the team implemented a communication hierarchy that showed the communication flow between each module and any related components between the modules. Due to the importance of Control and Integration, both modules are located at the top of the hierarchy.
+
+The project team met twice each week on Wednesday and Sunday to ensure each module's progress was on track and the Control module was aware of any changes. The Control module was responsible for leading each session and taking the meeting minutes\footnote{Example meeting minute avaiable in appendix}. 
  
 
 
@@ -219,9 +223,11 @@ The project team had a significant amount of freedom in designing and developing
 
 \subsection{Structural design}
 
-\begin{center}
-    [Structural design diagram]
-\end{center}
+\begin{figure} [h!]
+    \centering
+    \includegraphics[scale=0.5]{Structure.png}
+    \caption{Rover structural diagram}
+\end{figure}
 
 The team established the structural design of the rover system during the first week of the project timeline. The structural design is formed in three stages: 
 
@@ -235,7 +241,7 @@ The team established the structural design of the rover system during the first 
     
     With the role of Control established, the team could discuss how to structure the other modules that best took advantage of the ESP32's capabilities, ensured efficient operation in various environments and complimented the \textit{scalability} design theme. 
 
-    A major design problem was the location of processing the data from sensors like the optical sensor. The team chose to do as much processing locally on the ESP32 because the connection with Command module servers naturally has a certain degree of latency and Control was best equipped module on the rover to handle the processing. The Control module can also pre-process data to minimise the amount sent to Command and reduce the end-to-end latency of the system. [\textbf{latency data}]
+    A major design problem was the location of processing the data from sensors like the optical sensor. The team chose to do as much processing locally on the ESP32 because the connection with Command module servers naturally has a certain degree of latency and Control was best equipped module on the rover to handle the processing. The Control module can also pre-process data to minimise the amount sent to Command and reduce the end-to-end latency of the system.
     
     \item \textbf{Communication interface selection}: 
     
@@ -245,7 +251,6 @@ The team established the structural design of the rover system during the first 
 
 \end{enumerate}  
 
-\pagebreak
 \subsection{Functional design}
 
 The team defined the rover system into three functional layers that each handled a different aspect of the system. 
@@ -279,12 +284,120 @@ With that mindset, the team endeavoured to use as much open-source software as p
 \subsection{Command}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\subsubsection{Design}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The Command module was an important component of the rover system as it was the bridge to the database and the user. Because of the user aspect, the system had to consider other factors such as UI and UX in addition to traditional factors like efficiency. A middle-ground had to be found in order to balance between various factors since some system designs may be more user-friendly but less efficient. 
+
+\subsubsection{Communication protocol}
+
+During the research phase of the project, the Command module looked into various communication protocols like HTTP, MQTT and WebSocket. In collaboration with the Control module, the following requirements on the communication protocol were identified:
+\begin{itemize}
+    \item \textbf{Real-time}: The selected communication protocol would need to support real-time operations such as navigating the rover ,and receiving rover status and coordinates as it was updated. 
+      
+    \item \textbf{Well-supported}: The Command module was required to communicate with the rover through the Control module which was a ESP32 board and was programmed using the Arduino language. Following the open-source and modularity theme, any libraries used by Command and Control needed to be well-documented and well-supported by both modules. 
+    
+    \item \textbf{Energy efficient}: Any communication protocol would have to be lightweight in order to keep the Mars rover as efficient as possible.
+\end{itemize} 
+
+The WebSocket protocol was ultimately chosen as the communication protocol. The protocol supported duplex communication and service push is built in unlike HTTP which used polling. While WebSocket is a relatively new protocol, it is well-supported and well-documented by Arduino and the Python which was used by the Command module. 
+
+The performance of both WebSocket and MQTT protocol are both higher in terms of speed and packet-sizes when compared to HTTP but MQTT was not chosen due to the Minimalism design theme. The Mars rover system only consisted of one rover that only connected to the Command server. WebSocket protocols were designed to support such point-to-point communciation while MQTT contained several overheads to enable it to communicate with multiple parties. In addition, Websocket libraries are more common and well-documented than MQTT libraries. This made WebSocket the logical choice.
+\begin{figure}[!h]
+    \centering
+    \subfloat[Time for single request]{\includegraphics[width=0.5\textwidth]{Command_SocketvsHTTP_1.JPG}\label{fig:f1}}
+    \hfill
+    \subfloat[Data transfer for actual requests]{\includegraphics[width=0.5\textwidth]{Command_SocketvsHTTP_2.JPG}\label{fig:f2}}
+    \caption{Comparison of HTTP and Websocket protocols \cite{SocketvsHTTP}}
+\end{figure}
+
+\subsubsection{Frontend}
+
+The website of the Command module was created with React which is a JavaScript library that combined the speed of JavaScript with more easier method of rendering webpages that are highly dynamic and responsive to user input. Due to its component design, it naturally compliments the project's Modularity and Scalabity design theme. React is well-documented which made it easier for beginners to start developing quickly.    
+
+\begin{figure} [h!]
+    \centering
+    \includegraphics[scale=0.5]{Command_Frontend.png}
+    \caption{Frontend functional diagram }
+\end{figure}
+
+Due to the frontend being the point at which the user interacts with the rover system, UI and UX design factors were important factors of consideration in addition to scalability. The website was custom built without any templates and used the wireframe method to model the website for team feedback before implementation. The following design choices were made with these taken into account:
+\begin{itemize}
+    \item \textbf{Simplicity}: The Command interface must be minimal, allowing the user to intuitivly interact with the system. All rover information and actions must be easily seen and not require users to navigate around to find the information they need.
+    
+    To meet this design choice, the website only has one page that is divided into six grids that each contain a component of the rover's command system such as the map and rover navigation interface. This one-page design meant users do not have to click around to find information. The user would log in using their credentials and immediately be able to see key rover details in one glance.
+
+    \item \textbf{Scalability}: Due to the open-endedness of the project requirements, the exact number of features to implement was not known. In order to prevent the Command module from limiting the number of features the rover system has, the system must be designed to be able to scale and add new features easily. 
+    
+    Taking advantage of components in the React framework and the grid like design of the website, each grid was defined as a component which itself contains sub-components like buttons and display fields. This allows Command to easily add or modify components to enhance the website's features. For example, the map component was modified throughout the project timeline to include features like the animated rover icon that showed the direction the rover is facing and the gray pathway that showed the previous rover locations.  
+    
+\end{itemize}
+
+
+\pagebreak
+\subsubsection{Backend}
+
+The Command server was implemented with the open source python-based FastAPI framework. The python language was an important feature as the team felt comfortable using Python due to its readable and extensive well-documented libraries. 
+
+The main concern of using Python as the server language was the relatively slow performance when compared to such as C++ and JavaScript. However, with the addition of Starlette and Pydantic, FastAPI is on par with frameworks like NodeJS and Go. 
+
+\begin{figure} [h!]
+    \centering
+    \includegraphics[scale=0.7]{Command_FastAPI.JPG}
+    \caption{Benchmarks of framework performance \cite{FastAPI}}
+\end{figure}
+
+Being open-source, its interfaces are based on open standards for APIs which allowed easy connection to third-party services like authentication servers and databases. These features make the server design modular and scalable which was what the rover system required.  
+
+\begin{figure} [h!]
+    \centering
+    \includegraphics[scale=0.5]{Command_Backend.png}
+    \caption{Backend context diagram }
+\end{figure}
+
+The function of the server was to basically act as a data hub that directs incoming data to the correct recepients. For example, all incoming data from the rover will be redirected to the website where it will be processed client-side. The only exception was map coordinates and the rover tilt measurements that are copied and redirected to the database component for storage.
+
+\pagebreak
+\subsubsection{Database}
+
+The database component used MongoDB which is a NoSQL database. The design choice was based on the following advantages of MongoDB:
+\begin{itemize}
+    \item \textbf{Document-oriented}: MongoDB stores data in JSON-like objects and are non-relational. This allowed the Command module to store any records without having to specify a schema for the database. This meant any new features that generated new forms of data would not require modifications to the data-structure thus improving the system's scalabity potential.
+    
+    \item \textbf{Ease of use}: MongoDB is compatiable and well-documented on JavaScript and Python which is used in the Command module. in addition, MongoDB has an online intuitive database management system which helped in viewed the data stored in real-time.  
+    
+    \item \textbf{Mature ecosystem}: Developement can occur locally during testing and be easily ported into MongoDB Atlas which is a public server for deployment.
+\end{itemize}
+
+\subsubsection{Security}
+
+Where users are concerned, the team believed that security needed to be incorporated into the design to prevent any unauthorised access to the rover system.
+
+\begin{figure} [h!]
+    \centering
+    \includegraphics[scale=0.5]{Command_login.JPG}
+\end{figure}
+
+The Command module features a single-sign-on "Log In" page that prompted the user to authenticate themselves. The authentication system was implemented with Okta which provided an authentication server. Services like Okta are more secure than creating a custom authentication system especially with the constained project timeline. Any custom authentication system has the inherent security risks due to a rushed development and lack of expertise in such domain compared to a well-established like Okta. 
+
+The design of the authentication system incorporating Okta is shown below:
+\begin{figure}[!h]
+    \centering
+    \includegraphics[scale=0.5]{Command_authen.JPG}
+    \caption{Authentication system design \cite{Authentication}}
+\end{figure}
+
+
 \pagebreak
 \subsection{Control}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+
+
+
+
+
+\subsubsection{Drive confirmation}
 
 
 
@@ -305,6 +418,12 @@ With that mindset, the team endeavoured to use as much open-source software as p
 The design of the Drive module was based off the Drive requirements stated in the project requirement section of the report (Page 2). 
 
 \subsubsection{Design}
+
+\begin{figure} [h!]
+    \centering
+    \includegraphics[scale=0.3]{Drive_functional.png}
+    \caption{Drive functional diagram}
+\end{figure}
 
 The Drive receives nagivation instructions from the Control module and was designed to give user full control over the distance a rover goes per instruction and angle that the rover turns. The Drive instruction was defined as:
 $$
@@ -351,7 +470,7 @@ void MovingForward() {
 } 
 \end{lstlisting}
 
-Turning left and right was achieved by setting the respective wheel state to LOW. After turning, any distance change was in the x-direction and would equal the circumference defined by the rover's optical sensor. Turning angles were defined from the point where the circle's radius was the distance between the optical sensor to the midpoint along the rover shaft which was measured as 15 cm. It was detected that due to the two wheels not outputting the same amount of power. This affected the turning angle calculations since the circle radius i.e. the distance between the optical sensor to the midpoint along the rover shaft was 17.8 cm and calculations had to be compensated as shown below:
+Turning left and right was achieved by setting the respective wheel state to LOW. After turning, any distance change was in the x-direction and would equal the circumference defined by the rover's optical sensor. Turning angles were defined from the point where the circle's radius was the distance between the optical sensor to the midpoint along the rover shaft which was measured as 15 cm. It was detected that the two wheels do not output the same amount of power. This affected the turning angle calculations since the circle radius i.e. the distance between the optical sensor to the midpoint along the rover shaft was 12.7 cm and calculations had to be compensated as shown below:
 
 \begin{lstlisting}
 float Angle_Conversion(float target_angle) {
@@ -365,13 +484,13 @@ The halt instruction was implemented by disabling the H-bridge and set the PWM s
 
 The rover's position control was implemented with a closed-loop PI controller which used the error margin between the current rover position and the previous rover position. The logic was that if the rover moved forwards and backwards by 20 cm and the optical sensor detected that the rover did not reverse 20 cm, the error margin would be the difference between the current rover position and the previous rover position.  
 
-The controller was designed such that if the error margin was either in the range $-0.5 \text{cm} < \text{error in } y < 0.5 \text{cm}$ or $-0.78 \text{cm} < \text{error in } x < 0.78 \text{cm}$, the controller would consider the difference insignificant and rover would stop. Otherwise, the rover would either keep executing the current instruction or perform the reverse movement until it was within the error margin. 
+The controller was designed such that if the error margin was either in the range $-0.5 \text{ cm} < \text{error in } y < 0.5 \text{ cm}$ or $-0.2 \text{ cm}  < \text{error in } x < 0.2\text{ cm}  $, the controller would consider the difference insignificant and rover would stop. Otherwise, the rover would either keep executing the current instruction or perform the reverse movement until it was within the error margin. 
 
 \begin{lstlisting}
 if(F){ // Forward movement position control
     err_y = total_y - tmp_y; // Calculate error
     cp = pi_d(err_y);
-    Speed_Control(abs(cp)*0.01+0.4); // Using PI controller result to control speed
+    Speed_Control(min(abs(cp)*0.01+0.4), 0.7); // Using PI controller result to control speed
 
     // Position Control
     if(err_y < -0.5) { MovingForward(); }
@@ -385,7 +504,7 @@ if(F){ // Forward movement position control
         } 
 
         // Check the motion after 10sec for position correction
-        if(millis()-instructionCompleteTime > 20000 && !firstTime && !instructionCompleted) {
+        if(millis()-instructionCompleteTime > 10000 && !firstTime && !instructionCompleted) {
             Stop();
             instructionCompleted=1;
             Send_Instruction_Completed(total_y,1,'F');        
@@ -417,16 +536,18 @@ $$
 $$
 where $0.4$ was the minimum voltage required to activate the rover. If the rover stays at a place for a long time,due to the presence of the integral controller, the error would accumulated as time increases and the speed control function will increase the rover speed to correct the error. Through testing, the rover initially accelerated due to a significant initial error. As the rover approached the target, the rover decelerated, indicating that the measurements taken by the optical sensor was more accurate. This method effectively reduced the number of oscillations and resulted in a more accurate Drive performance.
 
-By using the formula $\text{speed} = \frac{\text{distance travelled}}{\text{timestamp difference}}$, the relationship between the duty cycle and speed can be displayed as a look-up table:
+By using the formula $\text{speed} = \frac{\text{distance travelled}}{\text{timestamp difference}}$, the relationship between the duty cycle and speed can be displayed as a look-up table as shown in Figure \ref{fig:duty}. This relationship formed the foundation of two advanced Drive features. By using the tilt data from the FPGA in the Vision component, the rover can detect when it is going up a slope and will increase the speed relative to when the rover is on a flat surface.
+
+\pagebreak
+
 \begin{figure} [h!]
     \centering
     \includegraphics[scale=0.4]{Speed_duty_cycle.jpg}
     \caption{Relationship between the speed and duty cycle}
+    \label{fig:duty}
 \end{figure}
 
-This relationship formed the foundation of two advanced Drive features. By using the tilt data from the FPGA in the Vision component, the rover can detect when it is going up a slope and will increase the speed relative to when the rover is on a flat surface. In addition, Drive could support a power-saving mode where the duty would be fixed between 0.4 to 0.8 to conserve the energy used.
-
-\pagebreak
+In addition, Drive supports a power-saving mode where the duty would be fixed between 0.4 to 0.7 to conserve the energy used.
 
 \subsubsection{Optical Sensor}
 
@@ -439,13 +560,10 @@ The optical sensor measures the distance of the rover travelled and the turning 
 \subsubsection{Advanced features}
 
 \begin{itemize}
-    \item Emergency Stop:
-    
-    Drive module has an "Emergency Stop" action (X) which could be issued by the Vision module when it detected an obstacle that was not a ball. The "Emergency Stop" is different from the standard "Stop" where if the "Emergency Stop" was used, the rover status will be updated to display an error has occured which is not the case for the standard "Stop" action. 
 
     \item Drive pausing:
     
-    By issung the Pause (P) and Unpause (U) commands, the rover would stop and allow the Vision module to caliberate, detect and process the distances between the rover and an obstacle. After the Unpause command is issued, the rover would continue executing the current set of instructions. The Arduino code for this feature is shown as follows:
+    By issuing the Pause (P) and Unpause (U) commands, the rover would stop and allow the Vision module to caliberate, detect and process the distances between the rover and an obstacle. During the pause, the rover will send the position of the rover. After the Unpause command is issued, the rover would continue executing the current set of instructions. The Arduino code for this feature is shown as follows:
     \begin{lstlisting}
     if(instruction[0] == 'P'){ // Pause state
         Stop();
@@ -456,6 +574,11 @@ The optical sensor measures the distance of the rover travelled and the turning 
         instructionStartTime=millis();
     }
     \end{lstlisting}
+
+    \item Emergency Stop:
+    
+    "Emergency Stop" action (X) is issued by Vision when a ball is in the path of the rover and would collide if the rover did not stop. The "Emergency Stop" is different from the standard "Stop" where if the "Emergency Stop" was used, the rover status will be updated to display an error has occured which is not the case for the standard "Stop" action. 
+
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -544,7 +667,7 @@ The intended objective of the Energy module was to convert as much sunlight as p
 
 The MPPT was designed and implemented with the Perturb and Observe Method \cite{PV_current}. This was due to the consideration that the intended use of the PV panels would be on the Mars rover and the IV characteristics of PV panels may vary in different environments. Therefore, the Energy module has incorporated a feedback system that maximises the value of the voltage output by using the fluctuating temperature and irradiance to determine the optimal operating point. The MPPT algorithm was implemented within the constant current component. If the measured current was smaller than $200$ mA, the algorithm will perform do MPPT. Otherwise, it perform constant current.
 
-By using Perturb and Observe method, the maximum power point was found by comparing the present and previous power value, and varying the PWM accordingly. By varying the PWM, the resistance of the load changes, and the value of current and voltage change as well. By using the buck mode, if the present power was larger than the previous power, the PWM would be decreased by $0.005$. If the present power was smaller than the previous power, the PWM would be increased by $0.005$. A change of $0.005$ was selected because teh value was a reasonably large enough range where the settling process of the values could be observed.
+By using Perturb and Observe method, the maximum power point was found by comparing the present and previous power value, and varying the PWM accordingly. By varying the PWM, the resistance of the load changes, and the value of current and voltage change as well. By using the buck mode, if the present power was larger than the previous power, the PWM would be decreased by $0.005$. If the present power was smaller than the previous power, the PWM would be increased by $0.005$. A change of $0.005$ was selected because the value was a reasonably large enough range where the settling process of the values could be observed.
 
 \pagebreak
 \subsubsection{Circuit Design}
@@ -614,16 +737,22 @@ The Energy module passes the SOC value to the Control module which can be used t
 \end{gather*}
 where "Total cell capacity" is defined as $565.07 + 543.68 + 554.51 = 1663.26$ mAh
 
-The Energy module decided to place the PV panels directly on the rover since the rover's range will be limited if it has return to a static charging station when the battery is low. If the PV panels are placed on the rover, the rover would be able to stop and charge anytime the battery is low. 
+A design problem in the Energy module was the location of the charging system. A static charging station could significantly reduce the weight of the Mars rover which would mean hgiher efficiency and simpler designs that leads to less possible points of failure. A charging station could include functionalities like additional sensors to monitor the health of the rover and replace failed parts like battery cells. 
 
-The Energy module did consider a static charging station which could significantly reduce the weight of the Mars rover. A reduced rover weight would mean more efficiency and less possible failure points. The charging station could include with other functionalities like additional sensors checking if everything on the rover functions normally and replacing failed parts like the battery cells. Ultimately, the advantage of not being constrained to an area due to the static charging station was more important than the advantages offered by the static charging station.
+Placing the PV panels on the rover would mean the rover's range is not constrained compared to if it has return to a charging station. The disadvantage, compared to the static charging station, would be the limited lifecycle of the battery cells and increase complexity of the rover. The Energy module chose to mount the PV panels since quality cell are sufficient and the advantages of not being constrained would be more important than the advantages offered by the static charging station.
 
 
 
 \pagebreak
 \section{Integration}
 
+\subsection{Testing}
+
+\subsection{Vision}
+
 \subsection{Energy}
+
+
 
 
 
